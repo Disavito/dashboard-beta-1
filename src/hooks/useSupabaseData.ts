@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
@@ -31,8 +31,7 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
     page,
     pageSize,
     searchQuery,
-    searchColumns,
-    disableRealtime = false
+    searchColumns
   } = options;
   
   const queryClient = useQueryClient();
@@ -143,69 +142,7 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
     placeholderData: keepPreviousData,
   });
 
-  const filtersRef = useRef(filters);
-  useEffect(() => {
-    filtersRef.current = filters;
-  }, [filters]);
 
-  // Realtime subscription mapping cache updates
-  useEffect(() => {
-    if (!enabled || disableRealtime) return;
-
-    // Use a unique channel name per hook instance to prevent conflicts
-    const channelName = `realtime-${tableName}-${Math.random().toString(36).substring(7)}`;
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: tableName },
-        (payload) => {
-          queryClient.setQueriesData({ queryKey: ['supabaseData', tableName] }, (oldData: any) => {
-            if (!oldData) return oldData;
-            
-            let newData = [...(oldData.data || [])];
-            
-            const matchesFilters = (item: any) => {
-              const currentFilters = filtersRef.current;
-              if (!currentFilters || Object.keys(currentFilters).length === 0) return true;
-              return Object.entries(currentFilters).every(([key, value]) => {
-                // Solo filtraremos si el campo existe en el objeto nuevo
-                if (item[key] === undefined) return true; 
-                return item[key] === value;
-              });
-            };
-
-            if (payload.eventType === 'DELETE' && payload.old) {
-              newData = newData.filter((item: any) => item.id !== payload.old.id);
-            } else if (payload.eventType === 'INSERT' && payload.new) {
-              if (matchesFilters(payload.new)) {
-                newData = [payload.new, ...newData];
-              }
-            } else if (payload.eventType === 'UPDATE' && payload.new) {
-              if (matchesFilters(payload.new)) {
-                // Actualizar o añadir si de pronto ahora sí cumple el filtro
-                const exists = newData.some((item: any) => item.id === payload.new.id);
-                if (exists) {
-                  newData = newData.map((item: any) => item.id === payload.new.id ? { ...item, ...payload.new } : item);
-                } else {
-                  newData = [payload.new, ...newData];
-                }
-              } else {
-                // Si ya no cumple el filtro tras la actualización, se elimina de la vista
-                newData = newData.filter((item: any) => item.id !== payload.new.id);
-              }
-            }
-
-            return { ...oldData, data: newData };
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [enabled, disableRealtime, tableName, queryClient]);
 
   const addRecord = useCallback(async (record: Partial<T>) => {
     const { data: newRecord, error: insertError } = await supabase

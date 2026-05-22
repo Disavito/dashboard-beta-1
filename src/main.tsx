@@ -6,6 +6,7 @@ import App from './App.tsx';
 import './index.css';
 import { ThemeProvider } from './components/ui-custom/theme-provider.tsx';
 import { UserProvider } from './context/UserContext.tsx';
+import { GlobalRealtimeProvider } from './context/GlobalRealtimeProvider.tsx';
 import { Toaster } from './components/ui/toaster.tsx';
 
 // Configuración optimizada del cliente de React Query
@@ -27,8 +28,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <UserProvider>
-            <App />
-            <Toaster />
+            <GlobalRealtimeProvider>
+              <App />
+              <Toaster />
+            </GlobalRealtimeProvider>
           </UserProvider>
         </ThemeProvider>
       </QueryClientProvider>
