@@ -51,11 +51,29 @@ app.post('/api/send-push', async (req, res) => {
   }
 
   try {
-    const { data: subs, error } = await supabase.from('push_subscriptions').select('*').eq('user_id', user_id);
-    if (error) throw error;
-    if (!subs || subs.length === 0) return res.status(200).json({ success: true, count: 0 });
+    let targetUserIds = [user_id];
+    
+    // Si el user_id es el maestro de admins, buscar todos los administradores e ingenieros
+    if (user_id === '00000000-0000-0000-0000-000000000000') {
+      // Necesitamos buscar los usuarios que tengan el rol 'admin' o 'engineer'
+      // Asumiendo que existe una vista o podemos consultar user_roles.
+      const { data: admins } = await supabase
+        .from('user_roles')
+        .select('user_id, roles(role_name)')
+        .not('roles', 'is', null);
+      
+      if (admins) {
+        targetUserIds = admins
+          .filter(a => ['admin', 'engineer'].includes(a.roles?.role_name))
+          .map(a => a.user_id);
+      }
+    }
 
-    const payload = JSON.stringify({ title, body: message, url: link || '/', icon: '/vite.svg' });
+    const { data: subs, error } = await supabase.from('push_subscriptions').select('*').in('user_id', targetUserIds);
+    if (error) throw error;
+    if (!subs || subs.length === 0) return res.status(200).json({ success: true, count: 0, msg: 'No active subscriptions for target users' });
+
+    const payload = JSON.stringify({ title, body: message, url: link || '/', icon: '/icon-192.png' });
     
     const promises = subs.map(async (sub) => {
       try {
