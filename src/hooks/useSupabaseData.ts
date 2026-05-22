@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, keepPreviousData, useMutation } from '@tanstack/react-query';
 import { useUser } from '@/context/UserContext';
 
 interface UseSupabaseDataOptions {
@@ -33,8 +33,6 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
     searchQuery,
     searchColumns
   } = options;
-  
-  const queryClient = useQueryClient();
   const { user, roles } = useUser();
 
   const [filters, setFilters] = useState<Record<string, any>>(initialFilters);
@@ -159,44 +157,78 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
   });
 
 
+  // -------------------------------------------------------------
+  // Mutaciones (Offline-First via React Query)
+  // -------------------------------------------------------------
+
+  const updateMutation = useMutation<any, Error, { tableName: string; id: string | number; record: Partial<T> }>({
+    mutationKey: ['updateRecord'],
+    onMutate: () => {
+      if (!navigator.onLine) {
+        toast.info('Sin conexión: Cambio guardado localmente.', { description: 'Se sincronizará al recuperar la señal.' });
+      }
+    },
+    onSuccess: () => {
+      if (navigator.onLine) {
+        toast.success(`${tableName} actualizado correctamente.`);
+      }
+    },
+    onError: (err: any) => {
+      toast.error(`Error al actualizar ${tableName}`, { description: err.message });
+    }
+  });
+
+  const addMutation = useMutation<any, Error, { tableName: string; record: Partial<T> }>({
+    mutationKey: ['addRecord'],
+    onMutate: () => {
+      if (!navigator.onLine) {
+        toast.info('Sin conexión: Creación guardada localmente.', { description: 'Se sincronizará al recuperar la señal.' });
+      }
+    },
+    onSuccess: () => {
+      if (navigator.onLine) toast.success(`${tableName} añadido correctamente.`);
+    },
+    onError: (err: any) => {
+      toast.error(`Error al añadir ${tableName}`, { description: err.message });
+    }
+  });
+
+  const deleteMutation = useMutation<any, Error, { tableName: string; id: string | number; isSoftDelete: boolean }>({
+    mutationKey: ['deleteRecord'],
+    onMutate: () => {
+      if (!navigator.onLine) {
+        toast.info('Sin conexión: Eliminación encolada.', { description: 'Se sincronizará al recuperar la señal.' });
+      }
+    },
+    onSuccess: () => {
+      if (navigator.onLine) toast.success(`${tableName} eliminado correctamente.`);
+    },
+    onError: (err: any) => {
+      toast.error(`Error al eliminar ${tableName}`, { description: err.message });
+    }
+  });
 
   const addRecord = useCallback(async (record: Partial<T>) => {
-    const { data: newRecord, error: insertError } = await supabase
-      .from(tableName)
-      .insert(record as any)
-      .select()
-      .single();
-
-    if (insertError) {
-      toast.error(`Error al añadir ${tableName}`, { description: insertError.message });
+    try {
+      const res = await addMutation.mutateAsync({ tableName, record });
+      return res as T;
+    } catch (e) {
       return null;
-    } else {
-      queryClient.invalidateQueries({ queryKey: ['supabaseData', tableName] });
-      toast.success(`${tableName} añadido correctamente.`);
-      return newRecord as T;
     }
-  }, [tableName, queryClient]);
+  }, [tableName, addMutation]);
 
   const updateRecord = useCallback(async (id: string | number, record: Partial<T>) => {
-    const { data: updatedRecord, error: updateError } = await supabase
-      .from(tableName)
-      .update(record as any)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (updateError) {
-      toast.error(`Error al actualizar ${tableName}`, { description: updateError.message });
+    try {
+      // Optimizamos localmente si es posible invalidando caché, pero main.tsx ya lo hace en onSuccess global.
+      const res = await updateMutation.mutateAsync({ tableName, id, record });
+      return res as T;
+    } catch (e) {
       return null;
-    } else {
-      queryClient.invalidateQueries({ queryKey: ['supabaseData', tableName] });
-      toast.success(`${tableName} actualizado correctamente.`);
-      return updatedRecord as T;
     }
-  }, [tableName, queryClient]);
+  }, [tableName, updateMutation]);
 
   const deleteRecord = useCallback(async (id: string | number, extraPayload?: any) => {
-    // Si es un rol restringido ('ingeniero' o 'finanzas') y está intentando borrar un ingreso o gasto, generamos una solicitud de aprobación
+    // Verificación de aprobación para admins
     const isRestrictedRole = roles?.includes('ingeniero') || roles?.includes('finanzas');
     const isProtectedTable = ['ingresos', 'gastos'].includes(tableName);
     
@@ -226,27 +258,16 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
       }
     }
 
-    // If table has soft delete, use update instead of delete
     const tablesWithSoftDeletes = ['ingresos', 'gastos', 'inventory_items', 'socio_documentos'];
+    const isSoftDelete = tablesWithSoftDeletes.includes(tableName);
     
-    let dbError;
-    if (tablesWithSoftDeletes.includes(tableName)) {
-      const { error } = await supabase.from(tableName).update({ deleted_at: new Date().toISOString() }).eq('id', id);
-      dbError = error;
-    } else {
-      const { error } = await supabase.from(tableName).delete().eq('id', id);
-      dbError = error;
-    }
-
-    if (dbError) {
-      toast.error(`Error al eliminar ${tableName}`, { description: dbError.message });
-      return false;
-    } else {
-      queryClient.invalidateQueries({ queryKey: ['supabaseData', tableName] });
-      toast.success(`${tableName} eliminado correctamente.`);
+    try {
+      await deleteMutation.mutateAsync({ tableName, id, isSoftDelete });
       return true;
+    } catch (e) {
+      return false;
     }
-  }, [tableName, queryClient, roles, user]);
+  }, [tableName, deleteMutation, roles, user]);
 
   return {
     data: queryData?.data || [],

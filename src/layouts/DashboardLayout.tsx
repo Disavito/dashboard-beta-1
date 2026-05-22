@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 import { useUser } from '@/context/UserContext';
 import { supabase } from '@/lib/supabaseClient';
 import NotificationBell from '@/components/ui/NotificationBell';
+import SyncStatusIndicator from '@/components/ui-custom/SyncStatusIndicator';
 import { useGlobalRealtime } from '@/hooks/useGlobalRealtime';
 
 function DashboardLayout() {
@@ -233,6 +234,7 @@ function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-4">
+            <SyncStatusIndicator />
             <NotificationBell />
             <div className="h-5 w-[1px] bg-slate-200/60" />
             <div className="flex items-center gap-3">
