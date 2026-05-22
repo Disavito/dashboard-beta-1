@@ -66,21 +66,43 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
+              // 1. Herramientas de Excel (Muy pesadas, solo se cargan al exportar)
+              if (id.includes('xlsx')) {
+                return 'excel-utils';
+              }
+              // 2. Utilidades PDF
               if (id.includes('jspdf') || id.includes('html2canvas')) {
                 return 'pdf-utils';
               }
+              // 3. Gráficos
               if (id.includes('recharts')) {
                 return 'charts';
               }
+              // 4. Core de React y Rutas (Esencial para pintar la pantalla inicial)
+              if (id.includes('react/') || id.includes('react-dom/') || id.includes('react-router')) {
+                return 'react-core';
+              }
+              // 5. Componentes UI Base y Animaciones
+              if (id.includes('@radix-ui') || id.includes('framer-motion') || id.includes('clsx') || id.includes('tailwind-merge')) {
+                return 'ui-core';
+              }
+              // 6. Iconos
               if (id.includes('lucide-react')) {
                 return 'icons';
               }
-              if (id.includes('@supabase') || id.includes('axios')) {
+              // 7. Servicios y Consultas de Datos
+              if (id.includes('@supabase') || id.includes('axios') || id.includes('@tanstack/react-query')) {
                 return 'services';
               }
+              // 8. Tablas y Fechas
               if (id.includes('ag-grid')) {
                 return 'ag-grid';
               }
+              if (id.includes('date-fns')) {
+                return 'date-utils';
+              }
+              
+              // Todo lo demás va a vendor
               return 'vendor';
             }
           },
