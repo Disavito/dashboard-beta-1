@@ -212,13 +212,20 @@ app.post('/api/reniec', async (req, res) => {
 
 import fs from 'fs';
 
+// Cache for index.html content
+let cachedIndexHtml = null;
+
 // Serve the static React files from 'dist' directory, but ignore index.html so we can inject env vars
 app.use(express.static(path.join(__dirname, 'dist'), { index: false }));
 
 // SPA fallback: any other route should serve index.html with runtime environment variables
-app.use((req, res) => {
+app.use(async (req, res) => {
   try {
-    let html = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf8');
+    if (!cachedIndexHtml) {
+      cachedIndexHtml = await fs.promises.readFile(path.join(__dirname, 'dist', 'index.html'), 'utf8');
+    }
+    
+    let html = cachedIndexHtml;
     const envScript = `<script>
       window.APP_ENV = {
         VITE_SUPABASE_URL: "${process.env.VITE_SUPABASE_URL || ''}",
@@ -229,6 +236,7 @@ app.use((req, res) => {
     html = html.replace('</head>', `${envScript}</head>`);
     res.send(html);
   } catch (err) {
+    console.error('Error loading index.html:', err);
     res.status(500).send('Error loading index.html');
   }
 });

@@ -48,9 +48,11 @@ const AdminJornadaView: React.FC = () => {
     queryFn: getAllColaboradores,
   });
 
-  const { data: jornadas } = useQuery({
+  const { data: jornadas, isFetching } = useQuery({
     queryKey: ['adminJornadas', startDate, endDate, selectedColaboradorId],
     queryFn: () => getAdminJornadas({ startDate, endDate, colaboradorId: selectedColaboradorId }),
+    staleTime: 1000 * 30, // 30 seconds stale time to ensure frequent updates
+    refetchOnMount: 'always', // Always fetch fresh data when entering the tab
   });
 
   const totalMinutes = useMemo(() => {

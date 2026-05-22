@@ -543,9 +543,17 @@ function People() {
         onConfirm={async () => {
           if (!socioToDelete) return;
           setIsDeleting(true);
-          const { error } = await supabase.from('socio_titulares').delete().eq('id', socioToDelete.id);
-          if (!error) { toast.success('Socio eliminado correctamente'); setIsDeleteDialogOpen(false); }
-          setIsDeleting(false);
+          try {
+            const { error } = await supabase.from('socio_titulares').delete().eq('id', socioToDelete.id);
+            if (error) throw error;
+            toast.success('Socio eliminado correctamente'); 
+            setIsDeleteDialogOpen(false);
+            refreshData(true);
+          } catch (e: any) {
+            toast.error('Error al eliminar: ' + e.message);
+          } finally {
+            setIsDeleting(false);
+          }
         }} 
         title="Eliminar Socio" 
         description="¿Estás seguro de eliminar este registro? Esta acción es irreversible."

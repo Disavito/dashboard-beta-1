@@ -618,7 +618,6 @@ function SocioTitularRegistrationForm({ socioId, onClose, onSuccess }: SocioTitu
                         errors.dni && "border-error ring-1 ring-error/20"
                       )}
                       placeholder="Ej: 12345678"
-                      readOnly={isDniSearching || isReniecSearching}
                       onBlur={() => searchSocioByDni(watchedDni)}
                     />
                     {(isDniSearching || isReniecSearching) && (
@@ -705,36 +704,30 @@ function SocioTitularRegistrationForm({ socioId, onClose, onSuccess }: SocioTitu
                         </PopoverTrigger>
                         <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-card border-border rounded-xl shadow-lg">
                           <Command>
-                            <CommandInput
-                              placeholder="Buscar localidad..."
-                              value={field.value}
-                              onValueChange={(search) => field.onChange(search)}
-                            />
+                            <CommandInput placeholder="Buscar localidad..." />
                             <CommandList>
                               <CommandEmpty>No se encontró localidad.</CommandEmpty>
                               <CommandGroup>
-                                {localitiesSuggestions
-                                  .filter(loc => loc.toLowerCase().includes((watchedLocalidad || '').toLowerCase()))
-                                  .map((loc) => (
-                                    <CommandItem
-                                      value={loc}
-                                      key={loc}
-                                      onSelect={(currentValue) => {
-                                        field.onChange(currentValue);
-                                        setOpenLocalitiesPopover(false);
-                                        // Auto-rellenar región, provincia y distrito de vivienda
-                                        const addressData = localityAddressMap[currentValue];
-                                        if (addressData) {
-                                          if (addressData.regionVivienda) setValue('regionVivienda', addressData.regionVivienda);
-                                          if (addressData.provinciaVivienda) setValue('provinciaVivienda', addressData.provinciaVivienda);
-                                          if (addressData.distritoVivienda) setValue('distritoVivienda', addressData.distritoVivienda);
-                                        }
-                                      }}
-                                    >
-                                      <Check className={cn("mr-2 h-4 w-4", field.value === loc ? "opacity-100" : "opacity-0")} />
-                                      {loc}
-                                    </CommandItem>
-                                  ))}
+                                {localitiesSuggestions.map((loc) => (
+                                  <CommandItem
+                                    value={loc}
+                                    key={loc}
+                                    onSelect={(currentValue) => {
+                                      field.onChange(currentValue);
+                                      setOpenLocalitiesPopover(false);
+                                      // Auto-rellenar región, provincia y distrito de vivienda
+                                      const addressData = localityAddressMap[currentValue];
+                                      if (addressData) {
+                                        if (addressData.regionVivienda) setValue('regionVivienda', addressData.regionVivienda);
+                                        if (addressData.provinciaVivienda) setValue('provinciaVivienda', addressData.provinciaVivienda);
+                                        if (addressData.distritoVivienda) setValue('distritoVivienda', addressData.distritoVivienda);
+                                      }
+                                    }}
+                                  >
+                                    <Check className={cn("mr-2 h-4 w-4", field.value === loc ? "opacity-100" : "opacity-0")} />
+                                    {loc}
+                                  </CommandItem>
+                                ))}
                               </CommandGroup>
                             </CommandList>
                           </Command>

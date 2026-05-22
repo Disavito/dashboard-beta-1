@@ -254,9 +254,17 @@ const ClockManager: React.FC<ClockManagerProps> = ({
 
           <div className="mt-6">
             {hasStarted ? (
-              <Badge className="bg-emerald-400 text-emerald-950 border-none px-4 py-1 rounded-full flex items-center gap-2 w-fit font-bold">
-                <span className="w-2 h-2 bg-emerald-900 rounded-full animate-pulse" /> EN ACTIVIDAD
-              </Badge>
+              <div className="space-y-2">
+                <Badge className="bg-emerald-400 text-emerald-950 border-none px-4 py-1 rounded-full flex items-center gap-2 w-fit font-bold">
+                  <span className="w-2 h-2 bg-emerald-900 rounded-full animate-pulse" /> EN ACTIVIDAD
+                </Badge>
+                {jornada?.fecha !== format(targetDate, 'yyyy-MM-dd') && (
+                  <div className="bg-red-500/20 border border-red-400/50 text-white text-xs px-3 py-2 rounded-lg mt-2 flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-200" />
+                    <p>Tienes un turno pendiente por finalizar de un <b>día anterior ({jornada?.fecha})</b>. Por favor, finaliza esa jornada antes de continuar.</p>
+                  </div>
+                )}
+              </div>
             ) : completedJornadasToday.length > 0 ? (
               <Badge className="bg-white/20 text-white border-none px-4 py-1 rounded-full flex items-center gap-2 w-fit font-bold">
                 <span className="w-2 h-2 bg-white rounded-full" /> {completedJornadasToday.length} TURNO(S) COMPLETADO(S) HOY
