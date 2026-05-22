@@ -93,10 +93,10 @@ export default function Expenses() {
     roles?.includes('admin') || roles?.includes('finanzas_senior') || !!customPermissions?.can_manage_finances || !!customPermissions?.can_view_expenses, 
   [roles, customPermissions]);
   
-  const checkRole = (roleName: string) => roles?.some(r => r.toLowerCase() === roleName.toLowerCase());
+  const checkRole = (roleName: string) => roles?.some(r => r.toLowerCase().includes(roleName.toLowerCase()));
 
   const isEngineerAndNotAdmin = useMemo(() => 
-    !!((checkRole('ingeniero') || checkRole('engineer') || checkRole('engeneer')) && !checkRole('admin') && !checkRole('finanzas_senior')),
+    !!((checkRole('ingenier') || checkRole('engin') || checkRole('engen')) && !checkRole('admin') && !checkRole('finanzas_senior')),
     [roles]
   );
 
@@ -267,7 +267,7 @@ export default function Expenses() {
         await updateRecord(editingExpense.id, payload);
         toast.success('Gasto actualizado');
       } else {
-        const isRestrictedRole = (checkRole('finanzas') || checkRole('ingeniero') || checkRole('engineer') || checkRole('engeneer')) && !checkRole('finanzas_senior') && !checkRole('admin');
+        const isRestrictedRole = (checkRole('finanzas') || checkRole('ingenier') || checkRole('engin') || checkRole('engen')) && !checkRole('finanzas_senior') && !checkRole('admin');
         const isHighExpense = Math.abs(payload.amount) >= 1000;
         const isSalary = payload.sub_category?.toLowerCase() === 'sueldo';
 

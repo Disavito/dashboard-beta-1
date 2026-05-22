@@ -72,7 +72,10 @@ const Sidebar: React.FC = () => {
     return allNavLinks.filter(link => {
       // Si es una ruta financiera, solo mostrar si es Admin o Finanzas
       if (link.isFinancial) {
-        if (link.path === '/expenses' && roles.some(r => r.toLowerCase() === 'ingeniero' || r.toLowerCase() === 'engineer' || r.toLowerCase() === 'engeneer')) {
+        if (link.path === '/expenses' && roles.some(r => {
+          const lower = r.toLowerCase();
+          return lower.includes('ingenier') || lower.includes('engin') || lower.includes('engen');
+        })) {
           return true;
         }
         return isAdminOrFinanzas;

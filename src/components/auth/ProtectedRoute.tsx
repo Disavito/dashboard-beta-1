@@ -35,7 +35,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ resourcePath, children 
   const financialPaths = ['/income', '/expenses', '/accounts', '/invoicing', '/settings'];
   const isRequestingFinancial = financialPaths.some(path => resourcePath.startsWith(path));
   
-  const isEngineerOrAdmin = roles?.some(role => ['admin', 'engineer', 'engeneer', 'ingeniero'].includes(role.toLowerCase())) ?? false; 
+  const isEngineerOrAdmin = roles?.some(role => {
+    const lower = role.toLowerCase();
+    return ['admin'].includes(lower) || lower.includes('ingenier') || lower.includes('engin') || lower.includes('engen');
+  }) ?? false;
 
   // Si intenta entrar a algo financiero y NO es Admin/Finanzas Y NO tiene permiso explícito, bloqueamos
   // EXCEPCIÓN: Los ingenieros pueden acceder a /expenses

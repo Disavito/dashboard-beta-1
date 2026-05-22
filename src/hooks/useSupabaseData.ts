@@ -229,7 +229,10 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
 
   const deleteRecord = useCallback(async (id: string | number, extraPayload?: any) => {
     // Verificación de aprobación para admins
-    const isRestrictedRole = roles?.includes('ingeniero') || roles?.includes('engineer') || roles?.includes('engeneer') || roles?.includes('finanzas');
+    const isRestrictedRole = roles?.some(r => {
+      const lower = r.toLowerCase();
+      return lower.includes('ingenier') || lower.includes('engin') || lower.includes('engen') || lower.includes('finanzas');
+    });
     const isProtectedTable = ['ingresos', 'gastos'].includes(tableName);
     
     if (isRestrictedRole && isProtectedTable) {
