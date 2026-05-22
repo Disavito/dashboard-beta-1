@@ -59,8 +59,12 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
 
       // Apply search if provided
       if (searchQuery && searchColumns && searchColumns.length > 0) {
-        const searchConditions = searchColumns.map(col => `${col}.ilike.%${searchQuery}%`).join(',');
-        query = query.or(searchConditions);
+        const words = searchQuery.trim().split(/\s+/);
+        words.forEach(word => {
+          if (!word) return;
+          const searchConditions = searchColumns.map(col => `${col}.ilike.%${word}%`).join(',');
+          query = query.or(searchConditions);
+        });
       }
 
       // Apply filters
