@@ -514,8 +514,8 @@ const Accounts: React.FC = () => {
               <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Historial Unificado</h3>
               <p className="text-slate-400 text-sm font-medium">Todos los movimientos de tesorería</p>
             </div>
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <div className="relative flex-1 md:w-64">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+              <div className="relative flex-1 w-full md:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input 
                   placeholder="Buscar por socio o recibo..." 
@@ -528,7 +528,7 @@ const Accounts: React.FC = () => {
                 onClick={handleGeneratePDF}
                 variant="outline" 
                 disabled={isGeneratingPDF} 
-                className="rounded-xl border-[#4892CC] text-[#4892CC] hover:bg-[#4892CC]/10 h-11 font-bold"
+                className="w-full sm:w-auto rounded-xl border-[#4892CC] text-[#4892CC] hover:bg-[#4892CC]/10 h-11 font-bold"
               >
                 {isGeneratingPDF ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
                 {isGeneratingPDF ? 'Generando PDF...' : 'Reporte PDF (Cierre)'}

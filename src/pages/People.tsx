@@ -347,7 +347,7 @@ function People() {
             />
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
             <LocalidadCombobox
               value={selectedLocalidad}
               onValueChange={setSelectedLocalidad}

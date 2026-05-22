@@ -660,18 +660,18 @@ function PartnerDocuments() {
             />
           </div>
           
-          <div className="flex gap-3 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <LocalidadCombobox
               value={selectedLocalidad}
               onValueChange={setSelectedLocalidad}
-              triggerClassName="h-14 w-full md:w-[240px]"
+              triggerClassName="h-14 w-full sm:w-[240px]"
               distritoFilter={selectedDistrito}
             />
 
             <DistritoCombobox
               value={selectedDistrito}
               onValueChange={setSelectedDistrito}
-              triggerClassName="h-14 w-full md:w-[240px]"
+              triggerClassName="h-14 w-full sm:w-[240px]"
             />
 
             {canManageEngineering && Object.keys(rowSelection).length > 0 && (
