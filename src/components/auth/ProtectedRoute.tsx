@@ -34,9 +34,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ resourcePath, children 
   // LÓGICA DE BLOQUEO POR RUTA FINANCIERA
   const financialPaths = ['/income', '/expenses', '/accounts', '/invoicing', '/settings'];
   const isRequestingFinancial = financialPaths.some(path => resourcePath.startsWith(path));
+  
+  const isEngineerOrAdmin = roles?.some(role => ['admin', 'engineer', 'engeneer', 'ingeniero'].includes(role.toLowerCase())) ?? false; 
 
   // Si intenta entrar a algo financiero y NO es Admin/Finanzas Y NO tiene permiso explícito, bloqueamos
-  if (isRequestingFinancial && !isAdminOrFinanzas && !isAuthorized) {
+  // EXCEPCIÓN: Los ingenieros pueden acceder a /expenses
+  const isEngineerAndRequestingExpenses = isEngineerOrAdmin && resourcePath === '/expenses';
+  if (isRequestingFinancial && !isAdminOrFinanzas && !isAuthorized && !isEngineerAndRequestingExpenses) {
     return (
       <div className="flex flex-col items-center justify-center h-screen text-center bg-background text-text p-6">
         <div className="w-20 h-20 bg-error/10 rounded-full flex items-center justify-center mb-6">
@@ -59,7 +63,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ resourcePath, children 
   // Rutas accesibles por rol sin requerir permiso explícito en la tabla de permisos
   const engineeringPaths = ['/jornada', '/inventory', '/partner-documents'];
   const isEngineeringPath = engineeringPaths.some(path => resourcePath.startsWith(path));
-  const isEngineerOrAdmin = roles?.some(role => ['admin', 'engineer'].includes(role.toLowerCase())) ?? false; 
 
   if (!isAuthorized && !isEngineeringPath && resourcePath !== '/' && resourcePath !== '/dashboard') {
     return (
