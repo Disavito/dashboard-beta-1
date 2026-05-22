@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 import { ColumnDef } from '@tanstack/react-table';
+import { useMutation } from '@tanstack/react-query';
 import { DataTable } from '@/components/ui-custom/DataTable';
 import { 
   FileWarning, 
@@ -86,6 +87,7 @@ interface LoteMedidoCellProps {
 const LoteMedidoCell = React.memo(({ socioId, initialValue, disabled, socio, requiredDocumentTypes }: LoteMedidoCellProps) => {
   const [checked, setChecked] = useState(initialValue);
   const mountedRef = useRef(true);
+  const updateMutation = useMutation<any, Error, { tableName: string; id: string | number; record: any }>({ mutationKey: ['updateRecord'] });
 
   // Sincronizar si el valor externo cambia (ej. después de un fetchAllData)
   useEffect(() => {
@@ -112,13 +114,12 @@ const LoteMedidoCell = React.memo(({ socioId, initialValue, disabled, socio, req
     setChecked(v);
 
     try {
-      const { error } = await supabase.from('socio_titulares').update({ is_lote_medido: v }).eq('id', socioId);
-      if (error) throw error;
-      toast.success('Estado actualizado');
+      await updateMutation.mutateAsync({ tableName: 'socio_titulares', id: socioId, record: { is_lote_medido: v } });
+      // El éxito global de react-query ya muestra el toast
     } catch {
       // Revertir solo esta celda si falla
       if (mountedRef.current) setChecked(!v);
-      toast.error('Error al actualizar');
+      // El error global de react-query ya muestra el toast
     }
   };
 
@@ -217,6 +218,8 @@ function PartnerDocuments() {
   const [rowSelection, setRowSelection] = useState<Record<number, boolean>>({});
   const [activeTab, setActiveTab] = useState('documents');
   const isDesktop = useMediaQuery('(min-width: 768px)');
+  
+  const updateMutation = useMutation<any, Error, { tableName: string; id: string | number; record: any }>({ mutationKey: ['updateRecord'] });
 
   // Refs imperativas — abrir/cerrar modales SIN re-renderizar este componente
   const uploadModalRef = useRef<{ open: (config: any) => void }>(null);
@@ -756,12 +759,16 @@ function PartnerDocuments() {
                           const s = socio as SocioConDocumentos;
                           const hasReqDocs = s.socio_documentos.some(d => requiredDocumentTypes.includes(d.tipo_documento as any));
                           if (!newValue && hasReqDocs) { toast.warning('Acción bloqueada', { description: 'No se puede desmarcar un lote con planos subidos.' }); return; }
+                          
+                          // Optimistic update
+                          setSociosConDocumentos(prev => prev.map(ss => ss.id === socioId ? { ...ss, is_lote_medido: newValue } : ss));
+                          
                           try {
-                            const { error } = await supabase.from('socio_titulares').update({ is_lote_medido: newValue }).eq('id', socioId);
-                            if (error) throw error;
-                            setSociosConDocumentos(prev => prev.map(ss => ss.id === socioId ? { ...ss, is_lote_medido: newValue } : ss));
-                            toast.success('Estado actualizado');
-                          } catch { toast.error('Error al actualizar'); }
+                            await updateMutation.mutateAsync({ tableName: 'socio_titulares', id: socioId, record: { is_lote_medido: newValue } });
+                          } catch { 
+                            // Revert on error
+                            setSociosConDocumentos(prev => prev.map(ss => ss.id === socioId ? { ...ss, is_lote_medido: !newValue } : ss));
+                          }
                         }}
                       />
                     </div>

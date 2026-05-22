@@ -97,7 +97,12 @@ export default function Expenses() {
     searchColumns: ['description', 'category', 'sub_category', 'numero_gasto']
   });
   
-  const { data: accountsData } = useSupabaseData<Cuenta>({ tableName: 'cuentas' });
+  const { data: accountsRaw } = useSupabaseData<Cuenta>({ tableName: 'cuentas' });
+  const accountsData = accountsRaw.length > 0 ? accountsRaw : [
+    { id: 'offline-1', name: 'Efectivo' } as Cuenta,
+    { id: 'offline-2', name: 'BBVA Empresa' } as Cuenta,
+    { id: 'offline-3', name: 'Cuenta Fidel' } as Cuenta
+  ];
 
   const { roles, customPermissions, user } = useUser();
   const canManageFinances = useMemo(() => 
