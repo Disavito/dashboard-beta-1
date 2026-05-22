@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
@@ -143,6 +143,11 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
     placeholderData: keepPreviousData,
   });
 
+  const filtersRef = useRef(filters);
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
+
   // Realtime subscription mapping cache updates
   useEffect(() => {
     if (!enabled || disableRealtime) return;
@@ -161,8 +166,9 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
             let newData = [...(oldData.data || [])];
             
             const matchesFilters = (item: any) => {
-              if (!filters || Object.keys(filters).length === 0) return true;
-              return Object.entries(filters).every(([key, value]) => {
+              const currentFilters = filtersRef.current;
+              if (!currentFilters || Object.keys(currentFilters).length === 0) return true;
+              return Object.entries(currentFilters).every(([key, value]) => {
                 // Solo filtraremos si el campo existe en el objeto nuevo
                 if (item[key] === undefined) return true; 
                 return item[key] === value;
