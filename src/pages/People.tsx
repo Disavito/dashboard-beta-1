@@ -80,13 +80,42 @@ function People() {
 
   const { loading: userLoading } = useUser();
 
-  const { data: socios, loading, setFilters, refreshData } = useSupabaseData<EnrichedSocio>({
+  const { data: rawSocios, loading, setFilters, refreshData } = useSupabaseData<EnrichedSocio>({
     tableName: 'vw_socio_titulares_estado',
     initialSort: { column: 'apellidoPaterno', ascending: true },
     fetchAll: true,
-    searchQuery: debouncedSearch,
-    searchColumns: ['nombres', 'apellidoPaterno', 'apellidoMaterno', 'dni', 'receiptNumber']
   });
+
+  const socios = useMemo(() => {
+    if (!debouncedSearch) return rawSocios;
+    
+    // Función para normalizar quitando acentos y pasando a minúsculas
+    const normalizeString = (str: string | null | undefined) => {
+      if (!str) return '';
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    };
+
+    const searchNormalized = normalizeString(debouncedSearch);
+    const words = searchNormalized.trim().split(/\s+/);
+
+    return rawSocios.filter(socio => {
+      const nNombres = normalizeString(socio.nombres);
+      const nPat = normalizeString(socio.apellidoPaterno);
+      const nMat = normalizeString(socio.apellidoMaterno);
+      const nDni = normalizeString(socio.dni);
+      const nReceipt = normalizeString(socio.receiptNumber);
+
+      return words.every(word => {
+        return (
+          nNombres.includes(word) ||
+          nPat.includes(word) ||
+          nMat.includes(word) ||
+          nDni.includes(word) ||
+          nReceipt.includes(word)
+        );
+      });
+    });
+  }, [rawSocios, debouncedSearch]);
 
   // Apply column filters
   useEffect(() => {
