@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useMutation } from '@tanstack/react-query';
 import { Loader2, Save, X, AlertCircle, Search, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +33,7 @@ import { useDebounce } from 'use-debounce';
 const transactionSchema = z.object({
   date: z.string().min(1, 'La fecha es requerida'),
   receipt_number: z.string().min(1, 'El número de recibo es requerido'),
-  dni: z.string().min(8, 'DNI inválido').max(8, 'DNI inválido'),
+  dni: z.string().optional(),
   full_name: z.string().min(1, 'El nombre es requerido'),
   amount: z.number(),
   account: z.string().min(1, 'La cuenta es requerida'),
@@ -40,6 +41,14 @@ const transactionSchema = z.object({
   numeroOperacion: z.number().optional().nullable(),
   is_payment_observed: z.boolean().default(false),
   payment_observation_detail: z.string().optional().nullable(),
+}).superRefine((data, ctx) => {
+  if (data.transaction_type !== 'Gasto' && (!data.dni || data.dni.length !== 8)) {
+    ctx.addIssue({
+      path: ['dni'],
+      message: 'DNI inválido (requerido para ingresos)',
+      code: z.ZodIssueCode.custom,
+    });
+  }
 });
 
 type TransactionFormValues = z.infer<typeof transactionSchema>;
@@ -54,6 +63,10 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSearchingDni, setIsSearchingDni] = useState(false);
   const [dniNotFound, setDniNotFound] = useState(false);
+
+  // Instanciar mutaciones globales para soporte offline
+  const addMutation = useMutation<any, Error, { tableName: string; record: any }>({ mutationKey: ['addRecord'] });
+  const updateMutation = useMutation<any, Error, { tableName: string; id: string | number; record: any }>({ mutationKey: ['updateRecord'] });
 
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
@@ -151,30 +164,33 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
 
       let incomeError;
       if (initialData) {
-        const { error } = await supabase
-          .from('ingresos')
-          .update(dataToSave)
-          .eq('id', initialData.id);
-        incomeError = error;
+        try {
+          await updateMutation.mutateAsync({ tableName: 'ingresos', id: initialData.id, record: dataToSave });
+        } catch(e: any) { incomeError = e; }
       } else {
-        const { error } = await supabase
-          .from('ingresos')
-          .insert([dataToSave]);
-        incomeError = error;
+        try {
+          await addMutation.mutateAsync({ tableName: 'ingresos', record: dataToSave });
+        } catch(e: any) { incomeError = e; }
       }
 
       if (incomeError) throw incomeError;
 
-      // Actualizar socio
-      await supabase
-        .from('socio_titulares')
-        .update({
-          is_payment_observed,
-          payment_observation_detail: is_payment_observed ? payment_observation_detail : null
-        })
-        .eq('dni', values.dni);
+      // Actualizar socio (solo si hay DNI y estamos online, ya que la mutación por DNI no está encolada)
+      if (values.dni && values.dni.length === 8 && navigator.onLine) {
+        await supabase
+          .from('socio_titulares')
+          .update({
+            is_payment_observed,
+            payment_observation_detail: is_payment_observed ? payment_observation_detail : null
+          })
+          .eq('dni', values.dni);
+      }
 
-      toast.success('Registro procesado correctamente');
+      if (!navigator.onLine) {
+        toast.info('Sin conexión', { description: 'Registro guardado localmente. Se sincronizará luego.' });
+      } else {
+        toast.success('Registro procesado correctamente');
+      }
       onSuccess();
     } catch (error) {
       toast.error('Error al guardar: ' + (error instanceof Error ? error.message : 'Error desconocido'));
@@ -254,7 +270,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
                 <FormControl>
                   <div className="relative">
                     <Input 
-                      placeholder="8 dígitos" 
+                      placeholder={transactionType === 'Gasto' ? "Opcional para gastos" : "8 dígitos"}
                       {...field} 
                       maxLength={8} 
                       className="pl-10 h-12 bg-slate-50 border-none rounded-xl font-mono" 
@@ -279,10 +295,10 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
                 <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nombre Completo</FormLabel>
                 <FormControl>
                   <Input 
-                    placeholder="Nombre del socio" 
+                    placeholder={transactionType === 'Gasto' ? "Concepto / Nombre del gasto" : "Nombre del socio"} 
                     {...field} 
                     className="h-12 bg-slate-50 border-none rounded-xl font-bold uppercase" 
-                    readOnly={isSearchingDni || (dniValue.length === 8 && !dniNotFound)}
+                    readOnly={isSearchingDni || (Boolean(dniValue) && dniValue!.length === 8 && !dniNotFound)}
                   />
                 </FormControl>
                 <FormMessage />
