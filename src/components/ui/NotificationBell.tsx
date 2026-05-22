@@ -236,6 +236,39 @@ const NotificationBell: React.FC = () => {
                         </Button>
                     </div>
                 )}
+                
+                <div className="p-2 bg-[#141414] border-t border-white/5 text-center">
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-[10px] text-gray-500 hover:text-white underline"
+                        onClick={async () => {
+                            import('sonner').then(async ({ toast }) => {
+                                const { supabase } = await import('@/lib/supabaseClient');
+                                const { data: { session } } = await supabase.auth.getSession();
+                                if (!session) return toast.error("No session");
+                                try {
+                                    const res = await fetch('/api/send-push', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ user_id: session.user.id, title: 'Diagnóstico Push', message: '¡Si lees esto, el servidor funciona!' })
+                                    });
+                                    const data = await res.json();
+                                    if (data.success) {
+                                        toast.success(`Push enviado a ${data.count} dispositivo(s).`);
+                                        if (data.count === 0) toast.error("No tienes suscripciones activas (0 dispositivos).");
+                                    } else {
+                                        toast.error(`Error del servidor: ${data.error || JSON.stringify(data)}`);
+                                    }
+                                } catch (e: any) {
+                                    toast.error(`Fallo de red: ${e.message}`);
+                                }
+                            });
+                        }}
+                    >
+                        Diagnóstico Push (Probar conexión)
+                    </Button>
+                </div>
             </PopoverContent>
         </Popover>
     );

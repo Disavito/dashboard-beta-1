@@ -160,12 +160,34 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
             
             let newData = [...(oldData.data || [])];
             
+            const matchesFilters = (item: any) => {
+              if (!filters || Object.keys(filters).length === 0) return true;
+              return Object.entries(filters).every(([key, value]) => {
+                // Solo filtraremos si el campo existe en el objeto nuevo
+                if (item[key] === undefined) return true; 
+                return item[key] === value;
+              });
+            };
+
             if (payload.eventType === 'DELETE' && payload.old) {
               newData = newData.filter((item: any) => item.id !== payload.old.id);
             } else if (payload.eventType === 'INSERT' && payload.new) {
-              newData = [payload.new, ...newData];
+              if (matchesFilters(payload.new)) {
+                newData = [payload.new, ...newData];
+              }
             } else if (payload.eventType === 'UPDATE' && payload.new) {
-              newData = newData.map((item: any) => item.id === payload.new.id ? { ...item, ...payload.new } : item);
+              if (matchesFilters(payload.new)) {
+                // Actualizar o añadir si de pronto ahora sí cumple el filtro
+                const exists = newData.some((item: any) => item.id === payload.new.id);
+                if (exists) {
+                  newData = newData.map((item: any) => item.id === payload.new.id ? { ...item, ...payload.new } : item);
+                } else {
+                  newData = [payload.new, ...newData];
+                }
+              } else {
+                // Si ya no cumple el filtro tras la actualización, se elimina de la vista
+                newData = newData.filter((item: any) => item.id !== payload.new.id);
+              }
             }
 
             return { ...oldData, data: newData };
