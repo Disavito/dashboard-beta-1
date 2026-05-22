@@ -42,10 +42,12 @@ interface DocumentCardViewProps {
   onOpenUploadModal: (socio: SocioConDocumentos, documentType: string) => void;
   onDeleteDocument: (documentId: number, documentLink: string, documentType: string, socioName: string) => void;
   onUpdateLoteMedido: (socioId: string, newValue: boolean, socio: SocioConDocumentos) => void;
+  resetTrigger?: string;
 }
 
 const DocumentCardView: React.FC<DocumentCardViewProps> = ({
   data,
+  resetTrigger,
   requiredDocumentTypes,
   canManageLoteMedido,
   canDeleteDocuments,
@@ -57,10 +59,10 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
   const [visibleCount, setVisibleCount] = useState(10);
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // Reiniciar la cuenta cuando los datos cambien (por ejemplo, al buscar o filtrar)
+  // Reiniciar la cuenta SOLO cuando los filtros de búsqueda cambien, NO cuando se edita un lote
   useEffect(() => {
     setVisibleCount(10);
-  }, [data]);
+  }, [resetTrigger]);
 
   // Lógica de Scroll Infinito
   useEffect(() => {

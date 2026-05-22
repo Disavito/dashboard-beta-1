@@ -32,6 +32,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import SearchInputWithDebounce from '@/components/custom/SearchInputWithDebounce';
 import { getCachedData, setCachedData, invalidateCache } from '@/lib/dataCache';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 // Interfaces
 interface SocioDocumento {
@@ -59,6 +60,7 @@ interface SocioConDocumentos {
   is_lote_medido: boolean | null;
   socio_documentos: SocioDocumento[];
   paymentInfo: IngresoInfo;
+  searchableContent?: string;
 }
 
 type DocumentoRequerido = 'Planos de ubicación' | 'Memoria descriptiva';
@@ -214,6 +216,7 @@ function PartnerDocuments() {
   const [selectedDistrito, setSelectedDistrito] = useState('all');
   const [rowSelection, setRowSelection] = useState<Record<number, boolean>>({});
   const [activeTab, setActiveTab] = useState('documents');
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   // Refs imperativas — abrir/cerrar modales SIN re-renderizar este componente
   const uploadModalRef = useRef<{ open: (config: any) => void }>(null);
@@ -280,14 +283,27 @@ function PartnerDocuments() {
         const hasMemoria = filteredSocioDocuments.some(d => d.tipo_documento === 'Memoria descriptiva');
         const finalIsLoteMedido = hasPlanos || hasMemoria || (socio.is_lote_medido ?? false);
 
-        // Traducir status de vista ('Activo'/'Inactivo'/'Sin Registro') a 'Pagado'/'No Pagado'
         const isPaid = socio.status === 'Activo' || socio.status === 'Inactivo';
+
+        const normalize = (text: string) => 
+          text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+          
+        const searchableContent = normalize(`
+          ${socio.nombres} 
+          ${socio.apellidoPaterno} 
+          ${socio.apellidoMaterno} 
+          ${socio.dni} 
+          ${socio.mz || ''} 
+          ${socio.lote || ''} 
+          ${socio.receiptNumber || ''}
+        `);
 
         return {
           ...socio,
           nombreCompleto: `${socio.apellidoPaterno} ${socio.apellidoMaterno} ${socio.nombres}`,
           is_lote_medido: finalIsLoteMedido,
           socio_documentos: filteredSocioDocuments,
+          searchableContent,
           paymentInfo: { 
             status: isPaid ? 'Pagado' : 'No Pagado', 
             receipt_number: socio.receiptNumber || null 
@@ -360,17 +376,7 @@ function PartnerDocuments() {
       // Si no quedan más palabras que buscar, retornamos true (cumple Mz/Lote)
       if (tokens.length === 0) return true;
 
-      const searchableContent = normalize(`
-        ${socio.nombres} 
-        ${socio.apellidoPaterno} 
-        ${socio.apellidoMaterno} 
-        ${socio.dni} 
-        ${socio.mz || ''} 
-        ${socio.lote || ''} 
-        ${socio.paymentInfo.receipt_number || ''}
-      `);
-
-      return tokens.every(token => searchableContent.includes(token));
+      return tokens.every(token => socio.searchableContent?.includes(token));
     });
   }, [sociosConDocumentos, debouncedSearchQuery, selectedLocalidad, selectedDistrito]);
 
@@ -721,41 +727,45 @@ function PartnerDocuments() {
                 </div>
               ) : (
                 <>
-                  <div className="hidden md:block">
-                    <DataTable 
-                      columns={columns} 
-                      data={filteredData} 
-                      rowSelection={rowSelection}
-                      onRowSelectionChange={setRowSelection}
-                    />
-                  </div>
-                  <div className="md:hidden p-4">
-                    <DocumentCardView
-                      data={filteredData}
-                      requiredDocumentTypes={requiredDocumentTypes}
-                      canManageLoteMedido={canManageEngineering}
-                      canDeleteDocuments={canDeleteDocsOrAdmin}
-                      canDeleteBlueprints={canDeleteBlueprints}
-                      onOpenUploadModal={(socio, type) => uploadModalRef.current?.open({ 
-                        socioId: socio.id, 
-                        socioName: `${socio.nombres} ${socio.apellidoPaterno} ${socio.apellidoMaterno}`, 
-                        documentType: type as any 
-                      })}
-                      onDeleteDocument={(id, link, type, name) => deleteDialogRef.current?.open({ documentId: id, documentLink: link, documentType: type, socioName: name })}
-                      onUpdateLoteMedido={async (socioId, newValue, socio) => {
-                        if (!canManageEngineering) { toast.error('Acceso restringido'); return; }
-                        const s = socio as SocioConDocumentos;
-                        const hasReqDocs = s.socio_documentos.some(d => requiredDocumentTypes.includes(d.tipo_documento as any));
-                        if (!newValue && hasReqDocs) { toast.warning('Acción bloqueada', { description: 'No se puede desmarcar un lote con planos subidos.' }); return; }
-                        try {
-                          const { error } = await supabase.from('socio_titulares').update({ is_lote_medido: newValue }).eq('id', socioId);
-                          if (error) throw error;
-                          setSociosConDocumentos(prev => prev.map(ss => ss.id === socioId ? { ...ss, is_lote_medido: newValue } : ss));
-                          toast.success('Estado actualizado');
-                        } catch { toast.error('Error al actualizar'); }
-                      }}
-                    />
-                  </div>
+                  {isDesktop ? (
+                    <div className="hidden md:block">
+                      <DataTable 
+                        columns={columns} 
+                        data={filteredData} 
+                        rowSelection={rowSelection}
+                        onRowSelectionChange={setRowSelection}
+                      />
+                    </div>
+                  ) : (
+                    <div className="md:hidden p-4">
+                      <DocumentCardView
+                        data={filteredData}
+                        resetTrigger={debouncedSearchQuery + selectedLocalidad + selectedDistrito}
+                        requiredDocumentTypes={requiredDocumentTypes}
+                        canManageLoteMedido={canManageEngineering}
+                        canDeleteDocuments={canDeleteDocsOrAdmin}
+                        canDeleteBlueprints={canDeleteBlueprints}
+                        onOpenUploadModal={(socio, type) => uploadModalRef.current?.open({ 
+                          socioId: socio.id, 
+                          socioName: `${socio.nombres} ${socio.apellidoPaterno} ${socio.apellidoMaterno}`, 
+                          documentType: type as any 
+                        })}
+                        onDeleteDocument={(id, link, type, name) => deleteDialogRef.current?.open({ documentId: id, documentLink: link, documentType: type, socioName: name })}
+                        onUpdateLoteMedido={async (socioId, newValue, socio) => {
+                          if (!canManageEngineering) { toast.error('Acceso restringido'); return; }
+                          const s = socio as SocioConDocumentos;
+                          const hasReqDocs = s.socio_documentos.some(d => requiredDocumentTypes.includes(d.tipo_documento as any));
+                          if (!newValue && hasReqDocs) { toast.warning('Acción bloqueada', { description: 'No se puede desmarcar un lote con planos subidos.' }); return; }
+                          try {
+                            const { error } = await supabase.from('socio_titulares').update({ is_lote_medido: newValue }).eq('id', socioId);
+                            if (error) throw error;
+                            setSociosConDocumentos(prev => prev.map(ss => ss.id === socioId ? { ...ss, is_lote_medido: newValue } : ss));
+                            toast.success('Estado actualizado');
+                          } catch { toast.error('Error al actualizar'); }
+                        }}
+                      />
+                    </div>
+                  )}
                 </>
               )}
             </div>
