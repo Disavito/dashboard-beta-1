@@ -25,7 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { DateMaskInput } from '@/components/ui/date-mask-input';
 import { useUser } from '@/context/UserContext';
 import { useDebounce } from 'use-debounce';
-
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 const expenseFormSchema = z.object({
   amount: z.preprocess(
     (val) => (val === '' ? undefined : Number(val)),
@@ -115,6 +115,7 @@ export default function Expenses() {
   // Infinite scroll para móvil
   const [mobileVisibleCount, setMobileVisibleCount] = useState(10);
   const observerTarget = useRef<HTMLDivElement>(null);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseFormSchema),
@@ -405,19 +406,22 @@ export default function Expenses() {
             </div>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="hidden md:block">
-              <DataTable
-                columns={columns}
-                data={expenseData}
-                isLoading={loading}
-                manualPagination={true}
-                pageCount={Math.ceil(totalCount / pagination.pageSize)}
-                pagination={pagination}
-                onPaginationChange={setPagination}
-              />
-            </div>
+            {!isMobile && (
+              <div className="hidden md:block">
+                <DataTable
+                  columns={columns}
+                  data={expenseData}
+                  isLoading={loading}
+                  manualPagination={true}
+                  pageCount={Math.ceil(totalCount / pagination.pageSize)}
+                  pagination={pagination}
+                  onPaginationChange={setPagination}
+                />
+              </div>
+            )}
 
-            <div className="grid gap-4 md:hidden">
+            {isMobile && (
+              <div className="grid gap-4 md:hidden">
               {mobileData.length > 0 ? (
                 <>
                 {mobileData.map((expense) => (
@@ -500,9 +504,10 @@ export default function Expenses() {
                 <p className="text-slate-400 font-bold">No se encontraron gastos</p>
               </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+            )}
+          </CardContent>
+        </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[500px] bg-white rounded-2xl border border-gray-100 shadow-premium">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { MapPin, FileText, CheckSquare, Square, DollarSign, Upload, Trash2, Loader2 } from 'lucide-react';
+import { MapPin, FileText, CheckSquare, Square, Upload, Trash2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

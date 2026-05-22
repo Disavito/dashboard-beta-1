@@ -122,7 +122,8 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
         results.forEach(({ data, error }) => {
           if (error) throw error;
           if (data) {
-            allData = [...allData, ...(data as T[])];
+            // Evitar recrear todo el array (O(N^2)), usar push para añadir los elementos (O(N))
+            allData.push(...(data as T[]));
           }
         });
       }

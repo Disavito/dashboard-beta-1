@@ -25,6 +25,7 @@ import TransactionForm from '@/components/custom/TransactionForm';
 import ConfirmationDialog from '@/components/ui-custom/ConfirmationDialog';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
   Tooltip,
   TooltipContent,
@@ -71,6 +72,8 @@ function Income() {
 
   const [mobileVisibleCount, setMobileVisibleCount] = useState(10);
   const observerTarget = useRef<HTMLDivElement>(null);
+  
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const filteredData = incomeData;
 
@@ -285,21 +288,27 @@ function Income() {
               />
             </div>
 
-            <div className="hidden md:block rounded-xl border border-slate-100 overflow-hidden">
-              <DataTable
-                columns={incomeColumns}
-                data={filteredData}
-                isLoading={loading}
-                manualPagination={true}
-                pageCount={Math.ceil(totalCount / pagination.pageSize)}
-                pagination={pagination}
-                onPaginationChange={setPagination}
-              />
-            </div>
-            <div className="grid gap-4 md:hidden">
-              {mobileData.length > 0 ? (
-                <>
-                {mobileData.map((income) => {
+            {/* Vista Escritorio */}
+            {!isMobile && (
+              <div className="hidden md:block rounded-xl border border-slate-100 overflow-hidden">
+                <DataTable
+                  columns={incomeColumns}
+                  data={filteredData}
+                  isLoading={loading}
+                  manualPagination={true}
+                  pageCount={Math.ceil(totalCount / pagination.pageSize)}
+                  pagination={pagination}
+                  onPaginationChange={setPagination}
+                />
+              </div>
+            )}
+            
+            {/* Vista Móvil */}
+            {isMobile && (
+              <div className="grid gap-4 md:hidden">
+                {mobileData.length > 0 ? (
+                  <>
+                  {mobileData.map((income) => {
                   const incomeDate = parseISO(income.date);
                   const isObserved = income.socio_titulares?.is_payment_observed;
                   return (
@@ -409,6 +418,7 @@ function Income() {
                 </div>
               )}
             </div>
+            )}
           </CardContent>
         </Card>
       </div>

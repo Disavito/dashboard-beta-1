@@ -1,13 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   ColumnDef, 
-  useReactTable, 
-  getCoreRowModel, 
-  getSortedRowModel,
-  getFilteredRowModel,
-  SortingState,
-  VisibilityState
 } from '@tanstack/react-table';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { 
   PlusCircle, 
   Loader2, 
@@ -75,8 +70,7 @@ function People() {
   const [selectedEstado, setSelectedEstado] = useState<string>('all');
   const [selectedDistrito, setSelectedDistrito] = useState<string>('all');
   
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'receiptNumber', desc: false }]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const [mobileVisibleCount, setMobileVisibleCount] = useState(10);
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -288,21 +282,9 @@ function People() {
     }
   ], []);
 
-  const table = useReactTable({
-    data: socios,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
-    onColumnVisibilityChange: setColumnVisibility,
-    state: { sorting, columnVisibility },
-  });
-
   const mobileData = useMemo(() => {
-    return table.getSortedRowModel().rows.slice(0, mobileVisibleCount);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [table, mobileVisibleCount, socios, sorting]);
+    return socios.slice(0, mobileVisibleCount);
+  }, [mobileVisibleCount, socios]);
 
   if ((loading && socios.length === 0) || userLoading) return (
     <div className="min-h-screen bg-[#FAFBFC] page-enter pb-10">
@@ -403,21 +385,23 @@ function People() {
         </div>
 
         {/* Vista Escritorio */}
-        <div className="hidden md:block space-y-4">
-          <DataTable 
-            columns={columns} 
-            data={table.getRowModel().rows.map(r => r.original)} 
-            isLoading={loading}
-            enableVirtualization={true}
-          />
-        </div>
+        {!isMobile && (
+          <div className="hidden md:block space-y-4">
+            <DataTable 
+              columns={columns} 
+              data={socios} 
+              isLoading={loading}
+              enableVirtualization={true}
+            />
+          </div>
+        )}
 
         {/* Vista Móvil */}
-        <div className="md:hidden space-y-4">
+        {isMobile && (
+          <div className="md:hidden space-y-4">
           {mobileData.length ? (
             <>
-              {mobileData.map((row) => {
-                const socio = row.original;
+              {mobileData.map((socio) => {
                 return (
                   <Card key={socio.id} className="w-full bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
                     <div className="p-5 space-y-3">
@@ -531,6 +515,7 @@ function People() {
             </div>
           )}
         </div>
+        )}
       </div>
 
       {/* Diálogos */}
@@ -542,7 +527,7 @@ function People() {
 
       <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
         <DialogContent className="max-w-4xl p-0 overflow-hidden bg-white border-none rounded-[2rem]">
-          <ExportSociosDialog onClose={() => setIsExportDialogOpen(false)} data={table.getRowModel().rows.map(r => r.original)} />
+          <ExportSociosDialog onClose={() => setIsExportDialogOpen(false)} data={socios} />
         </DialogContent>
       </Dialog>
 
