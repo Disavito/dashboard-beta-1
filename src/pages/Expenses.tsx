@@ -127,6 +127,14 @@ export default function Expenses() {
 
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<GastoType | null>(null);
+  const [dateInput, setDateInput] = useState('');
+
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [dataToConfirm, setDataToConfirm] = useState<ExpenseFormValues | null>(null);
+  const [isConfirmingSubmission, setIsConfirmingSubmission] = useState(false);
+
   // Cargar solicitudes pendientes si es ingeniero
   useEffect(() => {
     const fetchPending = async () => {
@@ -146,14 +154,6 @@ export default function Expenses() {
     };
     fetchPending();
   }, [isEngineerAndNotAdmin, user?.id, isConfirmDialogOpen]); // Refresh on close dialog
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingExpense, setEditingExpense] = useState<GastoType | null>(null);
-  const [dateInput, setDateInput] = useState('');
-
-  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [dataToConfirm, setDataToConfirm] = useState<ExpenseFormValues | null>(null);
-  const [isConfirmingSubmission, setIsConfirmingSubmission] = useState(false);
 
   // Infinite scroll para móvil
   const [mobileVisibleCount, setMobileVisibleCount] = useState(10);
