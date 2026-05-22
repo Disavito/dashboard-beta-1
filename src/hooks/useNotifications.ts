@@ -13,18 +13,24 @@ export interface Notification {
   created_at: string;
 }
 
+import { useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 
 export function useNotifications() {
   const queryClient = useQueryClient();
   const { user } = useUser();
   
-  const { data, loading, error, refreshData } = useSupabaseData<Notification>({
+  const { data, loading, error, refreshData, setFilters } = useSupabaseData<Notification>({
     tableName: 'notifications',
     selectQuery: '*',
-    filter: user ? { column: 'user_id', value: user.id } : undefined,
     limit: 50,
   });
+
+  useEffect(() => {
+    if (user) {
+      setFilters((prev) => ({ ...prev, user_id: user.id }));
+    }
+  }, [user, setFilters]);
 
   const markAsRead = async (id: string) => {
     await supabase.from('notifications').update({ is_read: true }).eq('id', id);
