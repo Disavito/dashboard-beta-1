@@ -13,11 +13,16 @@ export interface Notification {
   created_at: string;
 }
 
+import { useUser } from '@/context/UserContext';
+
 export function useNotifications() {
   const queryClient = useQueryClient();
+  const { user } = useUser();
+  
   const { data, loading, error, refreshData } = useSupabaseData<Notification>({
     tableName: 'notifications',
     selectQuery: '*',
+    filter: user ? { column: 'user_id', value: user.id } : undefined,
     limit: 50,
   });
 
@@ -27,9 +32,8 @@ export function useNotifications() {
   };
 
   const markAllAsRead = async () => {
-    // Para simplificar, marcaremos todas las no leídas como leídas.
-    // Idealmente, se filtraría por user_id.
-    await supabase.from('notifications').update({ is_read: true }).eq('is_read', false);
+    if (!user) return;
+    await supabase.from('notifications').update({ is_read: true }).eq('is_read', false).eq('user_id', user.id);
     queryClient.invalidateQueries({ queryKey: ['supabaseData', 'notifications'] });
   };
 
