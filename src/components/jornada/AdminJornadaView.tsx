@@ -48,7 +48,7 @@ const AdminJornadaView: React.FC = () => {
     queryFn: getAllColaboradores,
   });
 
-  const { data: jornadas, isFetching } = useQuery({
+  const { data: jornadas } = useQuery({
     queryKey: ['adminJornadas', startDate, endDate, selectedColaboradorId],
     queryFn: () => getAdminJornadas({ startDate, endDate, colaboradorId: selectedColaboradorId }),
     staleTime: 1000 * 30, // 30 seconds stale time to ensure frequent updates

@@ -163,7 +163,6 @@ function SocioTitularRegistrationForm({ socioId, onClose, onSuccess }: SocioTitu
   const { handleSubmit, setValue, watch, reset, register, control, formState: { errors } } = form;
   const watchedDni = watch('dni');
   const watchedFechaNacimiento = watch('fechaNacimiento');
-  const watchedLocalidad = watch('localidad'); 
   const watchedIsObservado = watch('isObservado');
   const watchedIsPaymentObserved = watch('isPaymentObserved');
 
