@@ -79,10 +79,12 @@ app.post('/api/send-push', async (req, res) => {
       try {
         await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload);
       } catch (e) {
-        if (e.statusCode === 410 || e.statusCode === 404 || e.statusCode === 403) {
+        const status = Number(e.statusCode);
+        if (status === 410 || status === 404 || status === 403) {
+          // Eliminar suscripción inválida o caducada de forma silenciosa
           await supabase.from('push_subscriptions').delete().eq('id', sub.id);
         } else {
-          console.error('Push error:', e);
+          console.error('Push error detallado:', e.message || e);
         }
       }
     });
@@ -129,8 +131,11 @@ app.post('/api/webhook/approval-request', async (req, res) => {
               await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, pushPayload);
               sentCount++;
             } catch (e) {
-              if (e.statusCode === 410 || e.statusCode === 404 || e.statusCode === 403) {
+              const status = Number(e.statusCode);
+              if (status === 410 || status === 404 || status === 403) {
                 await supabase.from('push_subscriptions').delete().eq('id', sub.id);
+              } else {
+                console.error('Webhook push error:', e.message || e);
               }
             }
           });
