@@ -107,17 +107,23 @@ app.post('/api/webhook/approval-request', async (req, res) => {
     if (payload.type === 'INSERT' && payload.table === 'approval_requests') {
       const record = payload.record;
       
-      // Fetch all admins/engineers to notify
-      const { data: admins } = await supabase
+      // Fetch all admins to notify
+      const { data: adminsRaw } = await supabase
         .from('user_roles')
-        .select('user_id, role')
-        .in('role', ['admin', 'engineer']);
+        .select('user_id, roles(role_name)')
+        .not('roles', 'is', null);
+        
+      const admins = (adminsRaw || []).filter(a => ['admin', 'finanzas_senior'].includes(a.roles?.role_name?.toLowerCase()));
         
       if (!admins || admins.length === 0) return res.status(200).json({ success: true, count: 0 });
       
       const title = 'Nueva Solicitud de Aprobación';
-      const message = `Se requiere aprobación para: ${record.request_type}`;
-      const link = '/settings'; // Path to aprobaciones page
+      const formattedType = record.request_type === 'engineer_expense' ? 'Gasto de Ingeniero' : 
+                            record.request_type === 'high_expense' ? 'Gasto Elevado' : 
+                            record.request_type === 'delete_expense' ? 'Eliminación de Gasto' :
+                            record.request_type === 'delete_income' ? 'Eliminación de Ingreso' : record.request_type;
+      const message = `Se requiere aprobación para: ${formattedType}`;
+      const link = '/aprobaciones'; // Path to aprobaciones page
       const pushPayload = JSON.stringify({ title, body: message, url: link, icon: '/vite.svg' });
       
       let sentCount = 0;
