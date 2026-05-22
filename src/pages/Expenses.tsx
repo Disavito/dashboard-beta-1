@@ -93,9 +93,12 @@ export default function Expenses() {
     roles?.includes('admin') || roles?.includes('finanzas_senior') || !!customPermissions?.can_manage_finances || !!customPermissions?.can_view_expenses, 
   [roles, customPermissions]);
   
+  const checkRole = (roleName: string) => roles?.some(r => r.toLowerCase() === roleName.toLowerCase());
+
   const isEngineerAndNotAdmin = useMemo(() => 
-    !!(roles?.includes('ingeniero') && !roles?.includes('admin') && !roles?.includes('finanzas_senior')),
-  [roles]);
+    !!(checkRole('ingeniero') && !checkRole('admin') && !checkRole('finanzas_senior')),
+    [roles]
+  );
 
   const canAddExpense = canManageFinances || isEngineerAndNotAdmin;
 
@@ -264,7 +267,7 @@ export default function Expenses() {
         await updateRecord(editingExpense.id, payload);
         toast.success('Gasto actualizado');
       } else {
-        const isRestrictedRole = (roles?.includes('finanzas') || roles?.includes('ingeniero')) && !roles?.includes('finanzas_senior') && !roles?.includes('admin');
+        const isRestrictedRole = (checkRole('finanzas') || checkRole('ingeniero')) && !checkRole('finanzas_senior') && !checkRole('admin');
         const isHighExpense = Math.abs(payload.amount) >= 1000;
         const isSalary = payload.sub_category?.toLowerCase() === 'sueldo';
 
