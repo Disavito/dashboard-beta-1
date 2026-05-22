@@ -38,8 +38,9 @@ RUN npm ci --omit=dev
 COPY server.js ./
 COPY --from=builder /app/dist ./dist
 
-# Expone el puerto 80 (EasyPanel lo mapea automáticamente)
-EXPOSE 80
+# Fijamos el puerto a 3000 por defecto para Easypanel
+ENV PORT=3000
+EXPOSE 3000
 
 # Inicia el servidor Node
 CMD ["npm", "start"]
