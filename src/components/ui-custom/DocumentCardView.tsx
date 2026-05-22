@@ -1,5 +1,5 @@
-import React from 'react';
-import { MapPin, FileText, CheckSquare, Square, DollarSign, Upload, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { MapPin, FileText, CheckSquare, Square, DollarSign, Upload, Trash2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,38 +36,63 @@ interface SocioConDocumentos {
 interface DocumentCardViewProps {
   data: SocioConDocumentos[];
   requiredDocumentTypes: string[];
-  // Renombrado para claridad: Permiso para gestionar el estado de Lote Medido (Admin/Engineer)
   canManageLoteMedido: boolean; 
-  // Nuevo prop: Permiso para eliminar o solicitar eliminación de documentos (Admin/Engineer)
   canDeleteDocuments: boolean;
   canDeleteBlueprints?: boolean;
   onOpenUploadModal: (socio: SocioConDocumentos, documentType: string) => void;
   onDeleteDocument: (documentId: number, documentLink: string, documentType: string, socioName: string) => void;
-  onUpdateLoteMedido: (socioId: string, newValue: boolean, socio: SocioConDocumentos) => void; // Añadir socio para consistencia
+  onUpdateLoteMedido: (socioId: string, newValue: boolean, socio: SocioConDocumentos) => void;
 }
 
 const DocumentCardView: React.FC<DocumentCardViewProps> = ({
   data,
   requiredDocumentTypes,
-  canManageLoteMedido, // Usamos el nuevo nombre
-  canDeleteDocuments, // Usamos el nuevo nombre
+  canManageLoteMedido,
+  canDeleteDocuments,
   canDeleteBlueprints,
   onOpenUploadModal,
   onDeleteDocument,
   onUpdateLoteMedido,
 }) => {
+  const [visibleCount, setVisibleCount] = useState(10);
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  // Reiniciar la cuenta cuando los datos cambien (por ejemplo, al buscar o filtrar)
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [data]);
+
+  // Lógica de Scroll Infinito
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && visibleCount < data.length) {
+          // Pintar 10 tarjetas más cuando el usuario llega al fondo
+          setVisibleCount((prev) => prev + 10);
+        }
+      },
+      { threshold: 1.0 }
+    );
+    if (observerTarget.current) observer.observe(observerTarget.current);
+    return () => observer.disconnect();
+  }, [visibleCount, data.length]);
+
+  const visibleData = useMemo(() => {
+    return data.slice(0, visibleCount);
+  }, [data, visibleCount]);
+
   if (data.length === 0) {
     return (
-      <div className="text-center py-10 text-textSecondary">
-        No hay socios que coincidan con los filtros o la búsqueda.
+      <div className="text-center py-10 text-textSecondary font-bold border-2 border-dashed border-gray-200 rounded-2xl mx-4">
+        No hay expedientes que coincidan con la búsqueda.
       </div>
     );
   }
 
   return (
-    <div className="grid gap-4 w-full max-w-xl mx-auto">
-      {data.map((socio) => {
-        const fullName = `${socio.nombres || ''} ${socio.apellidoPaterno || ''}`.trim();
+    <div className="grid gap-4 w-full max-w-xl mx-auto pb-10">
+      {visibleData.map((socio) => {
+        const fullName = `${socio.nombres || ''} ${socio.apellidoPaterno || ''} ${socio.apellidoMaterno || ''}`.trim();
         const isMedido = socio.is_lote_medido ?? false;
         const missingDocs = requiredDocumentTypes.filter(docType => {
           const doc = socio.socio_documentos.find(d => d.tipo_documento === docType);
@@ -75,57 +100,59 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
         });
 
         return (
-          <Card key={socio.id} className="w-full bg-card border-border shadow-lg transition-all duration-300 hover:shadow-premium hover:border-accent/50 overflow-hidden">
-            <CardHeader className="p-4 border-b border-border/50 flex flex-row items-center justify-between gap-2">
-              <CardTitle className="text-lg font-bold truncate text-primary flex-1">
-                {fullName}
-              </CardTitle>
+          <Card key={socio.id} className="w-full bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
+            <CardHeader className="p-4 border-b border-gray-50 flex flex-row items-start justify-between gap-2 bg-gray-50/50">
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] font-mono font-bold text-gray-400">DNI {socio.dni || 'N/A'}</span>
+                <CardTitle className="text-base font-black text-gray-900 uppercase leading-tight mt-0.5 truncate">
+                  {fullName}
+                </CardTitle>
+              </div>
               <Badge 
                 className={cn(
-                  "text-xs font-semibold shrink-0",
-                  socio.paymentInfo.status === 'Pagado' ? "bg-success/20 text-success hover:bg-success/30" : "bg-error/20 text-error hover:bg-error/30"
+                  "font-black border px-2.5 py-0.5 rounded-full text-[9px] uppercase tracking-wider shrink-0",
+                  socio.paymentInfo.status === 'Pagado' ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-red-100 text-red-700 border-red-200"
                 )}
               >
-                <DollarSign className="h-3 w-3 mr-1" /> 
-                <span className="hidden xs:inline">{socio.paymentInfo.status}</span>
-                <span className="xs:hidden">{socio.paymentInfo.status === 'Pagado' ? 'Si' : 'No'}</span>
+                {socio.paymentInfo.status === 'Pagado' ? 'Al Día' : 'Deuda'}
               </Badge>
             </CardHeader>
-            <CardContent className="p-4 space-y-3">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-textSecondary">DNI:</span>
-                <span className="font-medium text-foreground">{socio.dni || 'N/A'}</span>
-              </div>
+            <CardContent className="p-5 space-y-4">
               
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start text-sm gap-1">
-                <span className="text-textSecondary flex items-center gap-1 shrink-0">
-                    <MapPin className="h-4 w-4" /> Ubicación:
-                </span>
-                <span className="font-medium text-foreground text-left sm:text-right break-words w-full">
-                  {socio.localidad || 'N/A'} ({socio.mz || 'N/A'}/{socio.lote || 'N/A'})
-                </span>
+              <div className="grid grid-cols-2 gap-3 py-1">
+                <div>
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5"><MapPin className="w-3 h-3 inline mr-1" />Comunidad</p>
+                  <p className="text-xs font-bold text-gray-700 uppercase truncate">{socio.localidad || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Ubicación</p>
+                  <p className="text-xs font-bold text-gray-700 uppercase">Mz {socio.mz || '-'} Lt {socio.lote || '-'}</p>
+                </div>
               </div>
               
               {/* Lote Medido */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm border-t border-border/50 pt-3 gap-2">
-                <span className="text-textSecondary flex items-center gap-1 font-semibold">
-                  {isMedido ? <CheckSquare className="h-4 w-4 text-success" /> : <Square className="h-4 w-4 text-warning" />} Lote Medido:
+              <div className="flex flex-row justify-between items-center text-sm border-t border-gray-50 pt-4">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                  {isMedido ? <CheckSquare className="h-4 w-4 text-emerald-500" /> : <Square className="h-4 w-4 text-amber-500" />} Ingeniería
                 </span>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  className={cn("h-auto py-1 px-2 text-xs w-full sm:w-auto", isMedido ? "text-success hover:bg-success/10" : "text-warning hover:bg-warning/10")}
-                  onClick={() => onUpdateLoteMedido(socio.id, !isMedido, socio)} // Pasar socio
-                  disabled={!canManageLoteMedido} // Usar canManageLoteMedido
+                  className={cn(
+                    "h-8 text-xs font-bold rounded-xl", 
+                    isMedido ? "text-emerald-600 border-emerald-200 bg-emerald-50" : "text-amber-600 border-amber-200 bg-amber-50"
+                  )}
+                  onClick={() => onUpdateLoteMedido(socio.id, !isMedido, socio)}
+                  disabled={!canManageLoteMedido}
                 >
-                  {isMedido ? 'Marcar como No Medido' : 'Marcar como Medido'}
+                  {isMedido ? 'Medido' : 'Pendiente'}
                 </Button>
               </div>
 
               {/* Document Links */}
-              <div className="space-y-2 pt-3 border-t border-border/50">
-                <p className="text-sm font-semibold text-textSecondary flex items-center gap-1"><FileText className="h-4 w-4" /> Documentos Subidos:</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="pt-4 border-t border-gray-50">
+                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-1.5"><FileText className="h-3 w-3" /> Expediente Digital</p>
+                <div className="flex flex-wrap gap-1.5">
                   {socio.socio_documentos.length > 0 ? (
                     socio.socio_documentos.map((doc) => (
                       <DocumentLinkPill
@@ -133,32 +160,32 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
                         type={doc.tipo_documento}
                         link={doc.link_documento}
                         isAdmin={canDeleteDocuments || !!(canDeleteBlueprints && (doc.tipo_documento === 'Planos de ubicación' || doc.tipo_documento === 'Memoria descriptiva'))}
-                        socioId={socio.id} // Necesario para DocumentLinkPill
-                        documentId={doc.id} // Necesario para DocumentLinkPill
+                        socioId={socio.id}
+                        documentId={doc.id}
                         onDelete={() => onDeleteDocument(doc.id, doc.link_documento!, doc.tipo_documento, fullName)}
                       />
                     ))
                   ) : (
-                    <span className="text-xs italic text-textSecondary/70">Ningún documento subido.</span>
+                    <span className="text-xs font-bold text-gray-300 italic">No hay archivos.</span>
                   )}
                 </div>
               </div>
 
               {/* Missing Documents Actions */}
               {missingDocs.length > 0 && (
-                <div className="pt-3 border-t border-border/50 space-y-2">
-                  <p className="text-sm font-semibold text-error flex items-center gap-1"><Trash2 className="h-4 w-4" /> Documentos Faltantes:</p>
+                <div className="pt-4 border-t border-gray-50">
+                  <p className="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 flex items-center gap-1.5"><Trash2 className="h-3 w-3" /> Faltantes obligatorios</p>
                   <div className="flex flex-wrap gap-2">
                     {missingDocs.map(docType => (
                       <Button
                         key={docType}
-                        variant="secondary"
+                        variant="outline"
                         size="sm"
-                        className="text-xs h-auto py-1.5 px-2 bg-accent/10 text-accent hover:bg-accent/20 whitespace-normal text-left"
+                        className="h-8 text-[10px] font-bold border-red-200 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl"
                         onClick={() => onOpenUploadModal(socio, docType)}
                       >
-                        <Upload className="mr-2 h-3 w-3 shrink-0" />
-                        <span>Subir {docType === 'Planos de ubicación' ? 'Planos' : 'Memoria'}</span>
+                        <Upload className="mr-1.5 h-3 w-3" />
+                        Subir {docType.split(' ')[0]}
                       </Button>
                     ))}
                   </div>
@@ -168,6 +195,20 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
           </Card>
         );
       })}
+
+      {/* Infinite Scroll Loader / Finishing element */}
+      {visibleCount < data.length ? (
+        <div ref={observerTarget} className="py-10 flex justify-center w-full">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-[#4892CC]" />
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pintando más expedientes...</span>
+          </div>
+        </div>
+      ) : (
+        <div className="py-8 flex justify-center w-full">
+           <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest border border-dashed border-gray-200 px-4 py-2 rounded-full">Has llegado al final de la lista</span>
+        </div>
+      )}
     </div>
   );
 };
