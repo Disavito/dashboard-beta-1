@@ -88,15 +88,36 @@ export default function Expenses() {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch] = useDebounce(searchInput, 300);
 
+  const { roles, customPermissions, user } = useUser();
+  const canManageFinances = useMemo(() => 
+    roles?.includes('admin') || roles?.includes('finanzas_senior') || !!customPermissions?.can_manage_finances || !!customPermissions?.can_view_expenses, 
+  [roles, customPermissions]);
+  
+  const isEngineerAndNotAdmin = useMemo(() => 
+    !!(roles?.includes('ingeniero') && !roles?.includes('admin') && !roles?.includes('finanzas_senior')),
+  [roles]);
+
+  const canAddExpense = canManageFinances || isEngineerAndNotAdmin;
+
+  // Filtro de servidor para que ingenieros solo vean sus gastos aprobados
+  const serverFilters = useMemo(() => {
+    const filters: Record<string, any> = {};
+    if (isEngineerAndNotAdmin && user?.id) {
+      filters['colaborador_id'] = user.id;
+    }
+    return filters;
+  }, [isEngineerAndNotAdmin, user?.id]);
+
   const { data: expenseData, totalCount, loading, addRecord, updateRecord, deleteRecord } = useSupabaseData<GastoType>({
     tableName: 'gastos',
     initialSort: { column: 'date', ascending: false },
     page: pagination.pageIndex,
     pageSize: pagination.pageSize,
     searchQuery: debouncedSearch,
-    searchColumns: ['description', 'category', 'sub_category', 'numero_gasto']
+    searchColumns: ['description', 'category', 'sub_category', 'numero_gasto'],
+    initialFilters: serverFilters
   });
-  
+
   const { data: accountsRaw } = useSupabaseData<Cuenta>({ tableName: 'cuentas' });
   const accountsData = accountsRaw.length > 0 ? accountsRaw : [
     { id: 'offline-1', name: 'Efectivo' } as Cuenta,
@@ -104,11 +125,28 @@ export default function Expenses() {
     { id: 'offline-3', name: 'Cuenta Fidel' } as Cuenta
   ];
 
-  const { roles, customPermissions, user } = useUser();
-  const canManageFinances = useMemo(() => 
-    roles?.includes('admin') || roles?.includes('finanzas_senior') || !!customPermissions?.can_manage_finances || !!customPermissions?.can_view_expenses, 
-  [roles, customPermissions]);
-  
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+
+  // Cargar solicitudes pendientes si es ingeniero
+  useEffect(() => {
+    const fetchPending = async () => {
+      if (isEngineerAndNotAdmin && user?.id) {
+        const { supabase } = await import('@/lib/supabaseClient');
+        const { data, error } = await supabase
+          .from('approval_requests')
+          .select('*')
+          .eq('requested_by', user.id)
+          .eq('request_type', 'engineer_expense')
+          .in('status', ['pending', 'rejected'])
+          .order('created_at', { ascending: false });
+        if (!error && data) {
+          setPendingRequests(data);
+        }
+      }
+    };
+    fetchPending();
+  }, [isEngineerAndNotAdmin, user?.id, isConfirmDialogOpen]); // Refresh on close dialog
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<GastoType | null>(null);
   const [dateInput, setDateInput] = useState('');
@@ -230,12 +268,15 @@ export default function Expenses() {
         const isHighExpense = Math.abs(payload.amount) >= 1000;
         const isSalary = payload.sub_category?.toLowerCase() === 'sueldo';
 
-        if (isRestrictedRole && isHighExpense && !isSalary) {
+        // Assign author ID
+        payload.colaborador_id = user?.id || null;
+
+        if (isEngineerAndNotAdmin || (isRestrictedRole && isHighExpense && !isSalary)) {
           // Send to approval_requests instead
           const { supabase } = await import('@/lib/supabaseClient');
           const { error } = await supabase.from('approval_requests').insert({
             requested_by: user?.id,
-            request_type: 'high_expense',
+            request_type: isEngineerAndNotAdmin ? 'engineer_expense' : 'high_expense',
             payload: payload,
             status: 'pending'
           });
@@ -243,7 +284,7 @@ export default function Expenses() {
           if (error) {
             toast.error('Error al enviar solicitud de aprobación', { description: error.message });
           } else {
-            toast.success('Gasto elevado enviado a aprobación de administradores.');
+            toast.success(isEngineerAndNotAdmin ? 'Gasto enviado para aprobación de administrador.' : 'Gasto elevado enviado a aprobación.');
           }
         } else {
           await addRecord(payload);
@@ -368,7 +409,7 @@ export default function Expenses() {
               </p>
             </div>
           </div>
-          {canManageFinances && (
+          {canAddExpense && (
             <Button 
               onClick={() => {
                 form.reset({
@@ -378,8 +419,8 @@ export default function Expenses() {
                   category: '',
                   sub_category: null,
                   description: '',
-                  numero_gasto: null,
-                  colaborador_id: null,
+                  numero_gasto: generateNextNumeroGasto(expenseData),
+                  colaborador_id: user?.id || null,
                 });
                 setEditingExpense(null);
                 setIsDialogOpen(true);
@@ -390,6 +431,40 @@ export default function Expenses() {
             </Button>
           )}
         </header>
+
+        {isEngineerAndNotAdmin && pendingRequests.length > 0 && (
+          <Card className="border border-amber-200 bg-amber-50/50 shadow-sm rounded-3xl overflow-hidden mb-6">
+            <CardHeader className="border-b border-amber-100 bg-amber-100/50 p-4">
+              <CardTitle className="text-sm font-black uppercase text-amber-900 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-amber-600" /> Mis Solicitudes Pendientes / Rechazadas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y divide-amber-100">
+                {pendingRequests.map(req => (
+                  <div key={req.id} className="p-4 flex items-center justify-between hover:bg-amber-100/30 transition-colors">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-amber-900">{req.payload?.description || 'Sin descripción'}</span>
+                      <span className="text-xs text-amber-700/80 font-medium">
+                        {req.payload?.category} • {format(parseISO(req.created_at), 'dd/MM/yyyy')}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="font-black text-amber-900">
+                        {formatCurrency(req.payload?.amount || 0)}
+                      </span>
+                      {req.status === 'pending' ? (
+                        <Badge className="bg-amber-200 text-amber-800 border-none font-bold uppercase text-[10px]">Pendiente</Badge>
+                      ) : (
+                        <Badge className="bg-red-200 text-red-800 border-none font-bold uppercase text-[10px]">Rechazado</Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="border-none shadow-xl shadow-slate-200/40 bg-white/50 backdrop-blur-xl rounded-3xl overflow-hidden">
           <CardHeader className="border-b border-slate-100 bg-white p-6">
