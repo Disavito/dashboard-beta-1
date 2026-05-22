@@ -256,58 +256,22 @@ function PartnerDocuments() {
       setLoading(true);
     }
     try {
-      const [sociosRes, ingresosRes] = await Promise.all([
-        supabase.from('socio_titulares').select('id, dni, nombres, apellidoPaterno, apellidoMaterno, localidad, distritoVivienda, mz, lote, is_lote_medido, socio_documentos (id, tipo_documento, link_documento)').order('apellidoPaterno', { ascending: true }),
-        supabase.from('ingresos').select('dni, receipt_number, transaction_type, amount, date, created_at').neq('dni', null)
-      ]);
+      // 🚀 OPTIMIZACIÓN EXTREMA: En lugar de descargar todos los ingresos, usamos la vista ya calculada.
+      // Esto recorta el peso de la petición a la mitad y elimina el procesamiento en el celular.
+      const { data: sociosRes, error: sociosError } = await supabase
+        .from('vw_socio_titulares_estado')
+        .select('id, dni, nombres, apellidoPaterno, apellidoMaterno, localidad, distritoVivienda, mz, lote, is_lote_medido, status, receiptNumber, socio_documentos (id, tipo_documento, link_documento)')
+        .order('apellidoPaterno', { ascending: true });
 
-      if (sociosRes.error) throw sociosRes.error;
-      if (ingresosRes.error) throw ingresosRes.error;
+      if (sociosError) throw sociosError;
 
-      const ingresosByDni = new Map<string, Array<any>>();
-      ingresosRes.data?.forEach(ingreso => {
-        if (ingreso.dni) {
-          if (!ingresosByDni.has(ingreso.dni)) ingresosByDni.set(ingreso.dni, []);
-          ingresosByDni.get(ingreso.dni)?.push(ingreso);
-        }
-      });
-
-      const processedData = sociosRes.data.map(socio => {
-        const socioIngresos = ingresosByDni.get(socio.dni) || [];
-        
-        // Sort ingresos by date and created_at descending in JS to take load off the DB
-        if (socioIngresos.length > 1) {
-          socioIngresos.sort((a, b) => {
-            const dateA = new Date(a.date).getTime();
-            const dateB = new Date(b.date).getTime();
-            if (dateA !== dateB) return dateB - dateA;
-            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-          });
-        }
-        
-        // Verificar si la última transacción (la más reciente, índice 0) es anulación/devolución
-        if (socioIngresos.length > 0) {
-          const lastTx = socioIngresos[0];
-          const type = (lastTx.transaction_type || '').toLowerCase();
-          const amount = lastTx.amount;
-          if (type.includes('anulacion') || type.includes('devolucion') || amount < 0) {
-            return null; // Filtrar socio Retirado
-          }
+      const processedData = (sociosRes || []).map(socio => {
+        // Filtrar socio Retirado
+        if (socio.status === 'Retirado') {
+          return null;
         }
 
-        let validReceiptNumber: string | null = null;
-        let paymentStatus: 'Pagado' | 'No Pagado' = 'No Pagado';
-        const validTransactionTypes = ['Venta', 'Ingreso', 'Recibo de Pago'];
-
-        for (const ingreso of socioIngresos) {
-          if (ingreso.receipt_number && ingreso.transaction_type && validTransactionTypes.includes(ingreso.transaction_type)) {
-            validReceiptNumber = ingreso.receipt_number;
-            paymentStatus = 'Pagado';
-            break;
-          }
-        }
-
-        const filteredSocioDocuments = (socio.socio_documentos as any[]).filter(doc => {
+        const filteredSocioDocuments = (socio.socio_documentos as any[] || []).filter(doc => {
           if (!allowedDocumentTypes.includes(doc.tipo_documento) || !doc.link_documento) return false;
           return true;
         });
@@ -316,12 +280,18 @@ function PartnerDocuments() {
         const hasMemoria = filteredSocioDocuments.some(d => d.tipo_documento === 'Memoria descriptiva');
         const finalIsLoteMedido = hasPlanos || hasMemoria || (socio.is_lote_medido ?? false);
 
+        // Traducir status de vista ('Activo'/'Inactivo'/'Sin Registro') a 'Pagado'/'No Pagado'
+        const isPaid = socio.status === 'Activo' || socio.status === 'Inactivo';
+
         return {
           ...socio,
           nombreCompleto: `${socio.apellidoPaterno} ${socio.apellidoMaterno} ${socio.nombres}`,
           is_lote_medido: finalIsLoteMedido,
           socio_documentos: filteredSocioDocuments,
-          paymentInfo: { status: paymentStatus, receipt_number: validReceiptNumber },
+          paymentInfo: { 
+            status: isPaid ? 'Pagado' : 'No Pagado', 
+            receipt_number: socio.receiptNumber || null 
+          },
         };
       });
 

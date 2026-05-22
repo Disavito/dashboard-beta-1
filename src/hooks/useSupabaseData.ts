@@ -95,21 +95,36 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
     let finalCount = 0;
 
     if (fetchAll && limit === undefined && page === undefined) {
-      // Fetch all records in batches of 1000
+      // Fetch all records in parallel batches of 1000
       const BATCH_SIZE = 1000;
-      let from = 0;
-      let hasMore = true;
+      
+      // 1. Obtener el primer bloque y el total de registros en la misma petición
+      const initialQuery = buildQuery().range(0, BATCH_SIZE - 1);
+      const { data: firstBatch, error: firstError, count } = await initialQuery;
 
-      while (hasMore) {
-        const query = buildQuery().range(from, from + BATCH_SIZE - 1);
-        const { data: batch, error: batchError, count } = await query;
+      if (firstError) throw firstError;
 
-        if (batchError) throw batchError;
+      allData = firstBatch as T[];
+      if (count !== null) finalCount = count;
 
-        allData = [...allData, ...(batch as T[])];
-        if (from === 0 && count !== null) finalCount = count;
-        hasMore = batch.length === BATCH_SIZE;
-        from += BATCH_SIZE;
+      // 2. Si hay más registros, disparar el resto de peticiones en paralelo
+      if (count && count > BATCH_SIZE) {
+        const remainingBatches = Math.ceil((count - BATCH_SIZE) / BATCH_SIZE);
+        const promises = [];
+        
+        for (let i = 1; i <= remainingBatches; i++) {
+          const from = i * BATCH_SIZE;
+          const to = from + BATCH_SIZE - 1;
+          promises.push(buildQuery().range(from, to));
+        }
+
+        const results = await Promise.all(promises);
+        results.forEach(({ data, error }) => {
+          if (error) throw error;
+          if (data) {
+            allData = [...allData, ...(data as T[])];
+          }
+        });
       }
     } else {
       // Single fetch or paginated fetch
