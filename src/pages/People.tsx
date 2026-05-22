@@ -65,7 +65,7 @@ function People() {
   const [isDeleting, setIsDeleting] = useState(false);
   
   const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch] = useDebounce(searchInput, 800);
+  const [debouncedSearch] = useDebounce(searchInput, 300);
   const [selectedLocalidad, setSelectedLocalidad] = useState<string>('all');
   const [selectedEstado, setSelectedEstado] = useState<string>('all');
   const [selectedDistrito, setSelectedDistrito] = useState<string>('all');

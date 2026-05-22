@@ -36,7 +36,7 @@ import {
 function Income() {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 });
   const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch] = useDebounce(searchInput, 500);
+  const [debouncedSearch] = useDebounce(searchInput, 300);
   const [selectedLocalidadFilter, setSelectedLocalidadFilter] = useState<string>('all');
   const [selectedDistritoFilter, setSelectedDistritoFilter] = useState<string>('all');
 

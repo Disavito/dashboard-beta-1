@@ -86,7 +86,7 @@ const generateNextNumeroGasto = (expenses: GastoType[]): string => {
 export default function Expenses() {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 });
   const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch] = useDebounce(searchInput, 500);
+  const [debouncedSearch] = useDebounce(searchInput, 300);
 
   const { data: expenseData, totalCount, loading, addRecord, updateRecord, deleteRecord } = useSupabaseData<GastoType>({
     tableName: 'gastos',
