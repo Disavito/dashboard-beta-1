@@ -34,6 +34,7 @@ import { cn } from '@/lib/utils';
 import SearchInputWithDebounce from '@/components/custom/SearchInputWithDebounce';
 import { getCachedData, setCachedData, invalidateCache } from '@/lib/dataCache';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { offlineSync } from '@/lib/offlineSync';
 
 // Interfaces
 interface SocioDocumento {
@@ -112,6 +113,16 @@ const LoteMedidoCell = React.memo(({ socioId, initialValue, disabled, socio, req
 
     // Cambio visual INSTANTÁNEO — sin tocar el estado padre
     setChecked(v);
+
+    if (!navigator.onLine) {
+      await offlineSync.addJob({
+        id: crypto.randomUUID(),
+        type: 'update_lote_medido',
+        payload: { id: socioId, is_lote_medido: v }
+      });
+      toast.success('Guardado offline. Se sincronizará al conectar.');
+      return;
+    }
 
     try {
       await updateMutation.mutateAsync({ tableName: 'socio_titulares', id: socioId, record: { is_lote_medido: v } });
@@ -398,6 +409,18 @@ function PartnerDocuments() {
       .map(item => item.id);
 
     if (selectedIds.length === 0) return toast.warning('Ninguna fila cumple los requisitos');
+
+    if (!navigator.onLine) {
+      await offlineSync.addJob({
+        id: crypto.randomUUID(),
+        type: 'bulk_update_lote_medido',
+        payload: { ids: selectedIds, is_lote_medido: newValue }
+      });
+      toast.success(`Guardado offline: ${selectedIds.length} expedientes a actualizar.`);
+      setRowSelection({});
+      setSociosConDocumentos(prev => prev.map(s => selectedIds.includes(s.id) ? { ...s, is_lote_medido: newValue } : s));
+      return;
+    }
 
     try {
       const { error } = await supabase.from('socio_titulares').update({ is_lote_medido: newValue }).in('id', selectedIds);
@@ -763,6 +786,16 @@ function PartnerDocuments() {
                           // Optimistic update
                           setSociosConDocumentos(prev => prev.map(ss => ss.id === socioId ? { ...ss, is_lote_medido: newValue } : ss));
                           
+                          if (!navigator.onLine) {
+                            await offlineSync.addJob({
+                              id: crypto.randomUUID(),
+                              type: 'update_lote_medido',
+                              payload: { id: socioId, is_lote_medido: newValue }
+                            });
+                            toast.success('Guardado offline. Se sincronizará al conectar.');
+                            return;
+                          }
+
                           try {
                             await updateMutation.mutateAsync({ tableName: 'socio_titulares', id: socioId, record: { is_lote_medido: newValue } });
                           } catch { 

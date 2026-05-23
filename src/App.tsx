@@ -1,7 +1,8 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoadingSpinner from './components/ui-custom/LoadingSpinner';
+import { offlineSync } from './lib/offlineSync';
 
 // Page Imports
 const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'));
@@ -27,6 +28,17 @@ const AuditPage = lazy(() => import('./pages/AuditPage'));
 const AprobacionesPage = lazy(() => import('./pages/AprobacionesPage'));
 
 function App() {
+  useEffect(() => {
+    const handleOnline = () => {
+      offlineSync.processQueue();
+    };
+    window.addEventListener('online', handleOnline);
+    // Process on initial load in case there are pending jobs
+    offlineSync.processQueue();
+    
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background font-sans antialiased">
       <Suspense fallback={<LoadingSpinner />}>

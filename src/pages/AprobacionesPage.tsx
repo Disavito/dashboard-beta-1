@@ -58,7 +58,7 @@ export default function AprobacionesPage() {
         } else if (request.request_type === 'delete_expense') {
           const { error } = await supabase.from('gastos').update({ deleted_at: new Date().toISOString() }).eq('id', request.reference_id);
           if (error) throw error;
-        } else if (request.request_type === 'high_expense' || request.request_type === 'engineer_expense') {
+        } else if (request.request_type === 'high_expense' || request.request_type === 'engineer_expense' || request.request_type === 'expense_approval') {
           // Insert the expense since it was held back
           const { error } = await supabase.from('gastos').insert(request.payload);
           if (error) throw error;
@@ -86,13 +86,23 @@ export default function AprobacionesPage() {
   };
 
   const renderRequestDetails = (request: ApprovalRequest) => {
-    if (request.request_type === 'high_expense' || request.request_type === 'engineer_expense') {
+    if (request.request_type === 'high_expense' || request.request_type === 'engineer_expense' || request.request_type === 'expense_approval') {
       const payload = request.payload;
-      const isEngineer = request.request_type === 'engineer_expense';
+      const title = request.request_type === 'expense_approval' ? 'Nuevo Gasto a Aprobar' : 
+                    request.request_type === 'engineer_expense' ? 'Nuevo Gasto Declarado' : 'Nuevo Gasto Elevado';
       return (
         <div className="mt-4 p-4 bg-gray-50 rounded-xl space-y-2 border border-gray-100">
-          <div className="flex items-center gap-2 text-rose-600 font-bold mb-2">
-            <ArrowRight className="w-4 h-4" /> {isEngineer ? 'Nuevo Gasto Declarado' : 'Nuevo Gasto Elevado'}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2 text-rose-600 font-bold">
+              <ArrowRight className="w-4 h-4" /> {title}
+            </div>
+            {payload.is_declaracion_jurada ? (
+               <Badge className="bg-amber-100 text-amber-800 border-none text-[10px] uppercase font-bold">Declaración Jurada</Badge>
+            ) : payload.receipt_url ? (
+               <a href={payload.receipt_url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-[#4892CC] hover:underline flex items-center gap-1">
+                 <FileText className="w-3 h-3" /> Ver Comprobante
+               </a>
+            ) : null}
           </div>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div><span className="text-gray-500 block text-xs uppercase font-bold">Monto</span><span className="font-bold text-lg">{formatCurrency(Math.abs(payload.amount))}</span></div>
@@ -155,7 +165,7 @@ export default function AprobacionesPage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900">
-                      {request.request_type === 'high_expense' ? 'Aprobación de Gasto Elevado' : request.request_type === 'engineer_expense' ? 'Aprobación de Gasto (Ingeniero)' : 'Aprobación de Eliminación'}
+                      {request.request_type === 'high_expense' ? 'Aprobación de Gasto Elevado' : request.request_type === 'engineer_expense' ? 'Aprobación de Gasto (Ingeniero)' : request.request_type === 'expense_approval' ? 'Aprobación de Gasto' : 'Aprobación de Eliminación'}
                     </h3>
                     <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
                       <span className="font-medium text-gray-700">Solicitado por: {getColaboradorName(request.requested_by)}</span>
@@ -210,7 +220,7 @@ export default function AprobacionesPage() {
                   {historyRequests.map(h => (
                     <tr key={h.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-6 py-4 font-medium text-gray-900">
-                        {h.request_type === 'engineer_expense' ? 'Gasto Ingeniero' : h.request_type}
+                        {h.request_type === 'engineer_expense' ? 'Gasto Ingeniero' : h.request_type === 'expense_approval' ? 'Nuevo Gasto' : h.request_type}
                       </td>
                       <td className="px-6 py-4 text-gray-600">{getColaboradorName(h.requested_by)}</td>
                       <td className="px-6 py-4 text-gray-500">{format(parseISO(h.created_at), 'dd MMM yyyy', { locale: es })}</td>

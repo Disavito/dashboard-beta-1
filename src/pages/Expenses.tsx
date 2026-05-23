@@ -26,6 +26,9 @@ import { DateMaskInput } from '@/components/ui/date-mask-input';
 import { useUser } from '@/context/UserContext';
 import { useDebounce } from 'use-debounce';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { offlineSync } from '@/lib/offlineSync';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 const expenseFormSchema = z.object({
   amount: z.preprocess(
     (val) => (val === '' ? undefined : Number(val)),
@@ -41,6 +44,7 @@ const expenseFormSchema = z.object({
   description: z.string().min(1, 'La descripción es requerida.').max(255),
   numero_gasto: z.string().optional().nullable(),
   colaborador_id: z.string().uuid().optional().nullable(),
+  is_declaracion_jurada: z.boolean().default(false).optional(),
 });
 
 type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
@@ -137,6 +141,7 @@ export default function Expenses() {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [dataToConfirm, setDataToConfirm] = useState<ExpenseFormValues | null>(null);
   const [isConfirmingSubmission, setIsConfirmingSubmission] = useState(false);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
 
   // Cargar solicitudes pendientes si es ingeniero
   useEffect(() => {
@@ -232,7 +237,9 @@ export default function Expenses() {
         description: expense.description || '',
         numero_gasto: expense.numero_gasto || null,
         colaborador_id: expense.colaborador_id || null,
+        is_declaracion_jurada: (expense as any).is_declaracion_jurada || false,
       });
+      setReceiptFile(null);
       setDateInput(format(parsedDate, 'dd/MM/yyyy'));
     } else {
       const today = new Date();
@@ -245,7 +252,9 @@ export default function Expenses() {
         description: '',
         numero_gasto: generateNextNumeroGasto(expenseData),
         colaborador_id: null,
+        is_declaracion_jurada: false,
       });
+      setReceiptFile(null);
       setDateInput(format(today, 'dd/MM/yyyy'));
     }
     setIsDialogOpen(true);
@@ -262,40 +271,62 @@ export default function Expenses() {
         date: format(dataToConfirm.date, 'yyyy-MM-dd')
       };
 
-      if (editingExpense) {
-        // En edición, no aplicamos la restricción de gasto nuevo fuerte, pero si hubiera cambios, podríamos
-        await updateRecord(editingExpense.id, payload);
-        toast.success('Gasto actualizado');
-      } else {
-        const isRestrictedRole = (checkRole('finanzas') || checkRole('ingenier') || checkRole('engin') || checkRole('engen')) && !checkRole('finanzas_senior') && !checkRole('admin');
-        const isHighExpense = Math.abs(payload.amount) >= 1000;
-        const isSalary = payload.sub_category?.toLowerCase() === 'sueldo';
+      payload.colaborador_id = user?.id || null;
+      const isAdminOrFinanzas = checkRole('admin') || checkRole('finanzas_senior');
 
-        // Assign author ID
-        payload.colaborador_id = user?.id || null;
-
-        if (isEngineerAndNotAdmin || (isRestrictedRole && isHighExpense && !isSalary)) {
-          // Send to approval_requests instead
-          const { supabase } = await import('@/lib/supabaseClient');
-          const { error } = await supabase.from('approval_requests').insert({
+      if (!navigator.onLine) {
+        await offlineSync.addJob({
+          id: crypto.randomUUID(),
+          type: isAdminOrFinanzas ? 'direct_expense' : 'expense_approval',
+          payload: isAdminOrFinanzas ? payload : {
             requested_by: user?.id,
-            request_type: isEngineerAndNotAdmin ? 'engineer_expense' : 'high_expense',
+            request_type: 'expense_approval',
             payload: payload,
             status: 'pending'
-          });
-          
-          if (error) {
-            toast.error('Error al enviar solicitud de aprobación', { description: error.message });
-          } else {
-            toast.success(isEngineerAndNotAdmin ? 'Gasto enviado para aprobación de administrador.' : 'Gasto elevado enviado a aprobación.');
+          },
+          file: receiptFile || undefined,
+          fileName: receiptFile?.name
+        });
+        toast.success('Guardado offline. Se sincronizará automáticamente al conectar.');
+        setIsDialogOpen(false);
+        setIsConfirmDialogOpen(false);
+      } else {
+        let fileUrl = null;
+        if (receiptFile) {
+          const filePath = `receipts/${Date.now()}_${receiptFile.name}`;
+          const { supabase } = await import('@/lib/supabaseClient');
+          const { error: uploadError } = await supabase.storage.from('documentos').upload(filePath, receiptFile);
+          if (uploadError) {
+             toast.error('Error subiendo comprobante', { description: uploadError.message });
+             throw uploadError;
           }
-        } else {
-          await addRecord(payload);
-          toast.success('Gasto añadido');
+          const { data: publicUrlData } = supabase.storage.from('documentos').getPublicUrl(filePath);
+          fileUrl = publicUrlData.publicUrl;
+          (payload as any).receipt_url = fileUrl;
         }
+
+        if (editingExpense) {
+          await updateRecord(editingExpense.id, payload);
+          toast.success('Gasto actualizado');
+        } else {
+          if (isAdminOrFinanzas) {
+            await addRecord(payload);
+            toast.success('Gasto añadido directamente');
+          } else {
+            const { supabase } = await import('@/lib/supabaseClient');
+            const { error } = await supabase.from('approval_requests').insert({
+              requested_by: user?.id,
+              request_type: 'expense_approval',
+              payload: payload,
+              status: 'pending'
+            });
+            if (error) throw error;
+            toast.success('Gasto enviado para aprobación.');
+          }
+        }
+        setIsDialogOpen(false);
+        setIsConfirmDialogOpen(false);
       }
-      setIsDialogOpen(false);
-      setIsConfirmDialogOpen(false);
     } catch (err) {
       toast.error('Error: ' + (err instanceof Error ? err.message : 'Error desconocido'));
     } finally {
@@ -703,6 +734,31 @@ export default function Expenses() {
                   <FormMessage />
                 </FormItem>
               )} />
+
+              <div className="space-y-3 p-4 bg-slate-50 border border-slate-100 rounded-xl mt-4">
+                <FormField control={form.control} name="is_declaracion_jurada" render={({ field }) => (
+                  <FormItem className="flex flex-row items-center gap-3 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="font-bold text-slate-700">Gasto sin comprobante (Declaración Jurada)</FormLabel>
+                    </div>
+                  </FormItem>
+                )} />
+
+                {!form.watch('is_declaracion_jurada') && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Comprobante de Pago (Opcional)</Label>
+                    <Input 
+                      type="file" 
+                      accept="image/*,.pdf" 
+                      onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
+                      className="bg-white"
+                    />
+                  </div>
+                )}
+              </div>
 
               <DialogFooter className="pt-4">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl h-11">Cancelar</Button>

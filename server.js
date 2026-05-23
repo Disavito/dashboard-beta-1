@@ -120,6 +120,7 @@ app.post('/api/webhook/approval-request', async (req, res) => {
       const title = 'Nueva Solicitud de Aprobación';
       const formattedType = record.request_type === 'engineer_expense' ? 'Gasto de Ingeniero' : 
                             record.request_type === 'high_expense' ? 'Gasto Elevado' : 
+                            record.request_type === 'expense_approval' ? 'Nuevo Gasto' :
                             record.request_type === 'delete_expense' ? 'Eliminación de Gasto' :
                             record.request_type === 'delete_income' ? 'Eliminación de Ingreso' : record.request_type;
       const message = `Se requiere aprobación para: ${formattedType}`;

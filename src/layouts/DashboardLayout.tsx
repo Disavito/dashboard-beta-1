@@ -20,6 +20,8 @@ import {
   Package,
   BarChart3,
   ChevronDown,
+  Shield,
+  FileCheck,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
@@ -66,6 +68,7 @@ function DashboardLayout() {
         { name: 'Gastos', path: '/expenses', icon: ArrowDownCircle },
         { name: 'Facturación', path: '/invoicing', icon: FileText },
         { name: 'Cuentas', path: '/accounts', icon: Wallet },
+        { name: 'Aprobaciones', path: '/aprobaciones', icon: FileCheck },
       ]
     },
     {
@@ -92,6 +95,7 @@ function DashboardLayout() {
       title: 'Administración',
       items: [
         { name: 'Configuración', path: '/settings', icon: SettingsIcon },
+        { name: 'Auditoría', path: '/audit', icon: Shield },
       ]
     }
   ];
@@ -117,7 +121,18 @@ function DashboardLayout() {
         <nav className="space-y-4 py-2">
           {menuGroups.map((group) => {
             const visibleItems = group.items.filter(item => {
-              if (item.path !== '/dashboard' && item.path !== '/reportes' && permissions && !permissions.has(item.path)) {
+              if (item.path === '/dashboard' || item.path === '/reportes') return true;
+              
+              if (item.path === '/aprobaciones') {
+                return roles?.includes('admin') || roles?.includes('finanzas_senior') || (permissions && permissions.has('/settings'));
+              }
+
+              let requiredPath = item.path;
+              if (item.path === '/audit') {
+                requiredPath = '/settings';
+              }
+
+              if (permissions && !permissions.has(requiredPath)) {
                 return false;
               }
               return true;
