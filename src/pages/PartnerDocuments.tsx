@@ -226,6 +226,12 @@ function PartnerDocuments() {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [selectedLocalidad, setSelectedLocalidad] = useState('all');
   const [selectedDistrito, setSelectedDistrito] = useState('all');
+
+  // Resetear localidad cuando cambie el distrito
+  useEffect(() => {
+    setSelectedLocalidad('all');
+  }, [selectedDistrito]);
+
   const [rowSelection, setRowSelection] = useState<Record<number, boolean>>({});
   const [activeTab, setActiveTab] = useState('documents');
   const isDesktop = useMediaQuery('(min-width: 768px)');
@@ -342,11 +348,19 @@ function PartnerDocuments() {
     const normalize = (text: string) => 
       text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
+    // 1. Filtrar primero por distrito y localidad
+    let data = sociosConDocumentos;
+    if (selectedDistrito !== 'all') {
+      data = data.filter(s => (s as any).distritoVivienda === selectedDistrito);
+    }
+    if (selectedLocalidad !== 'all') {
+      data = data.filter(s => s.localidad === selectedLocalidad);
+    }
+
+    // 2. Si no hay búsqueda de texto, retornar el resultado
     const searchLower = normalize(debouncedSearchQuery.trim());
     if (!searchLower) {
-      return selectedLocalidad === 'all' 
-        ? sociosConDocumentos 
-        : sociosConDocumentos.filter(s => s.localidad === selectedLocalidad);
+      return data;
     }
 
     let exactMz: string | null = null;
@@ -369,15 +383,10 @@ function PartnerDocuments() {
 
     const tokens = remainingQuery.split(/\s+/).filter(t => t.length > 0);
 
-    return sociosConDocumentos.filter(socio => {
-      const matchesLocalidad = selectedLocalidad === 'all' || socio.localidad === selectedLocalidad;
-      const matchesDistrito = selectedDistrito === 'all' || (socio as any).distritoVivienda === selectedDistrito;
-      if (!matchesLocalidad || !matchesDistrito) return false;
-
+    return data.filter(socio => {
       // Filtrar por Manzana si el usuario lo especificó
       if (exactMz) {
         const socioMz = normalize(socio.mz || '').trim();
-        // Usar includes para tolerar variaciones en DB (ej. "Manzana A" con "mz A")
         if (!socioMz.includes(exactMz)) return false;
       }
 
