@@ -132,6 +132,8 @@ function DashboardLayout() {
 
               let requiredPath = item.path;
               if (item.path === '/audit') {
+                const isAdminOrFinanzas = roles?.some(r => ['admin', 'finanzas', 'finanzas_senior'].includes(r.toLowerCase()));
+                if (!isAdminOrFinanzas) return false;
                 requiredPath = '/settings';
               }
 

@@ -84,7 +84,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ resourcePath, children 
   }
 
   // LÓGICA DE BLOQUEO POR RUTA FINANCIERA
-  const financialPaths = ['/income', '/accounts', '/invoicing', '/settings'];
+  const financialPaths = ['/income', '/accounts', '/invoicing', '/settings', '/audit'];
   const isRequestingFinancial = financialPaths.some(path => resourcePath.startsWith(path));
 
   if (isRequestingFinancial && !isAdminOrFinanzas && !isAuthorized) {

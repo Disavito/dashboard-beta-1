@@ -30,6 +30,8 @@ interface Localidad {
 const SettingsPage: React.FC = () => {
   const { user, roles } = useUser();
   const isAdmin = roles?.includes('admin');
+  const isAdminOrFinanzas = roles?.some(r => ['admin', 'finanzas', 'finanzas_senior'].includes(r.toLowerCase()));
+  const defaultTab = isAdminOrFinanzas ? 'horarios' : 'perfil';
 
   return (
     <div className="p-4 md:p-8 bg-[#FFFFFF] min-h-screen max-w-5xl mx-auto space-y-8">
@@ -49,14 +51,18 @@ const SettingsPage: React.FC = () => {
         </div>
       </header>
 
-      <Tabs defaultValue="horarios" className="space-y-6">
+      <Tabs defaultValue={defaultTab} className="space-y-6">
         <TabsList className="bg-slate-50 p-1 rounded-2xl border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-1">
-          <TabsTrigger value="horarios" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm">
-            <Clock className="w-3.5 h-3.5 mr-1.5" /> Horarios
-          </TabsTrigger>
-          <TabsTrigger value="categorias" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm">
-            <Tag className="w-3.5 h-3.5 mr-1.5" /> Categorías
-          </TabsTrigger>
+          {isAdminOrFinanzas && (
+            <TabsTrigger value="horarios" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <Clock className="w-3.5 h-3.5 mr-1.5" /> Horarios
+            </TabsTrigger>
+          )}
+          {isAdminOrFinanzas && (
+            <TabsTrigger value="categorias" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <Tag className="w-3.5 h-3.5 mr-1.5" /> Categorías
+            </TabsTrigger>
+          )}
           <TabsTrigger value="localidades" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <MapPin className="w-3.5 h-3.5 mr-1.5" /> Localidades
           </TabsTrigger>
@@ -71,14 +77,18 @@ const SettingsPage: React.FC = () => {
         </TabsList>
 
         {/* ──── Horarios de Jornada ──── */}
-        <TabsContent value="horarios">
-          <HorariosSection isAdmin={isAdmin} />
-        </TabsContent>
+        {isAdminOrFinanzas && (
+          <TabsContent value="horarios">
+            <HorariosSection isAdmin={isAdmin} />
+          </TabsContent>
+        )}
 
         {/* ──── Categorías de Gasto ──── */}
-        <TabsContent value="categorias">
-          <CategoriasSection />
-        </TabsContent>
+        {isAdminOrFinanzas && (
+          <TabsContent value="categorias">
+            <CategoriasSection />
+          </TabsContent>
+        )}
 
         {/* ──── Localidades ──── */}
         <TabsContent value="localidades">
