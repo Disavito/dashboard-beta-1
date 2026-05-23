@@ -26,6 +26,7 @@ const allNavLinks = [
   { name: 'Facturación', path: '/invoicing', icon: ReceiptText, isFinancial: true },
   { name: 'Ingresos', path: '/income', icon: ArrowUpCircle, isFinancial: true },
   { name: 'Gastos', path: '/expenses', icon: ArrowDownCircle, isFinancial: true },
+  { name: 'Presupuestos', path: '/presupuestos', icon: Wallet, isFinancial: false },
   { name: 'Cuentas', path: '/accounts', icon: Wallet, isFinancial: true },
   { name: 'Reportes', path: '/reportes', icon: PieChart, isFinancial: true },
   { name: 'Inventario', path: '/inventory', icon: FolderOpen, isFinancial: false },
@@ -44,6 +45,7 @@ const prefetchRoute = (path: string) => {
     case '/partner-documents': import('@/pages/PartnerDocuments'); break;
     case '/jornada': import('@/pages/JornadaPage'); break;
     case '/inventory': import('@/pages/Inventory'); break;
+    case '/presupuestos': import('@/pages/PresupuestosPage'); break;
     case '/invoicing': import('@/pages/invoicing/InvoicingLayout'); break;
     case '/income': import('@/pages/Income'); break;
     case '/expenses': import('@/pages/Expenses'); break;
@@ -72,7 +74,7 @@ const Sidebar: React.FC = () => {
     return allNavLinks.filter(link => {
       // Si es una ruta financiera, solo mostrar si es Admin o Finanzas
       if (link.isFinancial) {
-        if (link.path === '/expenses' && roles.some(r => {
+        if ((link.path === '/expenses' || link.path === '/presupuestos') && roles.some(r => {
           const lower = r.toLowerCase();
           return lower.includes('ingenier') || lower.includes('engin') || lower.includes('engen');
         })) {
@@ -116,7 +118,7 @@ const Sidebar: React.FC = () => {
         </ul>
       </nav>
       <div className="mt-auto pt-6 border-t border-border/50 text-center text-textSecondary text-sm">
-        {!isSidebarCollapsed ? <p>&copy; 2025 FIMAGADI.</p> : <p>&copy;</p>}
+        {!isSidebarCollapsed ? <p>&copy; 2025 FIMAGADI v2.</p> : <p>&copy;</p>}
       </div>
     </aside>
   );

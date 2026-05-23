@@ -28,6 +28,7 @@ import { useDebounce } from 'use-debounce';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { offlineSync } from '@/lib/offlineSync';
 import { Checkbox } from '@/components/ui/checkbox';
+import { updateMontoRendido } from '@/lib/api/presupuestosApi';
 import { Label } from '@/components/ui/label';
 const expenseFormSchema = z.object({
   amount: z.preprocess(
@@ -45,6 +46,7 @@ const expenseFormSchema = z.object({
   numero_gasto: z.string().optional().nullable(),
   colaborador_id: z.string().uuid().optional().nullable(),
   is_declaracion_jurada: z.boolean().default(false).optional(),
+  presupuesto_id: z.string().uuid().optional().nullable(),
 });
 
 type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
@@ -142,6 +144,52 @@ export default function Expenses() {
   const [dataToConfirm, setDataToConfirm] = useState<ExpenseFormValues | null>(null);
   const [isConfirmingSubmission, setIsConfirmingSubmission] = useState(false);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [activePresupuestos, setActivePresupuestos] = useState<any[]>([]);
+  const [colaboradores, setColaboradores] = useState<Record<string, string>>({});
+
+  // Cargar presupuestos activos y colaboradores
+  useEffect(() => {
+    const loadPresupuestosAndColaboradores = async () => {
+      if (!user) return;
+      try {
+        const { supabase } = await import('@/lib/supabaseClient');
+        
+        let query = supabase
+          .from('presupuestos_operativos')
+          .select('id, motivo, colaborador_id, monto_aprobado, monto_rendido')
+          .eq('estado', 'Aprobado');
+        
+        const isAdminOrFinanzas = roles?.some(r => ['admin', 'finanzas', 'finanzas_senior'].includes(r.toLowerCase()));
+        if (!isAdminOrFinanzas) {
+          query = query.eq('colaborador_id', user.id);
+        }
+        
+        const { data: presData } = await query;
+        if (presData) {
+          setActivePresupuestos(presData);
+        }
+
+        if (isAdminOrFinanzas) {
+          const { data: colabsData } = await supabase
+            .from('colaboradores')
+            .select('user_id, name, apellidos');
+          if (colabsData) {
+            const map: Record<string, string> = {};
+            colabsData.forEach(c => {
+              if (c.user_id) {
+                map[c.user_id] = `${c.name} ${c.apellidos}`.trim();
+              }
+            });
+            setColaboradores(map);
+          }
+        }
+      } catch (err) {
+        console.error('Error al cargar datos de presupuestos/colaboradores:', err);
+      }
+    };
+
+    loadPresupuestosAndColaboradores();
+  }, [user, roles]);
 
   // Cargar solicitudes pendientes si es ingeniero
   useEffect(() => {
@@ -238,6 +286,7 @@ export default function Expenses() {
         numero_gasto: expense.numero_gasto || null,
         colaborador_id: expense.colaborador_id || null,
         is_declaracion_jurada: (expense as any).is_declaracion_jurada || false,
+        presupuesto_id: (expense as any).presupuesto_id || null,
       });
       setReceiptFile(null);
       setDateInput(format(parsedDate, 'dd/MM/yyyy'));
@@ -253,6 +302,7 @@ export default function Expenses() {
         numero_gasto: generateNextNumeroGasto(expenseData),
         colaborador_id: null,
         is_declaracion_jurada: false,
+        presupuesto_id: null,
       });
       setReceiptFile(null);
       setDateInput(format(today, 'dd/MM/yyyy'));
@@ -273,12 +323,14 @@ export default function Expenses() {
 
       payload.colaborador_id = user?.id || null;
       const isAdminOrFinanzas = checkRole('admin') || checkRole('finanzas_senior');
+      const isAutoApproved = dataToConfirm.category === 'Gasto Fijo' || dataToConfirm.sub_category === 'sueldo' || dataToConfirm.sub_category === 'Sueldo';
+      const shouldDirectInsert = isAdminOrFinanzas || isAutoApproved;
 
       if (!navigator.onLine) {
         await offlineSync.addJob({
           id: crypto.randomUUID(),
-          type: isAdminOrFinanzas ? 'direct_expense' : 'expense_approval',
-          payload: isAdminOrFinanzas ? payload : {
+          type: shouldDirectInsert ? 'direct_expense' : 'expense_approval',
+          payload: shouldDirectInsert ? payload : {
             requested_by: user?.id,
             request_type: 'expense_approval',
             payload: payload,
@@ -306,12 +358,25 @@ export default function Expenses() {
         }
 
         if (editingExpense) {
+          const oldPresupuestoId = (editingExpense as any).presupuesto_id;
+          const newPresupuestoId = payload.presupuesto_id;
+
           await updateRecord(editingExpense.id, payload);
           toast.success('Gasto actualizado');
+
+          if (oldPresupuestoId) {
+            await updateMontoRendido(oldPresupuestoId);
+          }
+          if (newPresupuestoId && newPresupuestoId !== oldPresupuestoId) {
+            await updateMontoRendido(newPresupuestoId);
+          }
         } else {
-          if (isAdminOrFinanzas) {
+          if (shouldDirectInsert) {
             await addRecord(payload);
-            toast.success('Gasto añadido directamente');
+            toast.success(isAutoApproved && !isAdminOrFinanzas ? 'Gasto Fijo Auto-Aprobado' : 'Gasto añadido directamente');
+            if (payload.presupuesto_id) {
+              await updateMontoRendido(payload.presupuesto_id);
+            }
           } else {
             const { supabase } = await import('@/lib/supabaseClient');
             const { error } = await supabase.from('approval_requests').insert({
@@ -347,10 +412,26 @@ export default function Expenses() {
   const confirmDeleteExpense = async () => {
     if (deletingExpenseId === null) return;
     setIsDeletingExpense(true);
-    await deleteRecord(deletingExpenseId);
-    setIsDeletingExpense(false);
-    setIsDeleteConfirmOpen(false);
-    setDeletingExpenseId(null);
+    try {
+      const { supabase } = await import('@/lib/supabaseClient');
+      const { data: oldExpense } = await supabase
+        .from('gastos')
+        .select('presupuesto_id')
+        .eq('id', deletingExpenseId)
+        .single();
+
+      await deleteRecord(deletingExpenseId);
+
+      if (oldExpense?.presupuesto_id) {
+        await updateMontoRendido(oldExpense.presupuesto_id);
+      }
+    } catch (err) {
+      console.error('Error al eliminar gasto y actualizar presupuesto:', err);
+    } finally {
+      setIsDeletingExpense(false);
+      setIsDeleteConfirmOpen(false);
+      setDeletingExpenseId(null);
+    }
   };
 
   const columns: ColumnDef<GastoType>[] = useMemo(() => {
@@ -702,7 +783,13 @@ export default function Expenses() {
                     <Select onValueChange={(val) => { field.onChange(val); form.setValue('sub_category', null); }} value={field.value}>
                       <FormControl><SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Categoría" /></SelectTrigger></FormControl>
                       <SelectContent>
-                        {MAIN_EXPENSE_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                        {MAIN_EXPENSE_CATEGORIES
+                          .filter(c => {
+                            // "Gasto Fijo" solo visible para admin/finanzas
+                            if (c.value === 'Gasto Fijo' && isEngineerAndNotAdmin) return false;
+                            return true;
+                          })
+                          .map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -735,15 +822,52 @@ export default function Expenses() {
                 </FormItem>
               )} />
 
+              {activePresupuestos.length > 0 && (
+                <FormField control={form.control} name="presupuesto_id" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vincular a Presupuesto Operativo (Opcional)</FormLabel>
+                    <Select onValueChange={(val) => field.onChange(val === "none" ? null : val)} value={field.value || "none"}>
+                      <FormControl>
+                        <SelectTrigger className="rounded-xl h-11">
+                          <SelectValue placeholder="Ninguno" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">Ninguno (Gasto general)</SelectItem>
+                        {activePresupuestos.map(p => {
+                          const name = colaboradores[p.colaborador_id] || '';
+                          const label = `${p.motivo} ${name ? `(${name})` : ''} - Saldo: S/ ${(p.monto_aprobado - p.monto_rendido).toFixed(2)}`;
+                          return (
+                            <SelectItem key={p.id} value={p.id}>
+                              {label}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              )}
+
               <div className="space-y-3 p-4 bg-slate-50 border border-slate-100 rounded-xl mt-4">
                 <FormField control={form.control} name="is_declaracion_jurada" render={({ field }) => (
-                  <FormItem className="flex flex-row items-center gap-3 space-y-0">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel className="font-bold text-slate-700">Gasto sin comprobante (Declaración Jurada)</FormLabel>
+                  <FormItem className="flex flex-col gap-3 space-y-0">
+                    <div className="flex flex-row items-center gap-3">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="font-bold text-slate-700">Gasto sin comprobante (Declaración Jurada)</FormLabel>
+                      </div>
                     </div>
+                    {field.value && (
+                      <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                        <p className="text-xs text-amber-800 leading-relaxed font-medium">
+                          <strong>Advertencia:</strong> Al marcar esta opción, declaras bajo juramento que los fondos fueron utilizados estrictamente para los fines descritos y asumes total responsabilidad sobre la veracidad de este gasto ante cualquier auditoría.
+                        </p>
+                      </div>
+                    )}
                   </FormItem>
                 )} />
 

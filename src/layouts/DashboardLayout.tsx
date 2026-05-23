@@ -83,6 +83,7 @@ function DashboardLayout() {
       items: [
         { name: 'Jornada', path: '/jornada', icon: Clock },
         { name: 'Inventario', path: '/inventory', icon: Package },
+        { name: 'Presupuestos', path: '/presupuestos', icon: Wallet },
       ]
     },
     {
@@ -121,7 +122,9 @@ function DashboardLayout() {
         <nav className="space-y-4 py-2">
           {menuGroups.map((group) => {
             const visibleItems = group.items.filter(item => {
-              if (item.path === '/dashboard' || item.path === '/reportes') return true;
+              // Rutas siempre visibles o que no requieren permiso explícito en DB
+              const openPaths = ['/dashboard', '/reportes', '/jornada', '/inventory', '/presupuestos'];
+              if (openPaths.includes(item.path)) return true;
               
               if (item.path === '/aprobaciones') {
                 return roles?.includes('admin') || roles?.includes('finanzas_senior') || (permissions && permissions.has('/settings'));

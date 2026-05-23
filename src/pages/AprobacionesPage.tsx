@@ -10,6 +10,7 @@ import { useUser } from '@/context/UserContext';
 import { formatCurrency } from '@/lib/utils';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
+import { updateMontoRendido } from '@/lib/api/presupuestosApi';
 
 interface ApprovalRequest {
   id: string;
@@ -32,8 +33,14 @@ export default function AprobacionesPage() {
   
   // Para mostrar nombres, necesitamos colaboradores
   const { data: colaboradores } = useSupabaseData<any>({ tableName: 'colaboradores', selectQuery: 'id, name, apellidos, user_id' });
+  const { data: budgets } = useSupabaseData<any>({ tableName: 'presupuestos_operativos', fetchAll: true });
   const { user, roles } = useUser();
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
+
+  const getBudgetMotivo = (budgetId: string) => {
+    const budget = budgets.find(b => b.id === budgetId);
+    return budget ? budget.motivo : 'Presupuesto Desconocido';
+  };
 
   const canApprove = roles?.includes('admin') || roles?.includes('finanzas_senior');
 
@@ -56,12 +63,21 @@ export default function AprobacionesPage() {
           const { error } = await supabase.from('ingresos').update({ deleted_at: new Date().toISOString() }).eq('id', request.reference_id);
           if (error) throw error;
         } else if (request.request_type === 'delete_expense') {
+          const { data: oldExpense } = await supabase.from('gastos').select('presupuesto_id').eq('id', request.reference_id).single();
           const { error } = await supabase.from('gastos').update({ deleted_at: new Date().toISOString() }).eq('id', request.reference_id);
           if (error) throw error;
+          
+          if (oldExpense?.presupuesto_id) {
+            await updateMontoRendido(oldExpense.presupuesto_id);
+          }
         } else if (request.request_type === 'high_expense' || request.request_type === 'engineer_expense' || request.request_type === 'expense_approval') {
           // Insert the expense since it was held back
           const { error } = await supabase.from('gastos').insert(request.payload);
           if (error) throw error;
+          
+          if (request.payload.presupuesto_id) {
+            await updateMontoRendido(request.payload.presupuesto_id);
+          }
         }
       }
 
@@ -108,6 +124,12 @@ export default function AprobacionesPage() {
             <div><span className="text-gray-500 block text-xs uppercase font-bold">Monto</span><span className="font-bold text-lg">{formatCurrency(Math.abs(payload.amount))}</span></div>
             <div><span className="text-gray-500 block text-xs uppercase font-bold">Categoría</span><span className="font-medium">{payload.category} - {payload.sub_category}</span></div>
             <div className="col-span-2"><span className="text-gray-500 block text-xs uppercase font-bold">Descripción</span><span className="text-gray-700">{payload.description}</span></div>
+            {payload.presupuesto_id && (
+              <div className="col-span-2 bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 text-xs">
+                <span className="font-bold text-[#4892CC] block">Vinculado a Presupuesto Operativo:</span>
+                <span className="font-semibold text-slate-700">{getBudgetMotivo(payload.presupuesto_id)}</span>
+              </div>
+            )}
           </div>
         </div>
       );

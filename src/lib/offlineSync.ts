@@ -1,4 +1,4 @@
-import { get, set, update } from 'idb-keyval';
+import { get, update } from 'idb-keyval';
 import { supabase } from './supabaseClient';
 import { toast } from 'sonner';
 
@@ -71,7 +71,7 @@ export const offlineSync = {
         // 1. Si hay archivo, subirlo primero a Storage
         if (job.file && job.fileName) {
           const filePath = `receipts/${Date.now()}_${job.fileName}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
+          const { error: uploadError } = await supabase.storage
             .from('documentos') // Asegurarse de tener un bucket 'documentos' configurado o cambiarlo
             .upload(filePath, job.file);
 

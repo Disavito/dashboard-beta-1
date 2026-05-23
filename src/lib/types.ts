@@ -66,3 +66,24 @@ export interface Lot {
   receiptNumber: string;
   documentLink: string | null;
 }
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  description: string | null;
+  total_quantity: number;
+  available_quantity: number;
+  created_at: string;
+  deleted_at: string | null;
+}
+
+export interface InventoryAssignment {
+  id: string;
+  item_id: string;
+  colaborador_id: string;
+  quantity: number;
+  status: string;
+  assigned_at: string;
+  returned_at: string | null;
+  notes: string | null;
+}

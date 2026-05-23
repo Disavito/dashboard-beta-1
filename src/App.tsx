@@ -26,6 +26,7 @@ const InventoryPage = lazy(() => import('./pages/Inventory'));
 const ReportesPage = lazy(() => import('./pages/Reportes'));
 const AuditPage = lazy(() => import('./pages/AuditPage'));
 const AprobacionesPage = lazy(() => import('./pages/AprobacionesPage'));
+const PresupuestosPage = lazy(() => import('./pages/PresupuestosPage'));
 
 function App() {
   useEffect(() => {
@@ -83,6 +84,10 @@ function App() {
 
               <Route element={<ProtectedRoute resourcePath="/expenses" />}>
                 <Route path="expenses" element={<EgresosPage />} />
+              </Route>
+
+              <Route element={<ProtectedRoute resourcePath="/presupuestos" />}>
+                <Route path="presupuestos" element={<PresupuestosPage />} />
               </Route>
 
               <Route element={<ProtectedRoute resourcePath="/accounts" />}>
