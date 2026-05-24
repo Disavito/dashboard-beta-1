@@ -22,6 +22,7 @@ import {
   ChevronDown,
   Shield,
   FileCheck,
+  HelpCircle,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
@@ -59,6 +60,7 @@ function DashboardLayout() {
       title: 'Principal',
       items: [
         { name: 'Resumen', path: '/dashboard', icon: LayoutDashboard },
+        { name: 'Manuales', path: '/ayuda', icon: HelpCircle },
       ]
     },
     {
@@ -123,7 +125,7 @@ function DashboardLayout() {
           {menuGroups.map((group) => {
             const visibleItems = group.items.filter(item => {
               // Rutas siempre visibles o que no requieren permiso explícito en DB
-              const openPaths = ['/dashboard', '/reportes', '/jornada', '/inventory', '/presupuestos'];
+              const openPaths = ['/dashboard', '/reportes', '/jornada', '/inventory', '/presupuestos', '/ayuda'];
               if (openPaths.includes(item.path)) return true;
               
               if (item.path === '/aprobaciones') {

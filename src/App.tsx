@@ -27,6 +27,7 @@ const ReportesPage = lazy(() => import('./pages/Reportes'));
 const AuditPage = lazy(() => import('./pages/AuditPage'));
 const AprobacionesPage = lazy(() => import('./pages/AprobacionesPage'));
 const PresupuestosPage = lazy(() => import('./pages/PresupuestosPage'));
+const HelpPage = lazy(() => import('./pages/HelpPage'));
 
 function App() {
   useEffect(() => {
@@ -102,6 +103,7 @@ function App() {
               </Route>
 
               <Route path="reportes" element={<ReportesPage />} />
+              <Route path="ayuda" element={<HelpPage />} />
             </Route>
           </Route>
         </Routes>
