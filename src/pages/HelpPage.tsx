@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { 
-  HelpCircle, BookOpen, Clock, UserCheck, FolderOpen, 
+  BookOpen, Clock, UserCheck, FolderOpen, 
   Wallet, ArrowUpCircle, ArrowDownCircle, FileText, 
-  Package, Shield, FileCheck, ClipboardList, CheckCircle2,
-  AlertTriangle, Play, Info
+  Package, Shield, FileCheck, ClipboardList,
+  Info, Settings as SettingsIcon
 } from 'lucide-react';
 
 const HelpPage: React.FC = () => {
@@ -208,7 +207,7 @@ const HelpPage: React.FC = () => {
                   <p>En el módulo **Expedientes Digitales**, puedes buscar por DNI, Nombre o manzana y lote (ej: *"mz H lt 15"*). Las localidades se filtran según el distrito seleccionado.</p>
                   <ul className="list-disc pl-5 space-y-2 text-slate-500 font-medium">
                     <li>**Subir archivos:** En la fila del socio, haz clic en **+ Planos** o **+ Memoria** para cargar PDFs o imágenes de la planimetría.</li>
-                    <li>**Marcar Medición:** Activa el switch **Lote Medido** individualmente o selecciona varios socios y presiona **Acciones -> Marcar como Medido**.</li>
+                    <li>**Marcar Medición:** Activa el switch **Lote Medido** individualmente o selecciona varios socios y presiona **Acciones -&gt; Marcar como Medido**.</li>
                     <li>**Qué NO hacer:** No puedes desactivar el switch de Lote Medido si el socio ya tiene planos o memorias subidos en el sistema.</li>
                     <li>**Anular Archivos:** Si subiste un archivo erróneo, presiona el botón **Eliminar** (Tacho rojo) e ingresa una justificación obligatoria. El archivo no desaparecerá hasta que el Administrador apruebe la solicitud de anulación.</li>
                   </ul>
