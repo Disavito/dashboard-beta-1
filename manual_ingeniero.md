@@ -30,16 +30,25 @@ Cuando requieras realizar un viaje de trabajo a una obra o realizar compras meno
 
 ---
 
-## 3. Rendición de Cuentas (Registro de Gastos)
-Una vez que hayas recibido los fondos y comiences a gastarlos en campo, debes rendir cada uno de los gastos que realices:
+## 3. Rendición y Registro de Gastos (Expenses)
+El sistema te permite registrar gastos bajo dos modalidades diferentes:
 
+* **Modalidad A: Gasto Vinculado a Presupuesto (Rendición)**
+  * **Cuándo usarlo:** Cuando realizas un gasto utilizando el dinero operativo que la empresa ya te transfirió previamente.
+  * **Cómo registrarlo:** Llena el formulario e ingresa el monto, fecha y descripción. En el campo **"Vincular a Presupuesto"**, selecciona tu presupuesto activo (ej. *Obra Arequipa*). Esto descontará automáticamente el gasto del saldo de tu presupuesto para justificarlo ante la administración.
+  
+* **Modalidad B: Gasto General / A Solicitud (Sin Presupuesto / Reembolsable)**
+  * **Cuándo usarlo:** Cuando realizas un gasto de tu propio bolsillo en campo (gasto reembolsable) o cuando solicitas el pago directo de un gasto específico que no estaba contemplado en un presupuesto global previo.
+  * **Cómo registrarlo:** Llena el formulario normalmente y deja el selector de **"Vincular a Presupuesto"** marcado como **"Ninguno"**. Al aprobarse por la administración, este gasto se gestionará para tu posterior reembolso.
+
+### Pasos para registrar cualquier Gasto:
 1. Ingresa a la sección **Gastos**.
 2. Haz clic en **Registrar Gasto** y completa el formulario:
    * **Monto:** Digita el valor exacto de la compra en Soles.
    * **Fecha:** Selecciona el día en que se realizó la transacción.
-   * **Categoría:** Elige entre *Viáticos* (alimentación, transporte, etc.) o *Otros*.
-   * **Descripción:** Detalla el concepto del gasto (ej. *"Cena del equipo técnico"*).
-   * **Vincular a Presupuesto (Muy Importante):** Si este gasto proviene del dinero que te fue transferido para la obra, abre este menú desplegable y selecciona el presupuesto correspondiente (ej. *Obra Arequipa*). Esto descontará automáticamente el monto de tu saldo pendiente por rendir.
+   * **Categoría:** Elige entre *Viáticos* (alimentación, transporte, hospedaje, etc.) o *Otros*.
+   * **Descripción:** Detalla el concepto del gasto (ej. *"Cena de coordinación de obra"*).
+   * **Vincular a Presupuesto (Opcional):** Elige tu presupuesto activo (Modalidad A) o déjalo en **"Ninguno"** (Modalidad B) según sea el caso.
 3. **Sustento del Gasto:**
    * **Con comprobante:** Sube la foto o PDF de la boleta de venta o factura.
    * **Sin comprobante (Declaración Jurada):** Si compraste en un lugar que no emite comprobantes autorizados (ej. menús en zonas rurales alejadas), marca la casilla **"Gasto sin comprobante (Declaración Jurada)"**. Lee con atención la declaración de responsabilidad y guárdalo.
