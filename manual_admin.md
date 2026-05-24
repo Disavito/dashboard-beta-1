@@ -1,105 +1,93 @@
-# Guía de Usuario: Administrador - FIMAGADI
+# Guía de Usuario en el Dashboard: Administrador - FIMAGADI
 
-Bienvenido a la guía oficial de usuario para el perfil de **Administrador**. Como usuario administrador, posees el control absoluto sobre la parametrización de horarios, la asignación de accesos especiales al personal, la autorización y control de presupuestos, el procesamiento de solicitudes críticas de aprobación (tanto de gastos como de eliminaciones) y la revisión de los registros de auditoría del sistema.
-
----
-
-## 1. Configuración de Horarios y Políticas de Asistencia
-
-La plataforma calcula de forma automática la puntualidad de los ingenieros al ingresar y salir del trabajo:
-
-### Procedimiento para Ajustar Horarios:
-1. Ve al panel de **Configuración** y selecciona la pestaña **Horarios**.
-2. Define los rangos permitidos para las marcaciones diarias:
-   * **Horario de Entrada:** Define la hora de inicio y de fin de la ventana de entrada permitida (por ejemplo, de 09:20 a 09:45). Toda marcación registrada después del límite establecido exigirá obligatoriamente que el ingeniero ingrese una justificación.
-   * **Horario de Salida:** Define la hora de inicio y de fin para el registro de salida (por ejemplo, de 18:20 a 18:40). Toda salida fuera de este rango requerirá justificación del empleado.
-3. Guarda los cambios. Las nuevas reglas se aplicarán inmediatamente a todas las marcaciones futuras del personal de campo.
+Bienvenido al manual operativo de usuario para el perfil de **Administrador**. Este documento detalla de manera exhaustiva el funcionamiento del **Dashboard de FIMAGADI** para tu rol, indicando a qué módulos ingresar, qué botones presionar, qué opciones seleccionar y cómo procesar solicitudes de aprobaciones críticas y auditorías dentro de la plataforma.
 
 ---
 
-## 2. Gestión de Personal y Permisos Modulares
+## 1. Módulo de Configuración (Parámetros y Permisos)
 
-Además de los roles preestablecidos (*Administrador*, *Finanzas*, *Ingeniero*), el sistema te permite otorgar o remover **accesos específicos** a cualquier colaborador de forma individual:
+El módulo de configuración centraliza los parámetros operativos globales y los accesos del personal:
 
-### Procedimiento para Asignar Accesos:
-1. Ve a la pestaña **Equipo** en el panel de Configuración (o Gestión de Usuarios).
-2. Selecciona al colaborador que deseas configurar.
-3. Utiliza los selectores individuales para activar o desactivar los siguientes permisos independientes:
-   * **Facturación Exclusiva:** Otorga acceso únicamente al módulo de emisión de comprobantes de pago (Boletas, Facturas, Notas de Crédito y resúmenes de declaración tributaria).
-   * **Encargado de Inventario:** Permite controlar el almacén técnico, realizar salidas a campo y registrar la devolución de herramientas.
-   * **Administrador de Jornada:** Habilita el panel de seguimiento de personal para revisar los registros de horas y registrar marcaciones manuales en caso de olvidos.
-   * **Gestor Financiero:** Habilita el control de ingresos de socios, el registro de egresos y el panel de tesorería.
-   * **Ver Gastos:** Permite el acceso de solo lectura al registro histórico de gastos.
-   * **Ver Ingresos:** Permite el acceso de solo lectura al registro histórico de aportes.
-   * **Ver Cuentas:** Permite el acceso de solo lectura al panel de caja y cuentas.
+* **Dónde ir:** En el menú izquierdo, haz clic en **Configuración**.
 
----
+### A. Gestión de Horarios de Asistencia:
+1. Dentro del panel de Configuración, haz clic en la pestaña **Horarios**.
+2. Modifica los campos numéricos de horas y minutos:
+   * **Horario de Entrada:** Configura las horas de inicio y fin permitidas para que los ingenieros marquen su ingreso sin justificación (ej. de 09:20 a 09:45).
+   * **Horario de Salida:** Configura las horas de inicio y fin para el registro de salida (ej. de 18:20 a 18:40).
+3. Haz clic en **Guardar**. El sistema aplicará inmediatamente estas tolerancias a todas las marcaciones futuras en el módulo de jornada de los usuarios.
 
-## 3. Registro de Socios y Criterios de Calificación
-
-Como Administrador, supervisas la integridad de los padrones de socios y debes asegurar la correcta aplicación de los siguientes flujos de registro:
-
-### A. Corroboración de Datos:
-Al empadronar o modificar un socio usando el buscador automático de DNI, se debe verificar siempre que la información cargada de los registros oficiales coincida exactamente con la identidad real del titular antes de guardar la ficha.
-
-### B. Autocompletado de Ubicación:
-Al seleccionar la Localidad del socio en la pestaña personal, el sistema auto-completa de forma automática el Distrito, Provincia y Región de la vivienda en la pestaña de domicilio. El operador solo debe capturar la Dirección física exacta de la vivienda.
-* **Manzana (Mz) y Lote (Lt):** El llenado de la Manzana y el Lote es opcional. No obstante, si se dispone de estos datos físicos, es obligatorio ingresarlos en el sistema.
-
-### C. Regla para Socios de Extrema Pobreza:
-* Los socios clasificados bajo la condición de **Extrema Pobreza** están exonerados de pagos monetarios.
-* Sin embargo, es obligatorio que se genere un **recibo con un monto de S/. 0.00** en la plataforma para regularizar e integrar su expediente en el dashboard sin alterar la contabilidad real de caja.
-
-### D. Gestión de Observaciones Administrativas y Financieras:
-* **Socio Observado (Administrativo):** Si al socio le falta presentar su constancia de posesión original, si está duplicado en el sistema, o si presenta cualquier otro detalle administrativo pendiente, se debe marcar la opción **Observado** indicando detalladamente el motivo de la irregularidad.
-* **Pago Observado (Financiero):** Se utiliza únicamente en situaciones específicas del cobro (por ejemplo, si el recibo/pago está duplicado, o si el Yape se depositó por error a la cuenta de un tercero). Esto permite marcar el pago como observado para que sea rectificado o saneado posteriormente por el área de finanzas.
-
-### E. Tipos de Recibos Válidos:
-Al evaluar los expedientes, debes considerar que coexisten dos sustentos de pago:
-1. **Recibos Físicos:** Comprobantes emitidos manualmente en papel antes de la creación del sistema digital actual. Varios socios históricos solo poseen este formato, el cual es válido para acreditar su solvencia.
-2. **Recibos Virtuales:** Comprobantes emitidos y registrados a través del dashboard contable actual.
+### B. Asignación de Permisos Modulares a Colaboradores:
+1. Dentro de Configuración, haz clic en la pestaña **Equipo** (o **Personal**).
+2. Selecciona al colaborador de la lista desplegable.
+3. Activa o desactiva los conmutadores (switches) individuales para otorgar o revocar accesos en el dashboard:
+   * **Facturación Exclusiva:** Activa para que el usuario solo visualice el módulo de facturación y declaraciones.
+   * **Encargado de Inventario:** Activa para habilitar los botones de creación de catálogo, asignación de salidas y retornos de herramientas en el módulo de inventario.
+   * **Administrador de Jornada:** Habilita la visualización del panel de seguimiento de marcas de asistencia de todos los colaboradores y el botón para registrar marcas manuales de otros.
+   * **Gestor Financiero:** Habilita el acceso completo a registrar ingresos, gastos y cuentas.
+   * **Ver Gastos / Ver Ingresos / Ver Cuentas:** Permisos de solo lectura para auditar los balances del dashboard sin capacidad de registrar transacciones.
 
 ---
 
-## 4. Control y Aprobación de Presupuestos Operativos
+## 2. Módulo de Presupuestos (Autorización y Cierre)
 
-Los presupuestos operativos sirven para financiar los traslados y viáticos de los ingenieros en obra. Eres el encargado de evaluar, aprobar y liquidar estas solicitudes:
+Como Administrador, tienes el control exclusivo sobre la aprobación y el archivo de solicitudes de fondos para viáticos de campo:
 
-1. Ve a la sección **Presupuestos**.
-2. **Evaluación de Solicitudes:**
-   * Ubica las solicitudes en estado *Pendiente*. Haz clic en **Aprobar** o **Rechazar**.
-   * Si decides aprobar, puedes modificar el campo **Monto Aprobado** para definir la cantidad definitiva a transferir al ingeniero (por defecto se carga el monto solicitado).
-   * Añade observaciones complementarias de la transferencia.
-3. **Control de Rendiciones y Cierre:**
-   * El sistema descuenta de forma automática el saldo pendiente de cada presupuesto a medida que el ingeniero registra y justifica sus gastos de campo.
-   * Una vez que el ingeniero rinda todos los fondos y el saldo quede en cero o sea conciliado, presiona **Cerrar Presupuesto** para archivarlo de forma definitiva y deshabilitar nuevas cargas.
-
----
-
-## 5. Bandeja de Aprobaciones Contables y Anulaciones
-
-La bandeja de **Aprobaciones Pendientes** centraliza las operaciones de egresos y anulaciones que requieren la validación de un supervisor:
-
-* **Aprobación de Gastos Operativos:** Revisa los datos de los egresos reportados por los ingenieros (montos, clasificaciones y conceptos), verifica el comprobante digital o la Declaración Jurada, y presiona **Aprobar** para grabarlo y deducir el saldo del presupuesto vinculado.
-* **Anulación de Transacciones (Ingresos o Gastos):** Ante solicitudes del personal por errores de digitación de aportes o compras consolidadas, evalúa el motivo y aprueba la solicitud para realizar una anulación administrativa (ocultando el registro del dashboard principal y recalculando de inmediato los saldos de las cuentas y presupuestos afectados).
+* **Dónde ir:** Haz clic en **Presupuestos** en el menú izquierdo.
+* **Aprobación de Solicitudes:**
+  1. Identifica los registros con la etiqueta amarilla *Pendiente*.
+  2. Haz clic en el botón **Aprobar**.
+  3. Se abrirá una ventana emergente. Revisa la cantidad solicitada por el ingeniero. En el campo **Monto Aprobado**, puedes ajustar y digitar la cantidad definitiva a asignar (por defecto se carga el monto solicitado).
+  4. Digita observaciones explicativas de la transacción en el cuadro de notas y presiona **Confirmar**. El presupuesto cambiará a estado *Aprobado* y el ingeniero visualizará su saldo disponible.
+* **Rechazo de Solicitudes:**
+  1. Haz clic en el botón **Rechazar**.
+  2. En el cuadro de diálogo, escribe obligatoriamente el motivo del rechazo para informar al ingeniero.
+* **Cierre y Liquidación Contable:**
+  1. El sistema descuenta del presupuesto los gastos que el ingeniero va registrando enlazados a dicho código.
+  2. Cuando el presupuesto esté completamente rendido y el saldo concilie a cero, haz clic en el botón **Cerrar Presupuesto** para archivarlo como histórico y bloquear nuevas vinculaciones de gastos.
 
 ---
 
-## 6. Bandeja de Eliminación de Archivos y Planos
+## 3. Bandeja de Aprobaciones Pendientes (Gastos y Anulaciones)
 
-El panel de **Solicitudes de Eliminación** dentro de la sección de documentos centraliza las peticiones de los ingenieros para borrar archivos de los expedientes digitales de los socios (por ejemplo, planos mal cargados, memorias descriptivas desactualizadas o comprobantes incorrectos).
+Este panel centraliza las operaciones del personal que requieren la autorización de un supervisor antes de impactar el balance de la empresa:
 
-### Procedimiento:
-1. Revisa el documento que se solicita eliminar, el nombre del socio al que pertenece y el motivo del borrado expuesto por el ingeniero.
-2. Si la solicitud es válida, haz clic en **Aprobar**.
-3. El sistema eliminará permanentemente el archivo físico de los servidores en la nube y lo borrará del expediente digital del socio de manera definitiva.
+* **Dónde ir:** Haz clic en **Aprobaciones Pendientes** en el menú lateral.
+
+### A. Autorización de Gastos:
+1. Revisa la lista de gastos pendientes enviados por los ingenieros de campo.
+2. Haz clic en el enlace **Ver Comprobante** para abrir la imagen o PDF del sustento en otra pestaña, o lee los comentarios si el gasto fue declarado como *Declaración Jurada*.
+3. Si el gasto está vinculado a un presupuesto, el sistema mostrará una alerta indicando el código y motivo del presupuesto afectado.
+4. Presiona **Aprobar** para insertar formalmente el egreso (registrado con valor negativo) en el flujo de cuentas del sistema y actualizar el saldo del presupuesto. Presiona **Rechazar** si no procede.
+
+### B. Autorización de Anulación de Ingresos o Gastos:
+1. Si un usuario reporta que digitó mal una transacción (ingreso o egreso) y solicita su corrección, verás la solicitud detallando el ID de transacción y el motivo de anulación.
+2. Revisa el caso y haz clic en **Aprobar**.
+3. El sistema anulará administrativamente la transacción (la ocultará de los listados generales y actualizará al instante los saldos consolidados de cuentas y presupuestos).
 
 ---
 
-## 7. Auditoría y Registro de Operaciones
+## 4. Bandeja de Eliminación de Archivos (en Expedientes)
 
-La sección de **Seguridad y Auditoría** te permite supervisar cada movimiento realizado dentro de la plataforma para garantizar la transparencia administrativa:
+Esta bandeja te permite autorizar la eliminación física de documentos y planos en la nube solicitados por los ingenieros:
 
-* **Inspección de Transacciones:** El sistema genera un registro inalterable cada vez que se inserta, modifica o elimina un dato en los módulos de ingresos, gastos, socios o control de asistencia.
-* **Detalle del Cambio:** Al presionar **Inspeccionar**, podrás comparar la información guardada antes y después de la modificación, identificando al usuario que realizó la acción y la hora exacta de la transacción.
-* **Exportar Reportes:** Utiliza el botón **Exportar Logs** para descargar la auditoría filtrada directamente en formato Excel.
+* **Dónde ir:** Ingresa a **Expedientes Digitales** (o **Documentos**) y haz clic en la pestaña **Solicitudes de Eliminación** (solo visible para Administradores).
+* **Cómo procesar:**
+  1. Revisa el documento que se solicita eliminar, el socio al que pertenece y la justificación dada por el ingeniero de campo.
+  2. Haz clic en **Aprobar** para borrar de forma definitiva el archivo del servidor de almacenamiento de la plataforma y retirar el link del expediente digital del socio, o haz clic en **Rechazar** para descartar la solicitud.
+
+---
+
+## 5. Módulo de Seguridad y Auditoría
+
+Este módulo te permite supervisar cada interacción y modificación de datos realizada en el sistema:
+
+* **Dónde ir:** Haz clic en el menú **Auditoría**.
+* **Cómo Inspeccionar Modificaciones:**
+  1. Visualiza el listado de eventos ordenados cronológicamente.
+  2. Haz clic en el botón **Inspeccionar** sobre cualquier log.
+  3. Se abrirá una ventana emergente mostrando dos recuadros de código JSON:
+     * **Datos Anteriores:** Muestra cómo estaba registrada la información antes de la acción del usuario.
+     * **Datos Nuevos:** Muestra el cambio exacto guardado tras la acción.
+  4. Identifica qué usuario realizó el cambio y a qué hora precisa.
+* **Descarga de Reporte:** Haz clic en **Exportar Logs** para descargar la lista filtrada de eventos en formato Excel.

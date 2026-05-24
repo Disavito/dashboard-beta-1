@@ -1,101 +1,74 @@
-# Guía de Usuario: Finanzas - FIMAGADI
+# Guía de Usuario en el Dashboard: Finanzas - FIMAGADI
 
-Bienvenido a la guía oficial de usuario para el perfil de **Finanzas**. Como responsable del control de fondos, registros contables y tesorería de la empresa, posees acceso a los módulos de cobros de socios, conciliación bancaria, facturación tributaria, y declaración electrónica de resúmenes diarios ante la SUNAT.
-
----
-
-## 1. Registro de Aportaciones de Socios (Ingresos)
-
-El módulo de **Ingresos** te permite llevar un control riguroso de todos los pagos ordinarios o extraordinarios realizados por los socios titulares:
-
-### A. Registro de Cobros Individuales:
-1. Ve a la sección **Ingresos** y haz clic en **Registrar Ingreso**.
-2. Digita el DNI o Nombre del titular en el campo de búsqueda para cargar automáticamente su perfil.
-3. Rellena los datos de la transacción en el formulario:
-   * **Monto:** Escribe el valor exacto recibido en Soles.
-   * **Fecha:** Elige el día en que se hizo efectivo el cobro.
-   * **Cuenta:** Selecciona la cuenta corriente de la empresa donde ingresará el dinero (por ejemplo, *BBVA*, *BCP* o *Efectivo*).
-   * **Tipo de Transacción:** Selecciona el método de pago (*Efectivo*, *Depósito* o *Transferencia*).
-   * **Número de Operación:** Digita el número de comprobante o código de transacción bancaria para el cruce de cuentas.
-4. **Comprobante Digital:** Al guardar la transacción, el sistema le asignará un número correlativo de recibo automático y generará de inmediato un recibo de pago en PDF para su descarga o impresión.
-
-### B. Regla Especial para Socios de Extrema Pobreza (Monto S/. 0.00):
-* Los socios calificados bajo la condición de **Extrema Pobreza** no realizan aportaciones económicas.
-* Sin embargo, para mantener al día el estado de su expediente digital en la plataforma, **es obligatorio generarles un recibo en el sistema con un monto de S/. 0.00**. Esto permite marcarlos como activos y habilitados en el dashboard sin alterar los balances de caja chica.
-
-### C. Doble Sistema de Recibos (Físicos vs. Virtuales):
-Al conciliar la solvencia o estado de pago de un socio en el dashboard, ten en cuenta las dos modalidades de sustento válidas:
-1. **Recibos Físicos:** Comprobantes emitidos manualmente en papel en gestiones previas a la instalación de la plataforma actual. Varios socios históricos solo poseen recibos físicos para acreditar su condición de "Pagados". Estos documentos físicos son comprobantes de sustento válidos y aprobados.
-2. **Recibos Virtuales:** Los nuevos recibos generados directamente por la plataforma al registrar aportaciones digitales.
-
-### D. Gestión de Observaciones en el Padrón de Socios:
-* **Pago Observado:** Si al conciliar detectas un Yape depositado a una cuenta ajena a la empresa, un pago duplicado o alguna discrepancia de depósitos, debes activar la opción **Pago Observado** en la ficha del socio y detallar el caso. Esto deja el cobro bajo advertencia para su posterior saneamiento.
-* **Socio Observado (Administrativo):** Si detectas que al titular le faltan documentos esenciales (como su constancia de posesión) o si su perfil está repetido en la base de datos, marca la casilla **Observado** detallando el motivo para alertar a los ingenieros y administradores.
-
-### E. Autocompletado por Localidad y Datos Opcionales:
-* Al registrar o modificar datos de vivienda, al seleccionar la **Localidad**, el sistema auto-completa los campos de Distrito, Provincia y Región. Solo debes digitar la Dirección de la casa.
-* Los campos de Manzana (Mz) y Lote (Lt) son opcionales, pero si el socio cuenta con ellos, es obligatorio ingresarlos.
-* **Corroboración:** Siempre debes verificar que todos los datos obtenidos mediante la búsqueda del DNI del socio sean correctos y válidos antes de consolidar el registro.
+Bienvenido al manual operativo de usuario para el perfil de **Finanzas**. Este documento detalla de manera exhaustiva el funcionamiento del **Dashboard de FIMAGADI** para tu rol, indicando a qué módulos ingresar, qué botones presionar, qué opciones seleccionar y cómo realizar el control de recaudaciones y declaraciones electrónicas dentro de la plataforma.
 
 ---
 
-## 2. Conciliación y Flujo de Cuentas Bancarias
+## 1. Módulo de Recaudación (Ingresos)
 
-El panel de **Cuentas y Tesorería** es tu consola de supervisión de liquidez y flujos en tiempo real:
+Esta sección permite registrar las aportaciones de los socios y emitir sus comprobantes:
 
-* **Gráficas de Análisis:** En la parte superior, revisa los gráficos analíticos mensuales. Puedes cambiar la escala de tiempo a *Día, Mes, Trimestre o Año* para visualizar la relación entre ingresos y gastos.
-* **Control y Cuadrado de Caja:**
-  * En la tabla de **Historial Unificado**, revisa las últimas transacciones registradas.
-  * Verifica que cada aporte e informe de gasto esté vinculado a su cuenta bancaria correspondiente para que el saldo de la plataforma coincida exactamente con tus estados de cuenta bancarios reales.
-* **Generación de Cierre de Caja:**
-  * Puedes filtrar el historial usando palabras clave, nombres de socios o números de recibos.
-  * Presiona el botón **Reporte PDF (Cierre)** para descargar un documento formal en PDF que consolide todos los movimientos financieros registrados en el periodo seleccionado.
-
----
-
-## 3. Emisión de Comprobantes y Facturación Comercial
-
-El módulo de Facturación centraliza la administración tributaria y contable de los socios:
-
-* **Consulta de Comprobantes:** Revisa e inspecciona el historial de Facturas, Boletas de Venta y Notas de Crédito generadas por el sistema.
-* **Anulación con Notas de Crédito:** Emite notas de crédito vinculadas a comprobantes emitidos previamente en caso de anulaciones de aportes o devoluciones.
-* **Cierre Contable:** Exporta las transacciones del mes a un archivo consolidado en Excel y compártelo directamente con el contador de la empresa para la liquidación mensual de impuestos.
+* **Dónde ir:** En el menú izquierdo, haz clic en **Ingresos**.
+* **Cómo Registrar una Aportación:**
+  1. Haz clic en el botón **Registrar Ingreso** (esquina superior derecha).
+  2. En el buscador de socios, escribe el DNI o nombres del socio y selecciónalo en el listado desplegable.
+  3. Rellena los datos en el formulario:
+     * **Monto:** Escribe el valor exacto recibido.
+       * *Regla para Socios de Extrema Pobreza:* Si el socio califica bajo esta condición, no se recibe efectivo, pero debes registrar obligatoriamente el ingreso digitando **Monto: 0.00**. Esto regulariza su estado en el padrón sin alterar la contabilidad de caja.
+     * **Cuenta:** Selecciona la cuenta bancaria de destino (BBVA, BCP, Efectivo).
+     * **Tipo de Transacción:** Elige la vía de pago (Efectivo, Depósito, Transferencia).
+     * **Número de Operación:** Digita el código de confirmación del depósito bancario.
+     * **Fecha:** Selecciona el día en que se realizó la operación.
+  4. Haz clic en **Guardar**.
+  5. **Comprobante Digital:** El sistema asignará el número de recibo de inmediato y abrirá una pestaña del navegador con el recibo en PDF para que lo descargues o imprimas de forma directa.
+* **Cómo Revertir o Modificar un Ingreso:**
+  * Si registraste un aporte por error y necesitas anularlo, ubica la fila del recibo en la tabla, haz clic en **Eliminar** (Tacho rojo) e ingresa de forma obligatoria el motivo de la anulación. Esto creará una solicitud de anulación para aprobación del Administrador.
 
 ---
 
-## 4. Resúmenes Diarios de Boletas y Comunicaciones de Baja (SUNAT)
+## 2. Módulo de Cuentas y Tesorería (Conciliaciones y Caja)
 
-Para cumplir con las normas fiscales, debes reportar de forma diaria los comprobantes simplificados (boletas) emitidos por la organización:
+Este panel sirve para supervisar el flujo de efectivo y emitir cierres contables:
 
-1. Ve a la sección **Resúmenes Diarios y Bajas**.
-2. **Generación del Resumen:**
-   * Utiliza el selector de calendario para elegir el día de las boletas que deseas declarar.
-   * Haz clic en **Generar Resumen del Día**. El sistema buscará todas las boletas de esa fecha y armará un agrupamiento detallado. Revisa que el listado esté completo.
-3. **Envío a SUNAT:**
-   * Haz clic en el botón **Enviar Resumen a SUNAT**. El sistema transmitirá los comprobantes a la plataforma electrónica tributaria y te asignará un número de **Ticket** de seguimiento.
-4. **Monitoreo de Tickets:**
-   * Revisa la tabla del **Historial de Resúmenes Enviados** para verificar el estado devuelto por SUNAT (*Aceptado*, *Rechazado*, o *Pendiente*).
-
----
-
-## 5. Auditoría y Registro de Egresos (Gastos)
-
-Tienes la responsabilidad de fiscalizar los gastos reportados por los ingenieros de campo antes de registrarlos formalmente como egresos de la tesorería:
-
-1. Ve a la sección **Aprobaciones Pendientes**.
-2. **Fiscalización de Consumos:**
-   * Revisa el monto, la fecha, la categoría (por ejemplo, *Viáticos* u *Otros*) y el concepto detallado.
-   * Presiona **Ver Comprobante** para comprobar que el archivo digital adjunto coincida con lo digitado, o audita la justificación si el gasto fue registrado como **Declaración Jurada**.
-   * Si todo está correcto, haz clic en **Aprobar** para registrar el egreso y descontar el monto de la cuenta bancaria seleccionada.
-
-### Gastos Administrativos Auto-Aprobados:
-Cuando registres egresos de la administración desde el módulo de gastos (por ejemplo, compras de oficina, servicios públicos, sueldos o pago de alquileres), el sistema identificará la categoría de *Gasto Fijo* o subcategoría de *Sueldo* y la insertará directamente como **"Auto-Aprobada"**, debitando el dinero de caja chica de inmediato sin requerir aprobación.
+* **Dónde ir:** En el menú izquierdo, haz clic en **Cuentas**.
+* **Gráficas e Indicadores:**
+  * En la parte superior, visualiza los indicadores de Saldo Neto, Ingresos y Gastos.
+  * Cambia la agrupación del gráfico de flujo haciendo clic en las pestañas **Día**, **Mes**, **Trimestre** o **Año**.
+* **Filtros de Historial Unificado:**
+  * En la tabla de transacciones de la parte inferior, filtra la lista abriendo los selectores **Todos los tipos** (de cuentas) o **Todas las cuentas** y eligiendo la cuenta a conciliar.
+  * Utiliza la barra de búsqueda de la tabla para buscar por nombre del socio o número de recibo/operación.
+* **Descargar Cierre de Caja:**
+  * Una vez filtrada la tabla con los datos que deseas conciliar, haz clic en el botón **Reporte PDF (Cierre)**. El sistema descargará automáticamente el documento consolidado en formato PDF.
+* **Registro de Movimientos Administrativos Directos:**
+  * **Qué hacer:** Si necesitas registrar un gasto propio de la oficina (ej. alquileres, luz, planillas), haz clic en el botón **Nuevo Movimiento** en este panel.
+  * **Qué ocurre:** Completa el formulario de egresos. Si seleccionas la categoría *Gasto Fijo* o subcategoría *Sueldo*, el sistema omitirá la cola de autorizaciones y restará el dinero de la cuenta de forma automática e inmediata (gasto auto-aprobado).
 
 ---
 
-## 6. Procedimiento para Anulación de Transacciones Erróneas
+## 3. Módulo de Resúmenes Diarios y Bajas (SUNAT)
 
-Si cometes un error al registrar un ingreso o un egreso ya consolidado:
-1. No podrás eliminar el registro de forma directa por motivos de seguridad del sistema.
-2. Deberás enviar una **Solicitud de Eliminación** detallando la justificación del error.
-3. Esta solicitud se enviará al Administrador. Una vez que este la apruebe, el sistema anulará el registro contable automáticamente (ocultándolo de las vistas del dashboard y recalculando de inmediato los saldos de cuentas y presupuestos afectados).
+Este módulo gestiona la declaración tributaria de las boletas del día ante la SUNAT de forma electrónica:
+
+* **Dónde ir:** En el menú lateral, bajo Facturación, haz clic en **Resúmenes Diarios**.
+* **Declarar Boletas del Día:**
+  1. En el selector de fecha del calendario, elige el día de las transacciones que deseas declarar.
+  2. Haz clic en el botón **Generar Resumen del Día**. Revisa el listado consolidado que se muestra en pantalla.
+  3. Haz clic en **Enviar Resumen a SUNAT**.
+  4. El sistema transmitirá los datos e insertará el número de **Ticket** oficial en la tabla de historial.
+* **Seguimiento del Envío:**
+  * Revisa la tabla del historial de envíos de la parte inferior de la pantalla para monitorear el estado devuelto por la SUNAT:
+    * `Aceptado` (Etiqueta verde): Envío exitoso, la declaración ha sido procesada de forma conforme.
+    * `Rechazado` (Etiqueta roja): Error en los comprobantes; debes re-evaluar y re-enviar.
+    * `Pendiente` (Etiqueta amarilla): Envío en cola de procesamiento.
+
+---
+
+## 4. Bandeja de Aprobaciones Pendientes (Gastos)
+
+Esta bandeja te permite autorizar la salida de fondos reportada por el equipo de campo:
+
+* **Dónde ir:** En el menú izquierdo, haz clic en **Aprobaciones Pendientes**.
+* **Cómo procesar:**
+  1. Revisa las solicitudes de egresos cargadas por los ingenieros.
+  2. Haz clic en **Ver Comprobante** para comprobar que el sustento digital coincida con el monto registrado, o valida los detalles si es una Declaración Jurada.
+  3. Si la solicitud es correcta, haz clic en **Aprobar** para que el egreso (representado con valor negativo) se consolide en el sistema de cuentas de tesorería y reste del presupuesto correspondiente. Si detectas fallos, haz clic en **Rechazar**.
