@@ -1,88 +1,87 @@
 # Guía de Usuario: Finanzas - FIMAGADI
 
-Bienvenido a la guía oficial de usuario para el perfil de **Finanzas**. Como responsable del control contable y tesorería de la empresa, posees acceso a los módulos de ingresos, conciliación bancaria, facturación tributaria, emisión de comprobantes y resúmenes diarios para la Superintendencia Nacional de Aduanas y de Administración Tributaria (SUNAT).
+Bienvenido a la guía oficial de usuario para el perfil de **Finanzas**. Como responsable del área contable, control de fondos y tesorería de la empresa, posees el acceso a las herramientas de recaudación, conciliación bancaria, facturación tributaria, y declaración electrónica de resúmenes diarios ante la SUNAT.
 
 ---
 
 ## 1. Registro de Aportaciones de Socios (Ingresos)
 
-El módulo de **Ingresos** registra las aportaciones ordinarias y extraordinarias abonadas por los socios de la organización:
+El módulo de **Ingresos** te permite llevar un control riguroso de todos los pagos y cuotas ordinarias o extraordinarias realizadas por los socios titulares:
 
 ### Registrar Ingreso Individual:
-1. Ingresa a la sección **Ingresos** y haz clic en **Registrar Ingreso**.
-2. Escribe el número de DNI o Nombre del titular en el buscador. El sistema utilizará la consulta atómica de la base de datos para recuperar su información en tiempo real.
-3. Rellena los datos obligatorios del formulario:
-   * **Monto:** Ingresa el valor exacto recibido en Soles.
-   * **Fecha:** Selecciona el día en que se hizo efectivo el cobro.
-   * **Cuenta:** Selecciona la cuenta bancaria de destino (tabla `cuentas`).
-   * **Tipo de Transacción:** Selecciona el canal de pago (ej. *Efectivo, Depósito, Transferencia*).
-   * **Número de Operación (`numeroOperacion`):** Digita el número de comprobante bancario para control de conciliaciones.
-4. **Emisión de Recibo Digital:** Al hacer clic en guardar, el sistema generará automáticamente un número de recibo correlativo único (`receipt_number`), escribirá el registro en la tabla `ingresos` y abrirá una ventana para descargar o imprimir el comprobante de pago en PDF.
+1. Ve a la sección **Ingresos** y haz clic en **Registrar Ingreso**.
+2. Digita el DNI o Nombre del titular en el campo de búsqueda. El sistema recuperará automáticamente sus datos de identidad de la base de datos de socios.
+3. Rellena los datos de la transacción en el formulario:
+   * **Monto:** Escribe el valor exacto recibido en Soles.
+   * **Fecha:** Elige el día en que se hizo efectivo el cobro.
+   * **Cuenta:** Selecciona la cuenta bancaria de la empresa donde ingresará el dinero (por ejemplo, *BBVA*, *BCP* o *Efectivo*).
+   * **Tipo de Transacción:** Selecciona el método de pago (*Efectivo*, *Depósito* o *Transferencia*).
+   * **Número de Operación:** Digita el número de comprobante o código de transacción bancaria para futuras conciliaciones.
+4. **Emisión de Recibo en PDF:** Al guardar la transacción, el sistema le asignará un número correlativo de recibo automático, ingresará el cobro a las cuentas del sistema y generará de inmediato un comprobante digital en PDF listo para ser descargado o impreso para el socio.
 
 ---
 
-## 2. Administración de Cuentas y Conciliación Bancaria
+## 2. Conciliación y Flujo de Cuentas Bancarias
 
-El módulo **Cuentas y Tesorería** (`Accounts.tsx`) es el visor de liquidez en tiempo real de FIMAGADI. Permite mantener control de las cuentas bancarias (BBVA, Efectivo, Caja Chica, etc.):
+El panel de **Cuentas y Tesorería** es tu consola de supervisión de liquidez y flujos en tiempo real:
 
-* **Análisis de Flujo:** En la parte superior, visualiza las gráficas analíticas comparando Ingresos versus Gastos. Puedes ajustar la escala de tiempo a *Día, Mes, Trimestre o Año*.
-* **Conciliación Periódica:** 
-  1. Verifica que los movimientos mostrados en la tabla del **Historial Unificado** coincidan exactamente con los extractos de tus cuentas bancarias reales.
-  2. Cada ingreso y gasto registrado debe estar asociado a su respectiva cuenta en la columna `account` para reflejar el saldo neto disponible correcto.
-* **Cierre de Caja y Reportes en PDF:**
-  1. En el Historial Unificado, realiza búsquedas por socio o número de recibo para filtrar transacciones.
-  2. Haz clic en el botón **Reporte PDF (Cierre)** para descargar de forma automática el archivo `Cierre_Caja_[fecha].pdf` que consolida todos los movimientos del periodo.
-
----
-
-## 3. Emisión de Comprobantes y Facturación Electrónica
-
-El sub-módulo de Facturación controla las obligaciones y facturas comerciales de la entidad:
-
-* **Auditoría de Comprobantes:** Desde el panel de facturación, visualiza e inspecciona de forma independiente Facturas, Boletas de Venta y Notas de Crédito emitidas.
-* **Notas de Crédito:** Genera notas de crédito asociadas a boletas o facturas previas ante anulaciones o devoluciones de aportes.
-* **Cierre Contable:** Descarga los reportes mensuales consolidados en formato Excel para ser enviados directamente al área contable externa de la empresa.
+* **Gráficas de Análisis:** En la parte superior, revisa los gráficos analíticos mensuales. Puedes cambiar la escala de tiempo a *Día, Mes, Trimestre o Año* para visualizar la relación entre ingresos y gastos.
+* **Control y Cuadrado de Caja:**
+  * En la tabla de **Historial Unificado**, revisa las últimas transacciones registradas.
+  * Verifica que cada aporte e informe de gasto esté vinculado a su cuenta bancaria correspondiente para que el saldo de la plataforma coincida exactamente con tus estados de cuenta bancarios reales.
+* **Generación de Cierre de Caja:**
+  * Puedes filtrar el historial usando palabras clave, nombres de socios o números de recibos.
+  * Presiona el botón **Reporte PDF (Cierre)** para descargar un documento formal en PDF que consolide todos los movimientos financieros registrados en el periodo seleccionado.
 
 ---
 
-## 4. Gestión de Resúmenes Diarios de Boletas y Bajas (SUNAT)
+## 3. Emisión de Comprobantes y Facturación Comercial
 
-Para cumplir con las regulaciones de la SUNAT, debes generar y reportar diariamente los comprobantes emitidos:
+El módulo de Facturación centraliza la administración tributaria y contable de los socios:
 
-1. Ingresa a la sección **Resúmenes Diarios y Bajas** (`ResumenDiarioPage.tsx`).
+* **Consulta de Comprobantes:** Revisa e inspecciona el historial de Facturas, Boletas de Venta y Notas de Crédito generadas por el sistema.
+* **Anulación con Notas de Crédito:** Emite notas de crédito vinculadas a comprobantes emitidos previamente en caso de anulaciones de aportes o devoluciones.
+* **Cierre Contable:** Exporta las transacciones del mes a un archivo consolidado en Excel y compártelo directamente con el contador de la empresa para la liquidación mensual de impuestos.
+
+---
+
+## 4. Resúmenes Diarios de Boletas y Comunicaciones de Baja (SUNAT)
+
+Para cumplir con las normas fiscales, debes reportar de forma diaria los comprobantes simplificados (boletas) emitidos por la organización:
+
+1. Ve a la sección **Resúmenes Diarios y Bajas**.
 2. **Generación del Resumen:**
-   * Selecciona la fecha de los comprobantes a declarar mediante el selector de calendario.
-   * Haz clic en **Generar Resumen del Día**. El sistema consultará la base de datos y agrupará todas las boletas de venta emitidas en dicha fecha en la tabla `resumen_diario_boletas`.
-   * Revisa la lista previa generada.
-3. **Envío Electrónico:**
-   * Presiona el botón **Enviar Resumen a SUNAT**.
-   * El sistema enviará el paquete XML a los servidores de SUNAT mediante API y obtendrá un número de **Ticket** de respuesta único.
+   * Utiliza el selector de calendario para elegir el día de las boletas que deseas declarar.
+   * Haz clic en **Generar Resumen del Día**. El sistema buscará todas las boletas de esa fecha y armará un agrupamiento detallado. Revisa que el listado esté completo.
+3. **Envío a SUNAT:**
+   * Haz clic en el botón **Enviar Resumen a SUNAT**. El sistema transmitirá los comprobantes a la plataforma electrónica tributaria y te asignará un número de **Ticket** de seguimiento.
 4. **Monitoreo de Tickets:**
-   * En la tabla **Historial de Resúmenes Enviados**, realiza el seguimiento del estado de cada envío:
-     * `Aceptado`: La SUNAT procesó y validó el resumen con éxito.
-     * `Rechazado`: Presenta inconsistencias; deberás subsanar los comprobantes y re-enviar.
-     * `Pendiente`: En cola de procesamiento.
+   * Revisa la tabla del **Historial de Resúmenes Enviados** para verificar el estado devuelto por SUNAT:
+     * *Aceptado:* El envío fue exitoso y la declaración está conforme.
+     * *Rechazado:* Presenta inconsistencias; deberás revisar los recibos de la fecha y volver a transmitir.
+     * *Pendiente:* En cola de espera en la plataforma tributaria.
 
 ---
 
-## 5. Fiscalización y Aprobación de Egresos
+## 5. Auditoría y Registro de Egresos (Gastos)
 
-Tienes atribuciones para revisar y autorizar los gastos rendidos por el personal técnico antes de consolidarlos en los balances de tesorería:
+Tienes la responsabilidad de fiscalizar los gastos reportados por los ingenieros de campo antes de registrarlos formalmente como egresos de la tesorería:
 
-1. Ve a **Aprobaciones Pendientes**.
-2. **Auditoría de Gastos:**
-   * Verifica los montos (ingresados como valores negativos en la tabla `gastos`), las clasificaciones (*Viáticos*, *Gasto Fijo* u *Otros*) y la descripción detallada.
-   * Abre el archivo adjunto para verificar la validez tributaria del comprobante subido o evalúa los motivos si fue cargado como *Declaración Jurada*.
-   * Si es correcto, haz clic en **Aprobar** para habilitar el egreso y actualizar la cuenta afectada.
+1. Ve a la sección **Aprobaciones Pendientes**.
+2. **Fiscalización de Consumos:**
+   * Revisa el monto, la fecha, la categoría (por ejemplo, *Viáticos* u *Otros*) y el concepto detallado.
+   * Presiona **Ver Comprobante** para comprobar que el archivo digital adjunto coincida con lo digitado, o audita la justificación si el gasto fue registrado como **Declaración Jurada**.
+   * Verifica si está asociado a un presupuesto operativo y si su concepto está alineado con la justificación del viaje de campo.
+   * Si todo está correcto, haz clic en **Aprobar** para registrar el egreso y descontar el monto de la cuenta bancaria seleccionada.
 
-### Auto-Aprobación de Gastos Administrativos Directos:
-Para agilizar la contabilidad ordinaria, cuando registres egresos propios de la administración de finanzas (ej. luz, agua, sueldos de personal o alquiler de oficinas) directamente desde el módulo de **Gastos**, el sistema identificará la categoría como **"Gasto Fijo"** o subcategoría **"Sueldo"** y la insertará directamente en la base de datos como **"Auto-Aprobada"**, evitando pasar por la cola de aprobación.
+### Gastos Administrativos Auto-Aprobados:
+Para optimizar el flujo de trabajo, cuando registres egresos de la administración desde el módulo de gastos (por ejemplo, compras de oficina, servicios públicos, sueldos o pago de alquileres), el sistema identificará la categoría de *Gasto Fijo* o subcategoría de *Sueldo* y la insertará directamente como **"Auto-Aprobada"**, debitando el dinero de caja chica de inmediato sin requerir aprobación.
 
 ---
 
-## 6. Procedimiento ante Errores (Solicitudes de Eliminación)
+## 6. Procedimiento para Anulación de Transacciones Erróneas
 
-Si cometes un error al digitar una aportación o un egreso ya consolidado en el sistema:
-1. No podrás borrar el registro directamente por políticas de seguridad RLS.
-2. Deberás enviar una **Solicitud de Eliminación** indicando el motivo y la justificación.
-3. Esta solicitud será procesada por el Administrador en la bandeja central. Una vez aprobada, el sistema aplicará un borrado lógico (`deleted_at = now()`), recalculando de manera transparente todos los balances y reportes asociados.
+Si cometes un error al registrar un ingreso o un egreso ya consolidado:
+1. No podrás eliminar el registro de forma directa por motivos de seguridad del sistema.
+2. Deberás enviar una **Solicitud de Eliminación** detallando la justificación del error.
+3. Esta solicitud se enviará al Administrador. Una vez que este la apruebe, el sistema anulará el registro contable automáticamente (ocultándolo de las vistas del dashboard y recalculando de inmediato los saldos de cuentas y presupuestos afectados).

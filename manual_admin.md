@@ -1,104 +1,103 @@
 # Guía de Usuario: Administrador - FIMAGADI
 
-Bienvenido a la guía oficial de usuario para el perfil de **Administrador**. Como usuario administrador, posees privilegios totales sobre la configuración del sistema, la administración de personal y permisos personalizados, la fiscalización presupuestaria, el procesamiento de solicitudes de aprobaciones críticas, y la auditoría de eventos inmutables de la base de datos.
+Bienvenido a la guía oficial de usuario para el perfil de **Administrador**. Como usuario administrador, posees el control absoluto sobre la parametrización de horarios, la asignación de accesos especiales al personal, la autorización y control de presupuestos, el procesamiento de solicitudes críticas de aprobación (tanto de gastos como de eliminaciones) y la revisión de los registros de auditoría del sistema.
 
 ---
 
-## 1. Configuración del Sistema y Parámetros Operativos
+## 1. Configuración de Horarios y Políticas de Asistencia
 
-El módulo **Configuración** (dentro del menú de Administración) permite modelar el comportamiento global de las reglas del negocio de FIMAGADI:
+La plataforma calcula de forma automática la puntualidad de los ingenieros al ingresar y salir del trabajo:
 
-### A. Control de Asistencia y Tolerancias (Tabla `configuracion`)
-El sistema valida automáticamente las marcaciones de los ingenieros contrastando sus horarios de marcado con la tabla `configuracion` (claves: `horario_entrada` y `horario_salida`).
-1. Ve a la pestaña **Horarios** en el panel de Configuración.
-2. Define los rangos de inicio y fin para el ingreso y salida permitidos:
-   * *Horario de Entrada:* Por defecto configurado como `{"inicio": "09:20", "fin": "09:45"}`. Cualquier marca fuera de este rango requerirá justificación del empleado.
-   * *Horario de Salida:* Por defecto configurado como `{"inicio": "18:20", "fin": "18:40"}`.
-3. Al guardar, los cambios se escriben directamente en la base de datos y surten efecto inmediato para todos los colaboradores de campo.
+### Procedimiento para Ajustar Horarios:
+1. Ve al panel de **Configuración** y selecciona la pestaña **Horarios**.
+2. Define los rangos permitidos para las marcaciones diarias:
+   * **Horario de Entrada:** Define la hora de inicio y de fin de la ventana de entrada permitida (por ejemplo, de 09:20 a 09:45). Toda marcación registrada después del límite establecido exigirá obligatoriamente que el ingeniero ingrese una justificación.
+   * **Horario de Salida:** Define la hora de inicio y de fin para el registro de salida (por ejemplo, de 18:20 a 18:40). Toda salida fuera de este rango requerirá justificación del empleado.
+3. Guarda los cambios. Las nuevas reglas se aplicarán inmediatamente a todas las marcaciones futuras del personal de campo.
 
-### B. Gestión de Personal y Permisos Granulares (`custom_permissions` JSONB)
-En FIMAGADI, además de los roles tradicionales (`admin`, `finanzas_senior`, `engineer`), puedes asignar **permisos modulares específicos** a cualquier colaborador. Esto se almacena en la columna JSONB `custom_permissions` de la tabla `colaboradores`.
-1. Ve a la pestaña **Equipo** en Configuración.
+---
+
+## 2. Gestión de Personal y Permisos Modulares
+
+Además de los roles preestablecidos (*Administrador*, *Finanzas*, *Ingeniero*), el sistema te permite otorgar o remover **accesos específicos** a cualquier colaborador de forma individual:
+
+### Procedimiento para Asignar Accesos:
+1. Ve a la pestaña **Equipo** en el panel de Configuración (o Gestión de Usuarios).
 2. Selecciona al colaborador que deseas configurar.
-3. Activa o desactiva las casillas correspondientes para otorgar las siguientes capacidades independientes:
-   * **Facturación Exclusiva (`can_invoice_only`):** Habilita únicamente el acceso al módulo de emisión de boletas, facturas y resúmenes diarios de SUNAT.
-   * **Encargado de Inventario (`can_manage_inventory`):** Asigna privilegios completos sobre el almacén de equipos (creación de catálogo, checkout atómico de herramientas y devoluciones).
-   * **Administrador de Jornada (`can_manage_jornada`):** Otorga permisos para ver el seguimiento del personal y registrar/editar manualmente registros de asistencia de otros empleados.
-   * **Gestor Financiero (`can_manage_finances`):** Permite ver, registrar y auditar todos los ingresos, egresos y conciliación de cuentas.
-   * **Visualización de Egresos (`can_view_expenses`):** Acceso en modo lectura al registro histórico de gastos.
-   * **Visualización de Ingresos (`can_view_income`):** Acceso en modo lectura al registro histórico de aportes de socios.
-   * **Visualización de Cuentas (`can_view_accounts`):** Acceso en modo lectura al panel de tesorería y balances de caja.
+3. Utiliza los selectores individuales para activar o desactivar los siguientes permisos independientes:
+   * **Facturación Exclusiva:** Otorga acceso únicamente al módulo de emisión de comprobantes de pago (Boletas, Facturas, Notas de Crédito y resúmenes de declaración tributaria).
+   * **Encargado de Inventario:** Permite controlar el almacén técnico, realizar salidas a campo y registrar la devolución de herramientas.
+   * **Administrador de Jornada:** Habilita el panel de seguimiento de personal para revisar los registros de horas y registrar marcaciones manuales en caso de olvidos.
+   * **Gestor Financiero:** Habilita el control de ingresos de socios, el registro de egresos y el panel de tesorería.
+   * **Ver Gastos:** Permite el acceso de solo lectura al registro histórico de gastos.
+   * **Ver Ingresos:** Permite el acceso de solo lectura al registro histórico de aportes.
+   * **Ver Cuentas:** Permite el acceso de solo lectura al panel de caja y cuentas.
 
 ---
 
-## 2. Gestión y Liquidación de Presupuestos Operativos
+## 3. Control y Aprobación de Presupuestos Operativos
 
-Los presupuestos operativos (`presupuestos_operativos`) permiten financiar los traslados y compras del equipo en obra. Como Administrador, eres el responsable de evaluar y liquidar estas solicitudes:
+Los presupuestos operativos sirven para financiar los traslados y viáticos de los ingenieros en obra. Eres el encargado de evaluar, aprobar y liquidar estas solicitudes:
 
 1. Ve a la sección **Presupuestos**.
-2. **Evaluación de Solicitudes Pendientes:**
-   * Ubica las solicitudes en estado `Pendiente`. Haz clic en **Aprobar** o **Rechazar**.
-   * Si decides aprobar, evalúa el presupuesto aproximado del ingeniero. Puedes redefinir y fijar el **Monto Aprobado** definitivo.
-   * Digita las observaciones de la transacción (ej. *"Aprobado y depositado en la cuenta de viáticos del Ingeniero para viáticos de Mayo"*).
-3. **Control y Liquidación (Cierre de Presupuesto):**
-   * El sistema calcula dinámicamente el dinero utilizado del presupuesto mediante la función `updateMontoRendido`. Cada vez que el ingeniero registre una boleta o declaración jurada enlazada a su presupuesto, su saldo por rendir se actualizará.
-   * Cuando el ingeniero haya rendido la totalidad de los fondos y el saldo neto sea conciliado, haz clic en **Cerrar Presupuesto** para archivarlo y deshabilitar nuevas cargas asociadas a ese código.
+2. **Evaluación de Solicitudes:**
+   * Ubica las solicitudes en estado *Pendiente*. Haz clic en **Aprobar** o **Rechazar**.
+   * Si decides aprobar, puedes modificar el campo **Monto Aprobado** para definir la cantidad definitiva a transferir al ingeniero (por defecto se carga el monto solicitado).
+   * Añade observaciones complementarias de la transferencia.
+3. **Control de Rendiciones y Cierre:**
+   * El sistema descuenta de forma automática el saldo pendiente de cada presupuesto a medida que el ingeniero registra y justifica sus gastos de campo.
+   * Una vez que el ingeniero rinda todos los fondos y el saldo quede en cero o sea conciliado, presiona **Cerrar Presupuesto** para archivarlo de forma definitiva y deshabilitar nuevas cargas.
 
 ---
 
-## 3. Central de Aprobaciones del Sistema (Finanzas y Eliminaciones)
+## 4. Bandeja de Aprobaciones Contables y Anulaciones
 
-La bandeja de **Aprobaciones Pendientes** (`AprobacionesPage.tsx`) procesa las solicitudes críticas generadas por los usuarios que no poseen facultades de inserción directa. Los registros pendientes provienen de la tabla `approval_requests`:
+La bandeja de **Aprobaciones Pendientes** centraliza las operaciones sensibles del equipo que requieren la validación de un supervisor:
 
-### A. Procesamiento de Gastos Pendientes (`expense_approval` / `engineer_expense` / `high_expense`):
-* **Origen:** Gastos viáticos o generales declarados por ingenieros de campo (con o sin comprobantes) y gastos elevados que exceden los límites regulares.
+### A. Aprobación de Gastos Operativos:
+* **Origen:** Gastos registrados por los ingenieros de campo (viáticos, consumos generales) y egresos elevados que requieren autorización previa.
 * **Acción:**
-  * Revisa los datos en el panel: Monto (representado en negativo para egresos), Categoría, Subcategoría, y Descripción.
-  * Verifica el soporte físico del gasto: haz clic en *"Ver Comprobante"* para auditar la factura/boleta digital o constata si se declaró como *"Declaración Jurada"*.
-  * Si es correcto, haz clic en **Aprobar**. Esto insertará de forma atómica el registro en la tabla `gastos`, calculará su correspondiente código correlativo de gasto (`numero_gasto` como `GA001`, `GA002` etc.), y recalculará la rendición del presupuesto operativo vinculado.
+  * Revisa los datos del gasto: Monto (el sistema representa los egresos con valores negativos para restar de caja), fecha y concepto.
+  * Haz clic en **Ver Comprobante** para comprobar la validez de la boleta o factura digital subida, o evalúa las notas del ingeniero si el consumo fue cargado como **Declaración Jurada**.
+  * Haz clic en **Aprobar** para insertar formalmente el gasto en el balance general de la empresa. Si el gasto estaba vinculado a un presupuesto, el saldo por rendir se actualizará de inmediato.
 
-### B. Procesamiento de Eliminación de Transacciones (`delete_income` / `delete_expense`):
-* **Origen:** Solicitudes enviadas por el personal para corregir errores de digitación de ingresos o egresos ya consolidados.
+### B. Solicitudes de Anulación de Transacciones:
+* **Origen:** Peticiones de corrección por parte de los usuarios al digitar de forma incorrecta un ingreso o un egreso ya consolidado.
 * **Acción:**
-  * Audita la justificación y los ID de los registros involucrados.
-  * Al hacer clic en **Aprobar**, el sistema aplica un **Borrado Lógico** en la base de datos (llenando la columna `deleted_at = now()`). Esto oculta la transacción del dashboard y los reportes para mantener la integridad contable, y recalcula automáticamente los balances de las cuentas y presupuestos afectados.
+  * Revisa la justificación del error.
+  * Al hacer clic en **Aprobar**, el sistema aplicará una anulación administrativa (ocultando el registro del dashboard principal y recalculando de inmediato los saldos de las cuentas y presupuestos afectados).
 
 ---
 
-## 4. Bandeja de Eliminación de Documentos Sensibles
+## 5. Bandeja de Eliminación de Archivos y Planos
 
-El módulo **Solicitudes de Eliminación** (`DeletionRequestsPage.tsx`) centraliza las peticiones de ingenieros para borrar archivos de los expedientes digitales de los socios (DNI, planos, memorias descriptivas, contratos).
+El panel de **Solicitudes de Eliminación** dentro de la sección de documentos centraliza las peticiones de los ingenieros para borrar archivos de los expedientes digitales de los socios (por ejemplo, planos mal cargados, memorias descriptivas desactualizadas o comprobantes incorrectos).
 
-### Procedimiento de Aprobación:
-1. Ve a la pestaña **Solicitudes de Eliminación** dentro de la sección de Documentos.
-2. Audita el tipo de documento solicitado a borrar, el nombre del socio afectado, y la justificación ingresada por el ingeniero.
-3. Haz clic en **Aprobar** para ejecutar la eliminación permanente:
-   * El sistema eliminará físicamente el archivo del Supabase Storage (buscando en los buckets `planos`, `memoria-descriptiva` o `documents`).
-   * Borrará permanentemente la fila en la tabla `socio_documentos` y el registro en la tabla `document_deletion_requests`.
+### Procedimiento:
+1. Revisa el documento que se solicita eliminar, el nombre del socio al que pertenece y el motivo del borrado expuesto por el ingeniero.
+2. Si la solicitud es válida, haz clic en **Aprobar**.
+3. El sistema eliminará permanentemente el archivo físico de los servidores en la nube y lo borrará del expediente digital del socio de manera definitiva.
 
 ---
 
-## 5. Auditoría Inmutable del Sistema (Audit Logs)
+## 6. Auditoría y Registro de Operaciones
 
-La sección **Seguridad y Auditoría** (`AuditPage.tsx`) ofrece total transparencia sobre el uso de la plataforma. La base de datos registra de por vida cada alteración de datos mediante triggers a nivel del motor PostgreSQL (`fn_audit_trigger`):
+La sección de **Seguridad y Auditoría** te permite supervisar cada movimiento realizado dentro de la plataforma para garantizar la transparencia administrativa:
 
-* **Eventos Auditados:** Registra de forma obligatoria las operaciones `INSERT`, `UPDATE` y `DELETE` en las tablas `ingresos`, `gastos`, `socio_titulares` y `registros_jornada`.
-* **Detalle del Cambio:** Al hacer clic en **Inspeccionar** sobre cualquier log, verás una comparativa exacta de:
-  * **Datos Anteriores (`old_data`):** El estado del registro antes del cambio en formato JSON (muy útil para reconstruir o revertir modificaciones incorrectas).
-  * **Datos Nuevos (`new_data`):** El estado final del registro en formato JSON.
-  * Identificación del autor de la modificación (`changed_by`), tabla afectada y fecha exacta.
-* **Exportación de Logs:** Puedes utilizar el botón **Exportar Logs** para descargar la auditoría filtrada directamente en formato Excel (`.xlsx`) para revisiones de gerencia.
+* **Inspección de Transacciones:** El sistema genera un registro automático e inalterable cada vez que se inserta, modifica o elimina un dato en los módulos de ingresos, gastos, socios o control de asistencia.
+* **Detalle del Cambio:** Al presionar **Inspeccionar**, podrás comparar:
+  * **Datos Anteriores:** El estado de la información antes de la modificación (ideal para auditar errores o restaurar datos).
+  * **Datos Nuevos:** El estado de la información guardado después de la modificación.
+  * Información del usuario que realizó la acción, el módulo afectado y la hora exacta de la transacción.
+* **Exportar Reportes:** Utiliza el botón **Exportar Logs** para descargar la auditoría filtrada directamente en formato Excel.
 
 ---
 
-## 6. Organización de Archivos Físicos (`cajas_archivo`)
+## 7. Registro de Cajas Físicas de Archivo
 
-El Administrador (o el Encargado de Inventario) debe asegurar la catalogación y ubicación física de los expedientes originales en papel. Para ello, utilizarás la tabla de base de datos `cajas_archivo`:
+Para mantener organizadas las carpetas impresas de los socios en el almacén de la oficina, utilizarás el módulo de gestión de cajas:
 
-* **Estructura de Archivamiento:** Cada caja física debe ser registrada en el sistema especificando:
-  * **Localidad ID (`localidad_id`):** Comunidad de donde proceden los expedientes.
-  * **Año de Expediente (`anio_expediente`):** Ej. `2026`.
-  * **Número de Caja (`numero_caja`):** El correlativo numérico de organización en la estantería física.
-* **Rotulado y Código QR:** 
-  * Al crear una caja, el sistema generará automáticamente un Código Único de Etiqueta (`codigo_etiqueta`) y un identificador QR único (`qr_uuid`).
-  * Deberás imprimir y adherir la etiqueta QR en la caja física. Esto permitirá a los ingenieros y encargados escanear la caja física en el almacén para saber instantáneamente qué socios tienen sus carpetas en papel dentro de esa caja.
+* **Crear Caja de Archivo:** Registra cada contenedor físico indicando la Localidad, el Año al que corresponden los expedientes y el Número correlativo de caja.
+* **Rotulado con Código QR:** 
+  * Al crear una caja en el sistema, se generará de manera automática un **Código de Etiqueta** y un **Código QR Único**.
+  * Imprime esta etiqueta y adhiérela a la caja física. El personal podrá escanear este código QR físico en el almacén para conocer de forma instantánea qué socios tienen sus expedientes de papel guardados en ese contenedor.
