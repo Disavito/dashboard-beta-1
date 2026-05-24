@@ -1,51 +1,88 @@
 # Guía de Usuario: Finanzas - FIMAGADI
 
-Bienvenido a la guía oficial de usuario para el perfil de **Finanzas**. Como encargado del control financiero de la empresa, tienes asignadas las tareas de fiscalización de caja chica, conciliación de movimientos de cuentas bancarias, cobro y emisión de recibos de socios, control contable de facturas y visualización de balances analíticos.
+Bienvenido a la guía oficial de usuario para el perfil de **Finanzas**. Como responsable del control contable y tesorería de la empresa, posees acceso a los módulos de ingresos, conciliación bancaria, facturación tributaria, emisión de comprobantes y resúmenes diarios para la Superintendencia Nacional de Aduanas y de Administración Tributaria (SUNAT).
 
 ---
 
-## 1. Registro de Aportes y Recibos (Ingresos)
-El módulo de **Ingresos** te permite llevar el control pormenorizado de las aportaciones y cuotas abonadas por los socios de la organización:
+## 1. Registro de Aportaciones de Socios (Ingresos)
 
-* **Registrar Ingreso Individual:**
-  1. Ingresa a la sección **Ingresos** y haz clic en **Registrar Ingreso**.
-  2. Escribe el nombre o DNI del socio en el buscador. Selecciona el socio correspondiente.
-  3. Rellena los datos de la transacción:
-     * **Monto:** Ingresa el valor recibido en Soles.
-     * **Fecha:** Define el día en que se realizó el depósito o pago.
-     * **Tipo de Transacción:** Elige la vía de pago (ej. *Efectivo, Transferencia, Depósito*).
-     * **Referencia / Nro. Operación:** Anota el número de operación bancaria o de recibo físico para control.
-  4. Guarda el registro. El sistema creará automáticamente una boleta digital en PDF.
-* **Descarga e Impresión:** Puedes imprimir o descargar el comprobante en PDF en el momento del registro para entregárselo directamente al socio aportante.
+El módulo de **Ingresos** registra las aportaciones ordinarias y extraordinarias abonadas por los socios de la organización:
 
----
-
-## 2. Emisión y Control de Facturación
-En el módulo de **Facturación** monitoreas las obligaciones fiscales y transacciones comerciales de la entidad:
-
-* **Auditoría de Comprobantes:** Visualiza, filtra y audita el listado histórico de Facturas, Boletas de Venta y Notas de Crédito generadas.
-* **Cierre de Impuestos:** Utiliza la herramienta de exportación mensual para descargar reportes consolidados en formato Excel y compartirlos con el área contable encargada de la declaración tributaria.
+### Registrar Ingreso Individual:
+1. Ingresa a la sección **Ingresos** y haz clic en **Registrar Ingreso**.
+2. Escribe el número de DNI o Nombre del titular en el buscador. El sistema utilizará la consulta atómica de la base de datos para recuperar su información en tiempo real.
+3. Rellena los datos obligatorios del formulario:
+   * **Monto:** Ingresa el valor exacto recibido en Soles.
+   * **Fecha:** Selecciona el día en que se hizo efectivo el cobro.
+   * **Cuenta:** Selecciona la cuenta bancaria de destino (tabla `cuentas`).
+   * **Tipo de Transacción:** Selecciona el canal de pago (ej. *Efectivo, Depósito, Transferencia*).
+   * **Número de Operación (`numeroOperacion`):** Digita el número de comprobante bancario para control de conciliaciones.
+4. **Emisión de Recibo Digital:** Al hacer clic en guardar, el sistema generará automáticamente un número de recibo correlativo único (`receipt_number`), escribirá el registro en la tabla `ingresos` y abrirá una ventana para descargar o imprimir el comprobante de pago en PDF.
 
 ---
 
-## 3. Administración y Conciliación de Cuentas
-El panel de **Cuentas** es tu visor de liquidez bancaria en tiempo real:
+## 2. Administración de Cuentas y Conciliación Bancaria
 
-* **Monitoreo de Cuentas:** Revisa los saldos disponibles en cada una de las cuentas corrientes o cajas de la empresa (ej. *Caja Chica, BBVA, Banco de Crédito*).
-* **Verificación de Movimientos:** Asegúrate de que cada ingreso registrado y cada gasto aprobado impacte en la cuenta correcta, realizando la consideración contable periódica para garantizar que los saldos del dashboard cuadren con los estados de cuenta bancarios reales.
+El módulo **Cuentas y Tesorería** (`Accounts.tsx`) es el visor de liquidez en tiempo real de FIMAGADI. Permite mantener control de las cuentas bancarias (BBVA, Efectivo, Caja Chica, etc.):
+
+* **Análisis de Flujo:** En la parte superior, visualiza las gráficas analíticas comparando Ingresos versus Gastos. Puedes ajustar la escala de tiempo a *Día, Mes, Trimestre o Año*.
+* **Conciliación Periódica:** 
+  1. Verifica que los movimientos mostrados en la tabla del **Historial Unificado** coincidan exactamente con los extractos de tus cuentas bancarias reales.
+  2. Cada ingreso y gasto registrado debe estar asociado a su respectiva cuenta en la columna `account` para reflejar el saldo neto disponible correcto.
+* **Cierre de Caja y Reportes en PDF:**
+  1. En el Historial Unificado, realiza búsquedas por socio o número de recibo para filtrar transacciones.
+  2. Haz clic en el botón **Reporte PDF (Cierre)** para descargar de forma automática el archivo `Cierre_Caja_[fecha].pdf` que consolida todos los movimientos del periodo.
 
 ---
 
-## 4. Auditoría y Aprobación de Egresos (Gastos)
-Tienes la potestad de fiscalizar los gastos cargados por los ingenieros de campo antes de registrarlos como egreso oficial:
+## 3. Emisión de Comprobantes y Facturación Electrónica
+
+El sub-módulo de Facturación controla las obligaciones y facturas comerciales de la entidad:
+
+* **Auditoría de Comprobantes:** Desde el panel de facturación, visualiza e inspecciona de forma independiente Facturas, Boletas de Venta y Notas de Crédito emitidas.
+* **Notas de Crédito:** Genera notas de crédito asociadas a boletas o facturas previas ante anulaciones o devoluciones de aportes.
+* **Cierre Contable:** Descarga los reportes mensuales consolidados en formato Excel para ser enviados directamente al área contable externa de la empresa.
+
+---
+
+## 4. Gestión de Resúmenes Diarios de Boletas y Bajas (SUNAT)
+
+Para cumplir con las regulaciones de la SUNAT, debes generar y reportar diariamente los comprobantes emitidos:
+
+1. Ingresa a la sección **Resúmenes Diarios y Bajas** (`ResumenDiarioPage.tsx`).
+2. **Generación del Resumen:**
+   * Selecciona la fecha de los comprobantes a declarar mediante el selector de calendario.
+   * Haz clic en **Generar Resumen del Día**. El sistema consultará la base de datos y agrupará todas las boletas de venta emitidas en dicha fecha en la tabla `resumen_diario_boletas`.
+   * Revisa la lista previa generada.
+3. **Envío Electrónico:**
+   * Presiona el botón **Enviar Resumen a SUNAT**.
+   * El sistema enviará el paquete XML a los servidores de SUNAT mediante API y obtendrá un número de **Ticket** de respuesta único.
+4. **Monitoreo de Tickets:**
+   * En la tabla **Historial de Resúmenes Enviados**, realiza el seguimiento del estado de cada envío:
+     * `Aceptado`: La SUNAT procesó y validó el resumen con éxito.
+     * `Rechazado`: Presenta inconsistencias; deberás subsanar los comprobantes y re-enviar.
+     * `Pendiente`: En cola de procesamiento.
+
+---
+
+## 5. Fiscalización y Aprobación de Egresos
+
+Tienes atribuciones para revisar y autorizar los gastos rendidos por el personal técnico antes de consolidarlos en los balances de tesorería:
 
 1. Ve a **Aprobaciones Pendientes**.
-2. **Revisión de Comprobante:** Verifica que los datos coincidan con el comprobante digital adjunto o la justificación de la Declaración Jurada.
-3. **Cruce de Presupuesto:** Comprueba si el gasto está vinculado a un presupuesto de obra operativo y si el concepto coincide con las notas de campo.
-4. Presiona **Aprobar** para validar el egreso e ingresarlo en el balance contable global del sistema.
+2. **Auditoría de Gastos:**
+   * Verifica los montos (ingresados como valores negativos en la tabla `gastos`), las clasificaciones (*Viáticos*, *Gasto Fijo* u *Otros*) y la descripción detallada.
+   * Abre el archivo adjunto para verificar la validez tributaria del comprobante subido o evalúa los motivos si fue cargado como *Declaración Jurada*.
+   * Si es correcto, haz clic en **Aprobar** para habilitar el egreso y actualizar la cuenta afectada.
+
+### Auto-Aprobación de Gastos Administrativos Directos:
+Para agilizar la contabilidad ordinaria, cuando registres egresos propios de la administración de finanzas (ej. luz, agua, sueldos de personal o alquiler de oficinas) directamente desde el módulo de **Gastos**, el sistema identificará la categoría como **"Gasto Fijo"** o subcategoría **"Sueldo"** y la insertará directamente en la base de datos como **"Auto-Aprobada"**, evitando pasar por la cola de aprobación.
 
 ---
 
-## 5. Reportes Financieros y Cajas Fijas
-* **Reportes Analíticos:** Ingresa a **Reportes** para analizar gráficos del rendimiento mensual de la empresa (ingresos versus gastos) e identificar flujos y tendencias operativas. Exporta estos gráficos y balances a Excel o PDF para su presentación en las juntas.
-* **Ingreso Directo / Gastos Fijos:** Al registrar un gasto operativo directo de la administración (ej. alquileres, servicios o sueldos) desde la sección de **Gastos**, el sistema lo marcará automáticamente como **"Auto-Aprobado"** y lo restará de las cuentas de forma inmediata, facilitando la fluidez contable.
+## 6. Procedimiento ante Errores (Solicitudes de Eliminación)
+
+Si cometes un error al digitar una aportación o un egreso ya consolidado en el sistema:
+1. No podrás borrar el registro directamente por políticas de seguridad RLS.
+2. Deberás enviar una **Solicitud de Eliminación** indicando el motivo y la justificación.
+3. Esta solicitud será procesada por el Administrador en la bandeja central. Una vez aprobada, el sistema aplicará un borrado lógico (`deleted_at = now()`), recalculando de manera transparente todos los balances y reportes asociados.
