@@ -1,108 +1,84 @@
 # Guía de Usuario: Ingeniero - FIMAGADI
 
-Bienvenido a la guía oficial de usuario para el perfil de **Ingeniero**. Esta guía detalla de manera exhaustiva las herramientas, flujos de trabajo y operaciones que tienes asignadas en la plataforma FIMAGADI para registrar tu asistencia, solicitar y rendir fondos, gestionar expedientes de socios y controlar las herramientas a tu cargo.
+Bienvenido a la guía oficial de usuario para el perfil de **Ingeniero**. Esta guía exhaustiva describe las labores técnicas y operativas exclusivas de tu rol en la plataforma FIMAGADI, abarcando las mediciones de campo, la asistencia, la carga de expedientes y la rendición de fondos.
 
 ---
 
-## 1. Módulo de Asistencia (Marcaciones de Jornada)
+## 1. Labores Técnicas Principales (Mediciones en Campo)
 
-El sistema de FIMAGADI utiliza un control de asistencia de cuatro (4) marcaciones obligatorias al día para llevar un seguimiento de tu jornada. Tus registros se evalúan de forma automática de acuerdo con las políticas de horario de la empresa:
-
-### Procedimiento para el Marcado Diario:
-1. **Registro de Entrada (Inicio de Jornada):**
-   * Al iniciar el día laboral, ve al módulo **Jornada** en el menú lateral y presiona **Marcar Entrada**.
-   * *Control de Tardanzas:* Si realizas la marcación después del horario establecido (la ventana estándar de ingreso es de 09:20 a 09:45), el sistema te pedirá obligatoriamente ingresar una **Justificación** detallada y observaciones antes de guardar la marca.
-2. **Registro de Inicio de Almuerzo:**
-   * Al iniciar tu descanso para comer, ingresa al módulo y presiona **Iniciar Almuerzo**.
-3. **Registro de Fin de Almuerzo:**
-   * Al retornar de tu almuerzo, presiona **Finalizar Almuerzo**.
-4. **Registro de Salida (Fin de Jornada):**
-   * Al concluir tus labores del día, presiona **Marcar Salida**.
-   * *Control de Salidas Anticipadas:* Si marcas tu salida antes del horario de salida configurado (ventana estándar de 18:20 a 18:40), deberás registrar de forma obligatoria una justificación antes de que se grabe tu marca.
+Como Ingeniero en FIMAGADI, tu trabajo técnico se centra de forma exclusiva en las siguientes actividades de campo y gabinete. Por el momento, no hay otras funciones técnicas asignadas a tu rol:
+1. **Toma de Puntos GPS:** Acudir al terreno y tomar las coordenadas y puntos de georreferenciación exactos del lote utilizando el equipo GPS de precisión.
+2. **Medición de Lotes:** Realizar el levantamiento de las medidas físicas del lote en campo.
+3. **Elaboración de Entregables:** Con la información recopilada en campo, elaborar los **Planos de ubicación** y las **Memorias descriptivas** en gabinete.
+4. **Carga en la Plataforma:** Subir los planos y memorias descriptivas correspondientes al expediente digital de cada socio en el dashboard.
 
 ---
 
-## 2. Registro y Edición de Socios (Consulta de Identidad por DNI)
+## 2. Módulo de Asistencia (Marcaciones de Jornada)
 
-Cuando realices el empadronamiento de nuevos socios o modifiques los datos de titulares existentes, contarás con una herramienta de consulta automática conectada con el servicio nacional de identidad.
+Debes registrar tu asistencia diaria mediante cuatro (4) marcaciones obligatorias en el módulo **Jornada** del menú lateral:
 
-### Procedimiento de Búsqueda y Auto-completado:
-1. Abre el formulario para **Registrar Socio** o editar uno existente.
-2. Digita el número de **DNI** del socio (8 dígitos) y haz clic fuera del campo o presiona la tecla Tab.
-3. El sistema buscará los datos de inmediato y auto-completará los siguientes campos:
-   * Nombres completos.
-   * Apellido Paterno y Apellido Materno (el sistema separa de manera inteligente apellidos compuestos o palabras como "DE", "DEL", "LA").
-   * Fecha de Nacimiento (y calcula automáticamente la edad actual del socio).
-   * Dirección oficial de su documento de identidad, Región, Provincia y Distrito de origen.
-4. **Completado Manual de Datos de Campo:** Deberás rellenar a mano los datos de su vivienda actual en la zona de trabajo:
-   * Dirección física del domicilio en el proyecto.
-   * Localidad (el sistema te ofrece sugerencias automáticas de localidades válidas de la zona).
-   * Manzana (Mz) y Lote (Lt) asignados.
-   * Situación Económica (*Pobre* o *Extremo Pobre*).
-5. **Indicadores de Alerta en Socios:**
-   * **Observado Administrativo:** Si el socio presenta problemas con sus carpetas o información general, activa esta opción e ingresa una descripción obligatoria del problema.
-   * **Pago Observado:** Si existen inconsistencias en sus cuotas o recibos de aportaciones, activa esta opción y detalla el motivo financiero de forma obligatoria.
+* **Marcación de Entrada (Inicio de Jornada):** Al iniciar tu jornada, presiona **Marcar Entrada**. Si marcas después de la tolerancia configurada (la ventana estándar es de 09:20 a 09:45), el sistema te exigirá registrar de forma obligatoria una **Justificación** de la tardanza.
+* **Marcación de Inicio de Almuerzo:** Al tomar tu descanso, presiona **Iniciar Almuerzo**.
+* **Marcación de Fin de Almuerzo:** Al retornar a tus labores, presiona **Finalizar Almuerzo**.
+* **Marcación de Salida (Fin de Jornada):** Al terminar tus actividades diarias, presiona **Marcar Salida**. Si sales antes del horario regular (ventana estándar de 18:20 a 18:40), el sistema te pedirá ingresar de forma obligatoria una justificación por salida anticipada.
 
 ---
 
-## 3. Expediente Digital de Socios y Carga de Documentos
+## 3. Registro y Edición de Socios (Empadronamiento en Campo)
 
-El módulo de expedientes te permite administrar los documentos técnicos de cada lote y actualizar el avance de ingeniería en campo.
+Cuando empadrones nuevos socios o actualices sus datos en el sistema, sigue estas instrucciones obligatorias para garantizar la calidad de la información:
 
-### Búsqueda y Filtrado:
-* **Filtros por Zona:** Puedes segmentar a los socios seleccionando el **Distrito**. Al cambiar este campo, el filtro de **Localidad** se reiniciará automáticamente para que no queden combinaciones vacías.
-* **Búsqueda por Manzana y Lote:** El buscador te permite buscar combinaciones específicas como *"mz B lt 5"* o *"manzana F lote 12"*. El sistema interpretará el comando y aislará la manzana y lote correspondientes de forma inmediata.
+### A. Consulta Automática por DNI:
+1. Digita el número de **DNI** (8 dígitos) del socio en el formulario de registro y sal del campo (blur) o presiona Tab.
+2. El sistema recuperará automáticamente de forma externa: nombres completos, apellidos, fecha de nacimiento, edad, dirección de su DNI y su distrito de procedencia.
+3. **Corroboración Obligatoria:** Debes corroborar y verificar visualmente que todos los datos traídos automáticamente coincidan exactamente con la información real de la persona.
 
-### Gestión de Avance y Archivos:
-* **Lote Medido (Estado de Ingeniería):** Indica si ya se realizaron las mediciones topográficas del lote. Puedes activarlo de forma individual en la tabla o de forma masiva seleccionando a varios socios y haciendo clic en **Acciones -> Marcar como Medido**.
-* **Tipos de Documentos y Reglas:** Puedes subir archivos PDF o imágenes correspondientes a:
-  1. *Planos de ubicación*
-  2. *Memoria descriptiva*
-  3. *Ficha de empadronamiento*
-  4. *Contrato firmado*
-  5. *Comprobante de Pago*
-* **Regla de Consistencia:** Para evitar inconsistencias de información, el sistema bloqueará e impedirá que desmarques un lote como "Medido" si este ya cuenta con planos de ubicación o memorias descriptivas cargadas en su expediente digital.
+### B. Datos de Vivienda y Autocompletado de Ubicación:
+1. Al seleccionar la **Localidad** del socio en la pestaña de datos personales, el sistema **asignará automáticamente** el Distrito, Provincia y Región en la pestaña de datos de vivienda.
+2. Solo debes escribir manualmente la **Dirección** física exacta de su vivienda.
+3. **Manzana (Mz) y Lote (Lt):** El ingreso de la manzana y lote es **opcional**. Sin embargo, si el socio dispone de esta información, es **obligatorio** que la registres en los campos correspondientes.
 
-### Solicitud de Eliminación de Documentos (Bandeja de Aprobación):
-Si subes un archivo equivocado y necesitas eliminarlo de un expediente:
-1. Haz clic en el botón de **Eliminar** (Tacho rojo) al costado del archivo.
-2. Ingresa de forma obligatoria una **Justificación** de la anulación.
-3. El sistema no borrará el archivo de inmediato; en su lugar, enviará una solicitud al Administrador. El archivo se borrará permanentemente solo cuando el Administrador autorice tu solicitud.
+### C. Clasificación de Extrema Pobreza (Recibos con Monto S/. 0.00):
+* Si el socio se encuentra clasificado bajo la condición de **Extrema Pobreza**, no se le exigirá realizar ningún pago monetario para su empadronamiento.
+* Sin embargo, es **obligatorio generar un recibo** en la plataforma, el cual se registrará con un **monto de S/. 0.00**. Esto permite regularizar su expediente digital en el sistema sin registrar ingresos de caja ficticios.
+
+### D. Gestión de Observaciones en el Perfil del Socio:
+* **Socio Observado (Administrativo):** Si detectas que al socio le falta la constancia de posesión, que el socio está repetido en la base de datos o presenta cualquier otro inconveniente administrativo, debes activar la opción **Observado** y redactar detalladamente el motivo de la observación.
+* **Pago Observado (Financiero):** Solo en casos muy específicos (por ejemplo, si el pago del socio está duplicado en el sistema, o si el comprobante Yape se envió por error a la cuenta de otra persona), debes marcar la opción de **Pago Observado** detallando el problema. Esto permitirá al área de finanzas realizar la rectificación posteriormente.
 
 ---
 
-## 4. Consulta de Cajas de Archivo Físico
+## 4. Expedientes Digitales y Carga de Documentos
 
-Para respaldar el expediente digital, la empresa almacena los documentos impresos originales en cajas numeradas. Desde la ficha de cada socio, puedes consultar los datos de su archivador real:
-* **Número de Caja:** El número del contenedor físico donde se archivó su carpeta.
-* **Año de Expediente:** El año correspondiente a sus trámites.
-* **Código de Etiqueta:** El identificador alfanumérico visible en el lomo de la caja.
-* **Código QR:** Identificador único para el escaneo e inventario rápido de carpetas físicas en el almacén.
+El módulo de expedientes te permite organizar y subir la planimetría que elaboras:
 
----
+### Búsqueda y Filtros de Lotes:
+* **Búsqueda Dinámica:** En el buscador puedes escribir comandos rápidos como *"mz A lt 15"* o *"manzana C lote 2"* para ubicar directamente al titular del lote.
+* **Filtros Inteligentes:** Al filtrar los expedientes por **Distrito**, el filtro de **Localidad** se reiniciará automáticamente para evitar búsquedas sin resultados.
 
-## 5. Solicitud de Fondos y Rendición de Gastos
+### Carga de Archivos de Ingeniería:
+* Una vez tomados los puntos y elaborados los planos y memorias, ingresa al expediente del socio y sube los archivos de **Planos de ubicación** y **Memoria descriptiva** (formatos PDF o imagen).
+* **Consistencia del Sistema:** El sistema bloqueará de forma automática cualquier intento de desmarcar el estado de "Lote Medido" de un socio si este ya cuenta con planos de ubicación o memorias descriptivas cargadas en su expediente virtual.
 
-El sistema te permite financiar tus traslados a obras o compras menores en campo, y reportar tus consumos directamente a contabilidad:
-
-1. **Solicitar Presupuesto:**
-   * Ve a la sección **Presupuestos** y haz clic en **Solicitar Fondos**.
-   * Ingresa el **Motivo** del viaje o compra y el **Monto Estimado** que necesitas.
-   * La solicitud pasará a evaluación de la administración, quienes te asignarán el monto definitivo a utilizar.
-2. **Rendición de Gastos Vinculados (Modalidad A):**
-   * Cuando realices compras utilizando el presupuesto que la administración ya te aprobó y transfirió previamente, ve a **Gastos** e introduce un nuevo registro.
-   * Rellena el formulario con el monto, la fecha, el concepto y selecciona el **Presupuesto Vinculado** correspondiente. Esto restará de forma automática el gasto de tu saldo pendiente por justificar.
-3. **Rendición de Gastos Reembolsables / Directos (Modalidad B):**
-   * Si realizaste un gasto no presupuestado de tu propio dinero (reembolsable) o solicitas la compra de un artículo no contemplado en un presupuesto de viaje, llena el formulario de gastos y deja el selector de presupuesto en **"Ninguno"**.
-   * Este gasto se enviará a la bandeja de pendientes del Administrador y se programará para su reembolso una vez que sea aprobado.
-4. **Comprobantes y Declaraciones Juradas:**
-   * **Con Sustento:** Sube una fotografía o archivo digital del comprobante (boleta o factura).
-   * **Sin Sustento (Declaración Jurada):** Si el establecimiento local no emite comprobantes válidos (ej. transporte local o alimentación en zonas alejadas), marca el casillero de **Declaración Jurada**. Esto creará un sustento digital de responsabilidad bajo tu firma para consideración de la administración.
+### Solicitud de Eliminación de Documentos:
+Como no posees permisos de borrado físico directo en el servidor:
+1. Haz clic en el botón de **Eliminar** (Tacho rojo) del documento correspondiente.
+2. Ingresa de forma obligatoria la **Justificación** de la anulación.
+3. Esto enviará una solicitud de autorización al panel del Administrador. El documento se eliminará solo cuando el Administrador apruebe tu solicitud.
 
 ---
 
-## 6. Inventario y Custodia de Herramientas de Campo
+## 5. Tipos de Comprobantes de Pago de Socios
 
-En el módulo **Inventario** puedes monitorear todos los dispositivos técnicos y consumibles que la empresa te ha entregado para tus labores diarias (ej. GPS de precisión, drones, equipos de seguridad, chalecos, laptops de campo).
-* **Custodia Activa:** Visualiza la lista de equipos asignados bajo tu nombre en el panel derecho.
-* **Devolución de Equipos:** Al regresar a la oficina, debes entregar físicamente las herramientas al encargado y asegurarte de que este registre la recepción en la plataforma. Tu estado de responsabilidad solo se liberará cuando el encargado confirme la devolución y la fecha de entrega quede registrada en el sistema.
+Al revisar el expediente digital y el estado de pagos de un socio, debes tener en cuenta que existen dos tipos de sustentos válidos en el sistema:
+1. **Recibos Físicos:** Son aquellos comprobantes en papel emitidos manualmente antes de la implementación del nuevo sistema digital. Varios socios antiguos solo cuentan con este documento físico, lo cual es sustento suficiente para justificar su estado de pago.
+2. **Recibos Virtuales:** Son los recibos digitales que se generan y consultan directamente a través del nuevo dashboard para las aportaciones actuales.
+
+---
+
+## 6. Rendición de Gastos y Custodia de Equipos
+
+* **Rendición de Fondos:** Si cuentas con un presupuesto de viaje aprobado (Modalidad A), registra tus gastos en el módulo de Gastos vinculándolos a dicho presupuesto para restar el saldo de tu rendición. Si realizas un gasto de tu bolsillo o un egreso no planificado (Modalidad B), regístralo sin vincular a ningún presupuesto para que se envíe como solicitud de reembolso a la administración.
+* **Soporte Digital:** Recuerda subir la fotografía del comprobante de pago o marcar la casilla de **Declaración Jurada** si el establecimiento local no emite comprobantes válidos.
+* **Equipos en Custodia:** Monitorea en el panel de inventario las herramientas técnicas que tienes a tu cargo (GPS, drones, winchas). Al devolverlas en oficina, asegúrate de que el encargado registre el retorno en el sistema para anular tu responsabilidad de custodia.

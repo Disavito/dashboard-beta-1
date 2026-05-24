@@ -35,7 +35,33 @@ Además de los roles preestablecidos (*Administrador*, *Finanzas*, *Ingeniero*),
 
 ---
 
-## 3. Control y Aprobación de Presupuestos Operativos
+## 3. Registro de Socios y Criterios de Calificación
+
+Como Administrador, supervisas la integridad de los padrones de socios y debes asegurar la correcta aplicación de los siguientes flujos de registro:
+
+### A. Corroboración de Datos:
+Al empadronar o modificar un socio usando el buscador automático de DNI, se debe verificar siempre que la información cargada de los registros oficiales coincida exactamente con la identidad real del titular antes de guardar la ficha.
+
+### B. Autocompletado de Ubicación:
+Al seleccionar la Localidad del socio en la pestaña personal, el sistema auto-completa de forma automática el Distrito, Provincia y Región de la vivienda en la pestaña de domicilio. El operador solo debe capturar la Dirección física exacta de la vivienda.
+* **Manzana (Mz) y Lote (Lt):** El llenado de la Manzana y el Lote es opcional. No obstante, si se dispone de estos datos físicos, es obligatorio ingresarlos en el sistema.
+
+### C. Regla para Socios de Extrema Pobreza:
+* Los socios clasificados bajo la condición de **Extrema Pobreza** están exonerados de pagos monetarios.
+* Sin embargo, es obligatorio que se genere un **recibo con un monto de S/. 0.00** en la plataforma para regularizar e integrar su expediente en el dashboard sin alterar la contabilidad real de caja.
+
+### D. Gestión de Observaciones Administrativas y Financieras:
+* **Socio Observado (Administrativo):** Si al socio le falta presentar su constancia de posesión original, si está duplicado en el sistema, o si presenta cualquier otro detalle administrativo pendiente, se debe marcar la opción **Observado** indicando detalladamente el motivo de la irregularidad.
+* **Pago Observado (Financiero):** Se utiliza únicamente en situaciones específicas del cobro (por ejemplo, si el recibo/pago está duplicado, o si el Yape se depositó por error a la cuenta de un tercero). Esto permite marcar el pago como observado para que sea rectificado o saneado posteriormente por el área de finanzas.
+
+### E. Tipos de Recibos Válidos:
+Al evaluar los expedientes, debes considerar que coexisten dos sustentos de pago:
+1. **Recibos Físicos:** Comprobantes emitidos manualmente en papel antes de la creación del sistema digital actual. Varios socios históricos solo poseen este formato, el cual es válido para acreditar su solvencia.
+2. **Recibos Virtuales:** Comprobantes emitidos y registrados a través del dashboard contable actual.
+
+---
+
+## 4. Control y Aprobación de Presupuestos Operativos
 
 Los presupuestos operativos sirven para financiar los traslados y viáticos de los ingenieros en obra. Eres el encargado de evaluar, aprobar y liquidar estas solicitudes:
 
@@ -50,26 +76,16 @@ Los presupuestos operativos sirven para financiar los traslados y viáticos de l
 
 ---
 
-## 4. Bandeja de Aprobaciones Contables y Anulaciones
+## 5. Bandeja de Aprobaciones Contables y Anulaciones
 
-La bandeja de **Aprobaciones Pendientes** centraliza las operaciones sensibles del equipo que requieren la validación de un supervisor:
+La bandeja de **Aprobaciones Pendientes** centraliza las operaciones de egresos y anulaciones que requieren la validación de un supervisor:
 
-### A. Aprobación de Gastos Operativos:
-* **Origen:** Gastos registrados por los ingenieros de campo (viáticos, consumos generales) y egresos elevados que requieren autorización previa.
-* **Acción:**
-  * Revisa los datos del gasto: Monto (el sistema representa los egresos con valores negativos para restar de caja), fecha y concepto.
-  * Haz clic en **Ver Comprobante** para comprobar la validez de la boleta o factura digital subida, o evalúa las notas del ingeniero si el consumo fue cargado como **Declaración Jurada**.
-  * Haz clic en **Aprobar** para insertar formalmente el gasto en el balance general de la empresa. Si el gasto estaba vinculado a un presupuesto, el saldo por rendir se actualizará de inmediato.
-
-### B. Solicitudes de Anulación de Transacciones:
-* **Origen:** Peticiones de corrección por parte de los usuarios al digitar de forma incorrecta un ingreso o un egreso ya consolidado.
-* **Acción:**
-  * Revisa la justificación del error.
-  * Al hacer clic en **Aprobar**, el sistema aplicará una anulación administrativa (ocultando el registro del dashboard principal y recalculando de inmediato los saldos de las cuentas y presupuestos afectados).
+* **Aprobación de Gastos Operativos:** Revisa los datos de los egresos reportados por los ingenieros (montos, clasificaciones y conceptos), verifica el comprobante digital o la Declaración Jurada, y presiona **Aprobar** para grabarlo y deducir el saldo del presupuesto vinculado.
+* **Anulación de Transacciones (Ingresos o Gastos):** Ante solicitudes del personal por errores de digitación de aportes o compras consolidadas, evalúa el motivo y aprueba la solicitud para realizar una anulación administrativa (ocultando el registro del dashboard principal y recalculando de inmediato los saldos de las cuentas y presupuestos afectados).
 
 ---
 
-## 5. Bandeja de Eliminación de Archivos y Planos
+## 6. Bandeja de Eliminación de Archivos y Planos
 
 El panel de **Solicitudes de Eliminación** dentro de la sección de documentos centraliza las peticiones de los ingenieros para borrar archivos de los expedientes digitales de los socios (por ejemplo, planos mal cargados, memorias descriptivas desactualizadas o comprobantes incorrectos).
 
@@ -80,24 +96,10 @@ El panel de **Solicitudes de Eliminación** dentro de la sección de documentos 
 
 ---
 
-## 6. Auditoría y Registro de Operaciones
+## 7. Auditoría y Registro de Operaciones
 
 La sección de **Seguridad y Auditoría** te permite supervisar cada movimiento realizado dentro de la plataforma para garantizar la transparencia administrativa:
 
-* **Inspección de Transacciones:** El sistema genera un registro automático e inalterable cada vez que se inserta, modifica o elimina un dato en los módulos de ingresos, gastos, socios o control de asistencia.
-* **Detalle del Cambio:** Al presionar **Inspeccionar**, podrás comparar:
-  * **Datos Anteriores:** El estado de la información antes de la modificación (ideal para auditar errores o restaurar datos).
-  * **Datos Nuevos:** El estado de la información guardado después de la modificación.
-  * Información del usuario que realizó la acción, el módulo afectado y la hora exacta de la transacción.
+* **Inspección de Transacciones:** El sistema genera un registro inalterable cada vez que se inserta, modifica o elimina un dato en los módulos de ingresos, gastos, socios o control de asistencia.
+* **Detalle del Cambio:** Al presionar **Inspeccionar**, podrás comparar la información guardada antes y después de la modificación, identificando al usuario que realizó la acción y la hora exacta de la transacción.
 * **Exportar Reportes:** Utiliza el botón **Exportar Logs** para descargar la auditoría filtrada directamente en formato Excel.
-
----
-
-## 7. Registro de Cajas Físicas de Archivo
-
-Para mantener organizadas las carpetas impresas de los socios en el almacén de la oficina, utilizarás el módulo de gestión de cajas:
-
-* **Crear Caja de Archivo:** Registra cada contenedor físico indicando la Localidad, el Año al que corresponden los expedientes y el Número correlativo de caja.
-* **Rotulado con Código QR:** 
-  * Al crear una caja en el sistema, se generará de manera automática un **Código de Etiqueta** y un **Código QR Único**.
-  * Imprime esta etiqueta y adhiérela a la caja física. El personal podrá escanear este código QR físico en el almacén para conocer de forma instantánea qué socios tienen sus expedientes de papel guardados en ese contenedor.
