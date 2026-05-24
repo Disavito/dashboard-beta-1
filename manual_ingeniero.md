@@ -1,16 +1,16 @@
-# Guía de Usuario: Ingeniero de Campo - FIMAGADI
+# Guía de Usuario: Ingeniero - FIMAGADI
 
-Bienvenido a la guía oficial de usuario para el perfil de **Ingeniero de Campo**. Esta guía detalla cómo utilizar las herramientas disponibles en el dashboard de FIMAGADI para registrar tu jornada laboral, solicitar viáticos, rendir tus comprobantes y gestionar los expedientes de socios en obra.
+Bienvenido a la guía oficial de usuario para el perfil de **Ingeniero**. Esta guía exhaustiva describe detalladamente las herramientas, vistas y operaciones que tienes asignadas en el dashboard de FIMAGADI para cumplir con tus labores diarias de control de asistencia, rendición de cuentas, custodia de activos y gestión de expedientes de socios en obra.
 
 ---
 
 ## 1. Registro de Asistencia (Jornada)
-El módulo de **Jornada** te permite registrar tus horas de ingreso y salida diaria de forma rápida y sencilla.
+El módulo de **Jornada** es tu herramienta para registrar tus horas de ingreso y salida diaria. El sistema valida tu hora de registro contra los límites configurados por la empresa:
 
 * **Marcar Entrada:**
   1. Al iniciar tus labores diarias, ingresa a la sección **Jornada**.
   2. Haz clic en el botón **Marcar Entrada**.
-  3. *Nota:* Si registras tu entrada fuera de la ventana horaria permitida por la empresa, el sistema te solicitará ingresar una **Justificación** obligatoria en texto (ej. *"Retraso por tráfico en la autopista de acceso"*).
+  3. *Control de Retrasos:* Si marcas tu ingreso después de la hora máxima permitida, el sistema te solicitará ingresar una **Justificación** en texto (ej. *"Retraso por tráfico en la autopista de acceso"*). Esta justificación será revisada por el Administrador.
 * **Marcar Salida:**
   1. Al concluir tu jornada de trabajo, ingresa nuevamente al módulo.
   2. Haz clic en el botón **Marcar Salida**.
@@ -18,15 +18,15 @@ El módulo de **Jornada** te permite registrar tus horas de ingreso y salida dia
 ---
 
 ## 2. Solicitud de Fondos (Presupuestos Operativos)
-Cuando requieras realizar un viaje de trabajo a una obra o realizar compras menores operativas, debes solicitar fondos con anticipación:
+Cuando necesites viajar a una obra o realizar compras operativas menores en campo, debes solicitar fondos con anticipación a la administración:
 
 1. Ingresa a la sección **Presupuestos** en el menú izquierdo.
 2. Haz clic en el botón **Solicitar Fondos** (esquina superior derecha).
-3. Completa los campos solicitados:
-   * **Motivo:** Detalla el propósito del presupuesto (ej. *"Hospedaje, viáticos y transporte - Obra Arequipa"*).
-   * **Monto Estimado:** Digita la cantidad estimada en Soles.
+3. Completa los campos solicitados de manera precisa:
+   * **Motivo:** Detalla el propósito del presupuesto (ej. *"Viaje a Obra Norte - Combustible, viáticos de alimentación y hospedaje"*).
+   * **Monto Estimado:** Digita la cantidad estimada necesaria en Soles.
 4. Presiona **Enviar Solicitud**. 
-5. Tu solicitud quedará en estado `Pendiente` en tu bandeja. Podrás revisar el historial aquí mismo y verás cuando cambie a `Aprobado` una vez que la administración procese y transfiera el dinero.
+5. Tu solicitud quedará en estado `Pendiente`. Podrás revisar el historial aquí mismo y verás cuando cambie a `Aprobado` una vez que el Administrador autorice el presupuesto y te asigne tu saldo por rendir.
 
 ---
 
@@ -35,13 +35,13 @@ El sistema te permite registrar gastos bajo dos modalidades diferentes:
 
 * **Modalidad A: Gasto Vinculado a Presupuesto (Rendición)**
   * **Cuándo usarlo:** Cuando realizas un gasto utilizando el dinero operativo que la empresa ya te transfirió previamente.
-  * **Cómo registrarlo:** Llena el formulario e ingresa el monto, fecha y descripción. En el campo **"Vincular a Presupuesto"**, selecciona tu presupuesto activo (ej. *Obra Arequipa*). Esto descontará automáticamente el gasto del saldo de tu presupuesto para justificarlo ante la administración.
+  * **Cómo registrarlo:** Llena el formulario e ingresa el monto, fecha y descripción. En el campo **"Vincular a Presupuesto"**, selecciona tu presupuesto activo correspondiente. Esto descontará automáticamente el gasto del saldo de tu presupuesto para justificarlo ante la administración.
   
 * **Modalidad B: Gasto General / A Solicitud (Sin Presupuesto / Reembolsable)**
   * **Cuándo usarlo:** Cuando realizas un gasto de tu propio bolsillo en campo (gasto reembolsable) o cuando solicitas el pago directo de un gasto específico que no estaba contemplado en un presupuesto global previo.
   * **Cómo registrarlo:** Llena el formulario normalmente y deja el selector de **"Vincular a Presupuesto"** marcado como **"Ninguno"**. Al aprobarse por la administración, este gasto se gestionará para tu posterior reembolso.
 
-### Pasos para registrar cualquier Gasto:
+### Pasos detallados para registrar cualquier Gasto:
 1. Ingresa a la sección **Gastos**.
 2. Haz clic en **Registrar Gasto** y completa el formulario:
    * **Monto:** Digita el valor exacto de la compra en Soles.
@@ -57,10 +57,10 @@ El sistema te permite registrar gastos bajo dos modalidades diferentes:
 ---
 
 ## 4. Control de Equipos en Custodia (Inventario)
-En la sección **Inventario** puedes monitorear en tiempo real todos los activos y consumibles que la empresa te ha entregado en custodia para el desempeño de tus funciones:
+En la sección **Inventario** puedes monitorear en tiempo real todos los activos y consumibles que el **Encargado de Inventario** te ha entregado en custodia:
 
 * **Equipos Asignados:** Revisa la tabla de la derecha para verificar que los GPS, winchas, drones u otros dispositivos que tienes físicamente coincidan exactamente con el registro del sistema.
-* **Devolución de Equipos:** Al retornar un activo al almacén central, asegúrate de que el personal encargado confirme la devolución en el sistema para liberar la custodia a tu nombre.
+* **Devolución de Equipos:** Al retornar un activo al almacén central, asegúrate de que el **Encargado de Inventario** registre la devolución en el sistema para liberar la custodia a tu nombre.
 
 ---
 

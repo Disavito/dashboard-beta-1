@@ -1,53 +1,51 @@
-# Guía de Usuario: Finanzas / Tesorería - FIMAGADI
+# Guía de Usuario: Finanzas - FIMAGADI
 
-Bienvenido a la guía oficial de usuario para el perfil de **Finanzas / Tesorería**. Esta guía describe cómo gestionar los ingresos de socios, conciliar las cuentas bancarias de la empresa, emitir y auditar comprobantes de pago y analizar el flujo de caja global del sistema.
+Bienvenido a la guía oficial de usuario para el perfil de **Finanzas**. Como encargado del control financiero de la empresa, tienes asignadas las tareas de fiscalización de caja chica, conciliación de movimientos de cuentas bancarias, cobro y emisión de recibos de socios, control contable de facturas y visualización de balances analíticos.
 
 ---
 
-## 1. Gestión de Cobros e Ingresos (Padrón de Socios)
-El módulo de **Ingresos** es la herramienta principal para registrar las aportaciones económicas de los socios de la organización:
+## 1. Registro de Aportes y Recibos (Ingresos)
+El módulo de **Ingresos** te permite llevar el control pormenorizado de las aportaciones y cuotas abonadas por los socios de la organización:
 
-* **Registrar Aporte Individual:**
+* **Registrar Ingreso Individual:**
   1. Ingresa a la sección **Ingresos** y haz clic en **Registrar Ingreso**.
-  2. Busca y selecciona al socio titular por su nombre o DNI.
-  3. Completa los campos del formulario:
-     * **Monto:** Ingresa la cantidad aportada en Soles.
-     * **Fecha:** Selecciona el día del pago.
-     * **Tipo de Transacción:** Selecciona el método de pago (ej. *Efectivo, Transferencia, Depósito*).
-     * **Número de Recibo / Operación:** Ingresa la referencia del pago para auditoría.
-  4. Presiona **Guardar**.
-* **Generación de Recibos:** Una vez registrado el ingreso, el sistema generará automáticamente un comprobante en PDF. Puedes descargarlo o imprimirlo directamente para entregárselo al socio.
+  2. Escribe el nombre o DNI del socio en el buscador. Selecciona el socio correspondiente.
+  3. Rellena los datos de la transacción:
+     * **Monto:** Ingresa el valor recibido en Soles.
+     * **Fecha:** Define el día en que se realizó el depósito o pago.
+     * **Tipo de Transacción:** Elige la vía de pago (ej. *Efectivo, Transferencia, Depósito*).
+     * **Referencia / Nro. Operación:** Anota el número de operación bancaria o de recibo físico para control.
+  4. Guarda el registro. El sistema creará automáticamente una boleta digital en PDF.
+* **Descarga e Impresión:** Puedes imprimir o descargar el comprobante en PDF en el momento del registro para entregárselo directamente al socio aportante.
 
 ---
 
-## 2. Control de Facturación y Comprobantes de Venta
-El módulo de **Facturación** te permite realizar el seguimiento fiscal y contable de los documentos comerciales emitidos:
+## 2. Emisión y Control de Facturación
+En el módulo de **Facturación** monitoreas las obligaciones fiscales y transacciones comerciales de la entidad:
 
-* **Búsqueda e Historial:** Revisa y audita las Facturas, Boletas de Venta y Notas de Crédito registradas en el sistema. Puedes filtrar los documentos por fecha, cliente o estado de validez.
-* **Declaración e Impuestos:** Exporta el historial de facturación mensual en formato de hoja de cálculo para facilitar el trabajo del área contable en la declaración mensual de impuestos.
+* **Auditoría de Comprobantes:** Visualiza, filtra y audita el listado histórico de Facturas, Boletas de Venta y Notas de Crédito generadas.
+* **Cierre de Impuestos:** Utiliza la herramienta de exportación mensual para descargar reportes consolidados en formato Excel y compartirlos con el área contable encargada de la declaración tributaria.
 
 ---
 
-## 3. Conciliación y Monitoreo de Cuentas Bancarias
-En la sección **Cuentas** puedes administrar los fondos monetarios en las diversas cuentas bancarias de la empresa (ej. *Caja Chica, Banco Continental, BBVA*):
+## 3. Administración y Conciliación de Cuentas
+El panel de **Cuentas** es tu visor de liquidez bancaria en tiempo real:
 
-* **Saldos en Tiempo Real:** Visualiza de forma centralizada cuánto dinero hay disponible en cada una de las cuentas registradas en el sistema.
-* **Auditoría de Movimientos:** Verifica que cada ingreso registrado y cada gasto aprobado impacte correctamente en la cuenta correspondiente, asegurando que el balance en el dashboard coincida exactamente con tus estados de cuenta bancarios físicos.
+* **Monitoreo de Cuentas:** Revisa los saldos disponibles en cada una de las cuentas corrientes o cajas de la empresa (ej. *Caja Chica, BBVA, Banco de Crédito*).
+* **Verificación de Movimientos:** Asegúrate de que cada ingreso registrado y cada gasto aprobado impacte en la cuenta correcta, realizando la consideración contable periódica para garantizar que los saldos del dashboard cuadren con los estados de cuenta bancarios reales.
 
 ---
 
 ## 4. Auditoría y Aprobación de Egresos (Gastos)
-Como parte del equipo de control de fondos, tienes acceso a validar las salidas de dinero reportadas por el personal de campo:
+Tienes la potestad de fiscalizar los gastos cargados por los ingenieros de campo antes de registrarlos como egreso oficial:
 
 1. Ve a **Aprobaciones Pendientes**.
-2. Evalúa las solicitudes de gastos que subieron los ingenieros. Comprueba que el comprobante de pago adjunto sea legible, tenga validez legal y el monto coincida.
-3. Si el gasto está vinculado a un presupuesto operativo, verifica que la descripción se alinee con las notas del viaje.
-4. Presiona **Aprobar** para registrar el egreso formalmente en el sistema y descontarlo del presupuesto asignado al ingeniero (si aplica).
+2. **Revisión de Comprobante:** Verifica que los datos coincidan con el comprobante digital adjunto o la justificación de la Declaración Jurada.
+3. **Cruce de Presupuesto:** Comprueba si el gasto está vinculado a un presupuesto de obra operativo y si el concepto coincide con las notas de campo.
+4. Presiona **Aprobar** para validar el egreso e ingresarlo en el balance contable global del sistema.
 
 ---
 
-## 5. Reportes Analíticos de Flujo de Caja
-El módulo de **Reportes** te ofrece una visión analítica del estado económico de la empresa:
-
-* **Gráficos de Caja:** Visualiza barras e histogramas mensuales de ingresos vs. egresos para identificar meses con mayor gasto operativo.
-* **Exportación de Datos:** Descarga resúmenes financieros mensuales o anuales completos en formato Excel o PDF para auditorías internas o reuniones de junta directiva.
+## 5. Reportes Financieros y Cajas Fijas
+* **Reportes Analíticos:** Ingresa a **Reportes** para analizar gráficos del rendimiento mensual de la empresa (ingresos versus gastos) e identificar flujos y tendencias operativas. Exporta estos gráficos y balances a Excel o PDF para su presentación en las juntas.
+* **Ingreso Directo / Gastos Fijos:** Al registrar un gasto operativo directo de la administración (ej. alquileres, servicios o sueldos) desde la sección de **Gastos**, el sistema lo marcará automáticamente como **"Auto-Aprobado"** y lo restará de las cuentas de forma inmediata, facilitando la fluidez contable.
