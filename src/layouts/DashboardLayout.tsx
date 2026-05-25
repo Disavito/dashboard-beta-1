@@ -128,8 +128,21 @@ function DashboardLayout() {
               const openPaths = ['/dashboard', '/reportes', '/jornada', '/inventory', '/presupuestos', '/ayuda'];
               if (openPaths.includes(item.path)) return true;
               
+              const isEngineer = roles?.some(r => {
+                const lower = r.toLowerCase();
+                return lower.includes('ingenier') || lower.includes('engine') || lower.includes('engen');
+              }) ?? false;
+              const isAdminOrFinance = roles?.some(r => {
+                const lower = r.toLowerCase();
+                return lower.includes('admin') || lower.includes('finan');
+              }) ?? false;
+
+              if (item.path === '/expenses') {
+                return isEngineer || isAdminOrFinance || (permissions && permissions.has('/expenses'));
+              }
+              
               if (item.path === '/aprobaciones') {
-                return roles?.includes('admin') || roles?.includes('finanzas_senior') || (permissions && permissions.has('/settings'));
+                return roles?.includes('admin') || roles?.includes('finanzas_senior') || isEngineer || (permissions && permissions.has('/settings'));
               }
 
               let requiredPath = item.path;

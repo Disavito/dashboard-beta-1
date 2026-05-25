@@ -108,14 +108,14 @@ export default function Expenses() {
 
   const canAddExpense = canManageFinances || isEngineerAndNotAdmin;
 
-  // Filtro de servidor para que ingenieros solo vean sus gastos aprobados
+  // Filtro de servidor para que usuarios no financieros solo vean sus gastos
   const serverFilters = useMemo(() => {
     const filters: Record<string, any> = {};
-    if (isEngineerAndNotAdmin && user?.id) {
+    if (!canManageFinances && user?.id) {
       filters['colaborador_id'] = user.id;
     }
     return filters;
-  }, [isEngineerAndNotAdmin, user?.id]);
+  }, [canManageFinances, user?.id]);
 
   const { data: expenseData, totalCount, loading, addRecord, updateRecord, deleteRecord } = useSupabaseData<GastoType>({
     tableName: 'gastos',
@@ -191,16 +191,16 @@ export default function Expenses() {
     loadPresupuestosAndColaboradores();
   }, [user, roles]);
 
-  // Cargar solicitudes pendientes si es ingeniero
+  // Cargar solicitudes pendientes si es usuario no financiero
   useEffect(() => {
     const fetchPending = async () => {
-      if (isEngineerAndNotAdmin && user?.id) {
+      if (!canManageFinances && user?.id) {
         const { supabase } = await import('@/lib/supabaseClient');
         const { data, error } = await supabase
           .from('approval_requests')
           .select('*')
           .eq('requested_by', user.id)
-          .eq('request_type', 'engineer_expense')
+          .in('request_type', ['engineer_expense', 'expense_approval'])
           .in('status', ['pending', 'rejected'])
           .order('created_at', { ascending: false });
         if (!error && data) {
@@ -209,7 +209,7 @@ export default function Expenses() {
       }
     };
     fetchPending();
-  }, [isEngineerAndNotAdmin, user?.id, isConfirmDialogOpen]); // Refresh on close dialog
+  }, [canManageFinances, user?.id, isConfirmDialogOpen]); // Refresh on close dialog
 
   // Infinite scroll para móvil
   const [mobileVisibleCount, setMobileVisibleCount] = useState(10);
@@ -547,7 +547,7 @@ export default function Expenses() {
           )}
         </header>
 
-        {isEngineerAndNotAdmin && pendingRequests.length > 0 && (
+        {!canManageFinances && pendingRequests.length > 0 && (
           <Card className="border border-amber-200 bg-amber-50/50 shadow-sm rounded-3xl overflow-hidden mb-6">
             <CardHeader className="border-b border-amber-100 bg-amber-100/50 p-4">
               <CardTitle className="text-sm font-black uppercase text-amber-900 flex items-center gap-2">
@@ -786,7 +786,7 @@ export default function Expenses() {
                         {MAIN_EXPENSE_CATEGORIES
                           .filter(c => {
                             // "Gasto Fijo" solo visible para admin/finanzas
-                            if (c.value === 'Gasto Fijo' && isEngineerAndNotAdmin) return false;
+                            if (c.value === 'Gasto Fijo' && !canManageFinances) return false;
                             return true;
                           })
                           .map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}

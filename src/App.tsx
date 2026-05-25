@@ -99,6 +99,9 @@ function App() {
               <Route element={<ProtectedRoute resourcePath="/settings" />}>
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="audit" element={<AuditPage />} />
+              </Route>
+
+              <Route element={<ProtectedRoute resourcePath="/aprobaciones" />}>
                 <Route path="aprobaciones" element={<AprobacionesPage />} />
               </Route>
 

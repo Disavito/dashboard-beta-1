@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,13 @@ interface ApprovalRequest {
 }
 
 export default function AprobacionesPage() {
-  const { data: requests, loading, refreshData } = useSupabaseData<ApprovalRequest>({
+  const { user, roles } = useUser();
+  const isAdminOrFinanzas = useMemo(() => 
+    roles?.some(r => ['admin', 'finanzas', 'finanzas_senior'].includes(r.toLowerCase())) ?? false,
+    [roles]
+  );
+
+  const { data: requests, loading, refreshData, setFilters } = useSupabaseData<ApprovalRequest>({
     tableName: 'approval_requests',
     initialSort: { column: 'created_at', ascending: false },
     fetchAll: true
@@ -34,7 +40,18 @@ export default function AprobacionesPage() {
   // Para mostrar nombres, necesitamos colaboradores
   const { data: colaboradores } = useSupabaseData<any>({ tableName: 'colaboradores', selectQuery: 'id, name, apellidos, user_id' });
   const { data: budgets } = useSupabaseData<any>({ tableName: 'presupuestos_operativos', fetchAll: true });
-  const { user, roles } = useUser();
+
+  // Aplicar filtro si no es administrador o finanzas
+  useEffect(() => {
+    if (user) {
+      const filters: Record<string, any> = {};
+      if (!isAdminOrFinanzas && user.id) {
+        filters['requested_by'] = user.id;
+      }
+      setFilters(filters);
+    }
+  }, [user, isAdminOrFinanzas, setFilters]);
+
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const getBudgetMotivo = (budgetId: string) => {
@@ -156,15 +173,21 @@ export default function AprobacionesPage() {
     <div className="space-y-6 max-w-5xl mx-auto pb-12">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-gray-900">Aprobaciones Pendientes</h1>
-          <p className="text-gray-500 mt-1">Gestiona solicitudes de eliminación y gastos elevados del equipo.</p>
+          <h1 className="text-3xl font-black tracking-tight text-gray-900">
+            {isAdminOrFinanzas ? 'Aprobaciones Pendientes' : 'Estado de mis Solicitudes'}
+          </h1>
+          <p className="text-gray-500 mt-1">
+            {isAdminOrFinanzas 
+              ? 'Gestiona solicitudes de eliminación y gastos elevados del equipo.' 
+              : 'Consulta el estado de tus solicitudes de gastos y eliminaciones de archivos.'}
+          </p>
         </div>
         <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 px-4 py-1 text-sm font-bold">
           {pendingRequests.length} pendientes
         </Badge>
       </div>
 
-      {!canApprove && (
+      {!canApprove && isAdminOrFinanzas && (
         <div className="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-xl text-sm font-medium">
           No tienes permisos para aprobar o rechazar solicitudes. Solo visualización.
         </div>

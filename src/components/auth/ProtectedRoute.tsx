@@ -41,7 +41,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ resourcePath, children 
 
   // Rutas que CUALQUIER usuario autenticado con rol engineer o admin puede ver
   // (sin necesidad de tenerlas en resource_permissions)
-  const openPaths = ['/jornada', '/inventory', '/partner-documents', '/presupuestos'];
+  const openPaths = ['/jornada', '/inventory', '/partner-documents', '/presupuestos', '/aprobaciones'];
   const isOpenPath = openPaths.some(path => resourcePath.startsWith(path));
 
   // Si es una ruta abierta, permitir acceso a engineers y admins
