@@ -12,11 +12,9 @@ import {
   Download, 
   ArrowUpDown,
   AlertCircle,
-  CheckCircle2,
   XCircle,
   UserMinus,
-  Users,
-  Filter
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -99,7 +97,7 @@ function People() {
 
   const { loading: userLoading } = useUser();
 
-  const { data: rawSocios, loading, setFilters, refreshData } = useSupabaseData<EnrichedSocio>({
+  const { data: rawSocios, loading, refreshData } = useSupabaseData<EnrichedSocio>({
     tableName: 'vw_socio_titulares_estado',
     initialSort: { column: 'apellidoPaterno', ascending: true },
     fetchAll: true,
@@ -110,7 +108,7 @@ function People() {
 
     // Filtros locales ultrarrápidos (ya que rawSocios tiene todos los datos gracias a la caché global)
     if (selectedLocalidad !== 'all') result = result.filter(s => s.localidad === selectedLocalidad);
-    if (selectedDistrito !== 'all') result = result.filter(s => s.distritoVivienda === selectedDistrito);
+    if (selectedDistrito !== 'all') result = result.filter(s => (s as any).distritoVivienda === selectedDistrito);
     
     if (viewFilter === 'activos') result = result.filter(s => s.status === 'Activo');
     if (viewFilter === 'inactivos') result = result.filter(s => s.status === 'Inactivo');

@@ -11,7 +11,6 @@ import {
   CheckCircle2, 
   LayoutGrid,
   Ticket,
-  Search,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
