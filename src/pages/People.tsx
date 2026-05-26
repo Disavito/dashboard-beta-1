@@ -12,6 +12,7 @@ import {
   Download, 
   ArrowUpDown,
   AlertCircle,
+  CheckCircle2,
   XCircle,
   UserMinus,
   Users
