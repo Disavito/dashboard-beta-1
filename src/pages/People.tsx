@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   XCircle,
   UserMinus,
-  Users
+  Users,
+  Filter
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +33,6 @@ import { cn, sortReceipts, sortNames } from '@/lib/utils';
 import { useUser } from '@/context/UserContext';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
 import { DataTable } from '@/components/ui-custom/DataTable';
-
 import {
   Select,
   SelectContent,
@@ -86,8 +86,8 @@ function People() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   
   const [selectedLocalidad, setSelectedLocalidad] = useState<string>('all');
-  const [selectedEstado, setSelectedEstado] = useState<string>('all');
   const [selectedDistrito, setSelectedDistrito] = useState<string>('all');
+  const [viewFilter, setViewFilter] = useState<string>('all');
   
   const isMobile = useMediaQuery('(max-width: 768px)');
 
@@ -106,7 +106,20 @@ function People() {
   });
 
   const socios = useMemo(() => {
-    if (!debouncedSearch) return rawSocios;
+    let result = rawSocios || [];
+
+    // Filtros locales ultrarrápidos (ya que rawSocios tiene todos los datos gracias a la caché global)
+    if (selectedLocalidad !== 'all') result = result.filter(s => s.localidad === selectedLocalidad);
+    if (selectedDistrito !== 'all') result = result.filter(s => s.distritoVivienda === selectedDistrito);
+    
+    if (viewFilter === 'activos') result = result.filter(s => s.status === 'Activo');
+    if (viewFilter === 'inactivos') result = result.filter(s => s.status === 'Inactivo');
+    if (viewFilter === 'retirados') result = result.filter(s => s.status === 'Retirado');
+    if (viewFilter === 'sin_registro') result = result.filter(s => s.status === 'Sin Registro');
+    if (viewFilter === 'alertas_pago') result = result.filter(s => (s as any).is_payment_observed === true);
+    if (viewFilter === 'alertas_generales') result = result.filter(s => (s as any).isObservado === true);
+
+    if (!debouncedSearch) return result;
     
     // Función para normalizar quitando acentos y pasando a minúsculas
     const normalizeString = (str: string | null | undefined) => {
@@ -117,7 +130,7 @@ function People() {
     const searchNormalized = normalizeString(debouncedSearch);
     const words = searchNormalized.trim().split(/\s+/);
 
-    return rawSocios.filter(socio => {
+    return result.filter(socio => {
       const nNombres = normalizeString(socio.nombres);
       const nPat = normalizeString(socio.apellidoPaterno);
       const nMat = normalizeString(socio.apellidoMaterno);
@@ -134,16 +147,7 @@ function People() {
         );
       });
     });
-  }, [rawSocios, debouncedSearch]);
-
-  // Apply column filters
-  useEffect(() => {
-    const newFilters: Record<string, any> = {};
-    if (selectedLocalidad !== 'all') newFilters.localidad = selectedLocalidad;
-    if (selectedDistrito !== 'all') newFilters.distritoVivienda = selectedDistrito;
-    if (selectedEstado !== 'all') newFilters.status = selectedEstado;
-    setFilters(newFilters);
-  }, [selectedLocalidad, selectedDistrito, selectedEstado, setFilters]);
+  }, [rawSocios, debouncedSearch, selectedLocalidad, selectedDistrito, viewFilter]);
 
   // Realtime updates (basic refresh)
   useEffect(() => {
@@ -157,7 +161,7 @@ function People() {
 
   useEffect(() => {
     setMobileVisibleCount(10);
-  }, [debouncedSearch, selectedLocalidad, selectedEstado, selectedDistrito]);
+  }, [debouncedSearch, selectedLocalidad, viewFilter, selectedDistrito]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -387,53 +391,75 @@ function People() {
       </div>
 
       <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-8">
-        {/* Filtros */}
-        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-          <div className="relative w-full lg:w-[400px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-            <DebouncedSearchInput 
-              placeholder="Buscar por DNI, nombre o recibo..." 
-              className="pl-11 bg-gray-50 border-none focus:ring-2 focus:ring-[#4892CC]/20 h-12 rounded-xl font-medium w-full" 
-              value={debouncedSearch}
-              onChange={setDebouncedSearch}
-            />
+        {/* Filtros Enterprise (Minimalistas y Profesionales) */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
+          <div className="flex items-center gap-3 w-full lg:w-auto flex-wrap">
+            <div className="relative w-full sm:w-[280px] shrink-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
+              <DebouncedSearchInput 
+                placeholder="Buscar socio..." 
+                className="pl-9 bg-white border border-gray-200 focus:ring-1 focus:ring-slate-300 h-9 rounded-md font-medium w-full shadow-sm text-sm transition-all" 
+                value={debouncedSearch}
+                onChange={setDebouncedSearch}
+              />
+            </div>
+
+            {/* Filtros Combinados (Dropdowns) */}
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+              <Select value={viewFilter} onValueChange={setViewFilter}>
+                <SelectTrigger className="h-9 w-full sm:w-[170px] rounded-md border shadow-sm text-xs font-medium bg-white text-gray-700 border-gray-200 hover:bg-gray-50 focus:ring-1 focus:ring-slate-300">
+                  <SelectValue placeholder="Estado y Alertas" />
+                </SelectTrigger>
+                <SelectContent className="rounded-md">
+                  <SelectItem value="all">Todos los Socios</SelectItem>
+                  <SelectItem value="activos" className="text-emerald-700 font-medium">Activos</SelectItem>
+                  <SelectItem value="alertas_pago" className="text-red-600 font-medium">Alertas de Pago</SelectItem>
+                  <SelectItem value="alertas_generales" className="text-amber-600 font-medium">Alertas Generales</SelectItem>
+                  <SelectItem value="inactivos" className="text-slate-600">Inactivos</SelectItem>
+                  <SelectItem value="retirados" className="text-slate-600">Retirados</SelectItem>
+                  <SelectItem value="sin_registro" className="text-slate-400">No Registrados</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <LocalidadCombobox
+                value={selectedLocalidad}
+                onValueChange={setSelectedLocalidad}
+                triggerClassName={cn(
+                  "h-9 rounded-md border shadow-sm text-xs font-medium transition-colors px-3 w-full sm:w-auto",
+                  selectedLocalidad !== 'all' ? "bg-slate-100 text-slate-800 border-slate-300" : "bg-white text-gray-600 hover:bg-gray-50 border-gray-200"
+                )}
+                distritoFilter={selectedDistrito}
+              />
+
+              <DistritoCombobox
+                value={selectedDistrito}
+                onValueChange={setSelectedDistrito}
+                triggerClassName={cn(
+                  "h-9 rounded-md border shadow-sm text-xs font-medium transition-colors px-3 w-full sm:w-auto",
+                  selectedDistrito !== 'all' ? "bg-slate-100 text-slate-800 border-slate-300" : "bg-white text-gray-600 hover:bg-gray-50 border-gray-200"
+                )}
+              />
+
+              {(selectedLocalidad !== 'all' || selectedDistrito !== 'all' || viewFilter !== 'all') && (
+                <Button 
+                  variant="ghost" 
+                  onClick={() => { setSelectedLocalidad('all'); setSelectedDistrito('all'); setViewFilter('all'); }}
+                  className="h-9 rounded-md px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                  title="Limpiar filtros"
+                >
+                  <XCircle className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-            <LocalidadCombobox
-              value={selectedLocalidad}
-              onValueChange={setSelectedLocalidad}
-              triggerClassName="w-full md:w-[220px] h-12"
-              distritoFilter={selectedDistrito}
-            />
-
-            <DistritoCombobox
-              value={selectedDistrito}
-              onValueChange={setSelectedDistrito}
-              triggerClassName="w-full md:w-[220px] h-12"
-            />
-
-            <Select value={selectedEstado} onValueChange={setSelectedEstado}>
-              <SelectTrigger className="w-full md:w-[180px] h-12 bg-gray-50 border-none rounded-xl font-bold text-gray-700">
-                <SelectValue placeholder="Estado" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="all">Todos los Estados</SelectItem>
-                <SelectItem value="Activo">Activo</SelectItem>
-                <SelectItem value="Inactivo">Inactivo</SelectItem>
-                <SelectItem value="Retirado">Retirado</SelectItem>
-                <SelectItem value="Sin Registro">Sin Registro</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Button 
-              variant="outline" 
-              onClick={() => setIsExportDialogOpen(true)}
-              className="h-12 border-gray-200 text-gray-600 gap-2 rounded-xl font-bold px-5 hover:bg-gray-50"
-            >
-              <Download className="h-4 w-4" /> Exportar Reporte
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            onClick={() => setIsExportDialogOpen(true)}
+            className="h-9 border-gray-200 text-gray-700 gap-2 rounded-md font-medium px-4 hover:bg-gray-100 shadow-sm shrink-0 w-full lg:w-auto mt-2 lg:mt-0"
+          >
+            <Download className="h-4 w-4" /> <span className="hidden sm:inline">Exportar</span>
+          </Button>
         </div>
 
         {/* Vista Escritorio */}
@@ -444,6 +470,12 @@ function People() {
               data={socios} 
               isLoading={loading}
               enableVirtualization={true}
+              rowClassName={(row) => {
+                const socio = row.original as any;
+                if (socio.is_payment_observed) return "bg-red-50/60 hover:bg-red-100/50";
+                if (socio.isObservado) return "bg-amber-50/60 hover:bg-amber-100/50";
+                return "";
+              }}
             />
           </div>
         )}
@@ -453,9 +485,17 @@ function People() {
           <div className="md:hidden space-y-4">
           {mobileData.length ? (
             <>
-              {mobileData.map((socio) => {
+              {mobileData.map((socio: any) => {
                 return (
-                  <Card key={socio.id} className="w-full bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
+                  <Card 
+                    key={socio.id} 
+                    className={cn(
+                      "w-full border shadow-sm rounded-2xl overflow-hidden transition-colors",
+                      socio.is_payment_observed ? "bg-red-50/60 border-red-100" :
+                      socio.isObservado ? "bg-amber-50/60 border-amber-100" :
+                      "bg-white border-gray-100"
+                    )}
+                  >
                     <div className="p-5 space-y-3">
                       {/* Header: Nombre + Estado */}
                       <div className="flex justify-between items-start gap-2">

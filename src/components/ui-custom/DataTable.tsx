@@ -47,6 +47,7 @@ interface DataTableProps<TData, TValue> {
   onPaginationChange?: (updaterOrValue: any) => void;
   // Propiedades para virtualización
   enableVirtualization?: boolean;
+  rowClassName?: (row: import('@tanstack/react-table').Row<TData>) => string;
 }
 
 export function DataTable<TData, TValue>({
@@ -67,6 +68,7 @@ export function DataTable<TData, TValue>({
   pagination: controlledPagination,
   onPaginationChange,
   enableVirtualization = false,
+  rowClassName,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   
@@ -161,7 +163,10 @@ export function DataTable<TData, TValue>({
                   {virtualItems.map((virtualRow) => {
                     const row = rows[virtualRow.index];
                     return (
-                      <TableRow key={row.id} className="border-gray-50 hover:bg-slate-50/70 transition-colors duration-150">
+                      <TableRow 
+                        key={row.id} 
+                        className={cn("border-gray-50 hover:bg-slate-50/70 transition-colors duration-150", rowClassName?.(row))}
+                      >
                         {row.getVisibleCells().map((cell) => (
                           <TableCell key={cell.id} className="py-4 px-4 text-sm text-gray-600 whitespace-nowrap">
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -178,7 +183,10 @@ export function DataTable<TData, TValue>({
                 </>
               ) : (
                 rows.map((row) => (
-                  <TableRow key={row.id} className="border-gray-50 hover:bg-slate-50/70 transition-colors duration-150">
+                  <TableRow 
+                    key={row.id} 
+                    className={cn("border-gray-50 hover:bg-slate-50/70 transition-colors duration-150", rowClassName?.(row))}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="py-4 px-4 text-sm text-gray-600 whitespace-nowrap">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
