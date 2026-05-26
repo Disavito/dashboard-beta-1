@@ -261,7 +261,12 @@ function People() {
     },
     {
       id: 'observaciones',
-      header: 'Observaciones',
+      accessorFn: (row: any) => `${row.observacion || ''} ${row.payment_observation_detail || ''}`.trim(),
+      header: ({ column }) => (
+        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-gray-700" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Observaciones <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const socio = row.original as any;
         const hasObs = socio.isObservado && socio.observacion;

@@ -45,8 +45,10 @@ const EXPORT_FIELDS = [
   { id: 'mz', label: 'Manzana', category: 'Básico' },
   { id: 'lote', label: 'Lote', category: 'Básico' },
   { id: 'is_lote_medido', label: 'Lote Medido', category: 'Básico' },
+  { id: 'observacion', label: 'Obs. General (Socio)', category: 'Básico' },
   { id: 'receiptNumber', label: 'N° de Recibo', category: 'Financiero' },
   { id: 'status', label: 'Estado de Pago', category: 'Financiero' },
+  { id: 'payment_observation_detail', label: 'Obs. Financiera (Pago)', category: 'Financiero' },
   { id: 'has_planos', label: 'Planos', category: 'Documentos' },
   { id: 'has_memoria', label: 'Memoria Descriptiva', category: 'Documentos' },
   { id: 'has_ficha', label: 'Ficha Técnica', category: 'Documentos' },
@@ -63,7 +65,7 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
 
   const data = externalData || fetchedData || [];
 
-  const [selectedFields, setSelectedFields] = useState<string[]>(['dni', 'fullName', 'localidad', 'mz', 'lote', 'receiptNumber']);
+  const [selectedFields, setSelectedFields] = useState<string[]>(['dni', 'fullName', 'localidad', 'mz', 'lote', 'receiptNumber', 'observacion', 'payment_observation_detail']);
   const [format, setFormat] = useState<'xlsx' | 'csv' | 'pdf'>('xlsx');
   const [isExporting, setIsExporting] = useState(false);
   const [loteMedidoFilter, setLoteMedidoFilter] = useState<'all' | 'medido' | 'no_medido'>('all');
@@ -111,6 +113,8 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
       if (selectedFields.includes('is_lote_medido')) row['Lote Medido'] = item.is_lote_medido ? 'SÍ' : 'NO';
       if (selectedFields.includes('receiptNumber')) row['N° Recibo'] = item.receiptNumber;
       if (selectedFields.includes('status')) row['Estado'] = item.status;
+      if (selectedFields.includes('observacion')) row['Obs. General'] = item.observacion || '-';
+      if (selectedFields.includes('payment_observation_detail')) row['Obs. Financiera'] = item.payment_observation_detail || '-';
       
       if (selectedFields.includes('has_planos')) row['Planos'] = item.has_planos ? 'SÍ' : 'NO';
       if (selectedFields.includes('has_memoria')) row['Memoria'] = item.has_memoria ? 'SÍ' : 'NO';
