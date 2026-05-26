@@ -14,7 +14,8 @@ import {
   AlertCircle,
   CheckCircle2,
   XCircle,
-  UserMinus
+  UserMinus,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,6 +58,24 @@ interface EnrichedSocio extends SocioTitular {
   has_contrato?: boolean;
 }
 
+function DebouncedSearchInput({ value: initialValue, onChange, className, placeholder }: { value: string, onChange: (value: string) => void, className?: string, placeholder?: string }) {
+  const [value, setValue] = useState(initialValue);
+  const [debouncedValue] = useDebounce(value, 300);
+
+  useEffect(() => {
+    onChange(debouncedValue);
+  }, [debouncedValue, onChange]);
+
+  return (
+    <Input 
+      placeholder={placeholder}
+      className={className}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+    />
+  );
+}
+
 function People() {
   const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
@@ -64,8 +83,8 @@ function People() {
   const [socioToDelete, setSocioToDelete] = useState<EnrichedSocio | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   
-  const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch] = useDebounce(searchInput, 300);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  
   const [selectedLocalidad, setSelectedLocalidad] = useState<string>('all');
   const [selectedEstado, setSelectedEstado] = useState<string>('all');
   const [selectedDistrito, setSelectedDistrito] = useState<string>('all');
@@ -355,6 +374,10 @@ function People() {
             <div>
               <h1 className="text-4xl font-black text-gray-900 tracking-tight">Gestión de Socios</h1>
               <p className="text-gray-500 font-medium mt-1">Control de estados basado en el movimiento más reciente.</p>
+              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-[#4892CC]/10 text-[#4892CC] rounded-xl text-sm font-bold">
+                <Users className="w-4 h-4" />
+                <span>{socios.length} socio{socios.length !== 1 ? 's' : ''} encontrado{socios.length !== 1 ? 's' : ''}</span>
+              </div>
             </div>
             <Button className="h-12 bg-[#4892CC] hover:bg-[#3C8B93] text-white gap-2 rounded-2xl font-bold shadow-lg shadow-[#4892CC]/20 px-6" onClick={() => setIsRegistrationDialogOpen(true)}>
               <PlusCircle className="h-5 w-5" /> Registrar Nuevo Socio
@@ -367,12 +390,12 @@ function People() {
         {/* Filtros */}
         <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
           <div className="relative w-full lg:w-[400px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
+            <DebouncedSearchInput 
               placeholder="Buscar por DNI, nombre o recibo..." 
-              className="pl-11 bg-gray-50 border-none focus:ring-2 focus:ring-[#4892CC]/20 h-12 rounded-xl font-medium" 
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              className="pl-11 bg-gray-50 border-none focus:ring-2 focus:ring-[#4892CC]/20 h-12 rounded-xl font-medium w-full" 
+              value={debouncedSearch}
+              onChange={setDebouncedSearch}
             />
           </div>
 

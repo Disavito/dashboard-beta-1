@@ -14,7 +14,8 @@ import {
   Search,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Users
 } from 'lucide-react';
 import LocalidadCombobox from '@/components/custom/LocalidadCombobox';
 import DistritoCombobox from '@/components/custom/DistritoCombobox';
@@ -32,9 +33,9 @@ import DeletionRequestsTable from '@/components/documents/DeletionRequestsTable'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import SearchInputWithDebounce from '@/components/custom/SearchInputWithDebounce';
-import { getCachedData, setCachedData, invalidateCache } from '@/lib/dataCache';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { offlineSync } from '@/lib/offlineSync';
+import { useSupabaseData } from '@/hooks/useSupabaseData';
 
 // Interfaces
 interface SocioDocumento {
@@ -221,11 +222,85 @@ const DeleteDialogWrapper = React.memo(React.forwardRef<
 }));
 
 function PartnerDocuments() {
-  const [sociosConDocumentos, setSociosConDocumentos] = useState<SocioConDocumentos[]>([]);
-  const [loading, setLoading] = useState(true);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [selectedLocalidad, setSelectedLocalidad] = useState('all');
   const [selectedDistrito, setSelectedDistrito] = useState('all');
+
+  const allowedDocumentTypes = useMemo(() => [
+    "Planos de ubicación", "Memoria descriptiva", "Ficha", "Contrato", "Comprobante de Pago"
+  ], []);
+
+  const requiredDocumentTypes: DocumentoRequerido[] = useMemo(() => [
+    "Planos de ubicación", "Memoria descriptiva"
+  ], []);
+
+  // Fetching con caché global (React Query) para evitar el delay de 10 segundos
+  const { data: rawSocios, loading: sociosLoading, refreshData: refreshSocios } = useSupabaseData<any>({
+    tableName: 'vw_socio_titulares_estado',
+    initialSort: { column: 'apellidoPaterno', ascending: true },
+    fetchAll: true,
+  });
+
+  const { data: rawDocs, loading: docsLoading, refreshData: refreshDocs } = useSupabaseData<any>({
+    tableName: 'socio_documentos',
+    selectQuery: 'id, socio_id, tipo_documento, link_documento',
+    fetchAll: true,
+  });
+
+  const loading = sociosLoading || docsLoading;
+
+  const sociosConDocumentos = useMemo(() => {
+    if (!rawSocios || !rawDocs) return [];
+
+    const docsBySocio = new Map();
+    for (const doc of rawDocs) {
+      if (!docsBySocio.has(doc.socio_id)) docsBySocio.set(doc.socio_id, []);
+      docsBySocio.get(doc.socio_id).push(doc);
+    }
+
+    return rawSocios.map(socio => {
+      if (socio.status === 'Retirado') return null;
+
+      const socioDocs = docsBySocio.get(socio.id) || [];
+      const filteredSocioDocuments = socioDocs.filter((doc: any) => 
+        allowedDocumentTypes.includes(doc.tipo_documento) && doc.link_documento
+      );
+
+      const hasPlanos = filteredSocioDocuments.some((d: any) => d.tipo_documento === 'Planos de ubicación');
+      const hasMemoria = filteredSocioDocuments.some((d: any) => d.tipo_documento === 'Memoria descriptiva');
+      const finalIsLoteMedido = hasPlanos || hasMemoria || (socio.is_lote_medido ?? false);
+      const isPaid = socio.status === 'Activo' || socio.status === 'Inactivo';
+
+      const normalize = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        
+      const searchableContent = normalize(`
+        ${socio.nombres} 
+        ${socio.apellidoPaterno} 
+        ${socio.apellidoMaterno} 
+        ${socio.dni} 
+        ${socio.mz || ''} 
+        ${socio.lote || ''} 
+        ${socio.receiptNumber || ''}
+      `);
+
+      return {
+        ...socio,
+        nombreCompleto: `${socio.apellidoPaterno} ${socio.apellidoMaterno} ${socio.nombres}`,
+        is_lote_medido: finalIsLoteMedido,
+        socio_documentos: filteredSocioDocuments,
+        searchableContent,
+        paymentInfo: { 
+          status: isPaid ? 'Pagado' : 'No Pagado', 
+          receipt_number: socio.receiptNumber || null 
+        },
+      };
+    }).filter(Boolean) as SocioConDocumentos[];
+  }, [rawSocios, rawDocs]);
+
+  const refreshAllData = useCallback(() => {
+    refreshSocios(true);
+    refreshDocs(true);
+  }, [refreshSocios, refreshDocs]);
 
   // Resetear localidad cuando cambie el distrito
   useEffect(() => {
@@ -248,101 +323,6 @@ function PartnerDocuments() {
   const canDeleteBlueprints = useMemo(() => !!customPermissions?.can_delete_blueprints, [customPermissions]);
   const isEngineer = useMemo(() => roles?.includes('engineer') ?? false, [roles]);
   const canManageEngineering = useMemo(() => isAdmin || isEngineer, [isAdmin, isEngineer]);
-
-  const allowedDocumentTypes = useMemo(() => [
-    "Planos de ubicación", "Memoria descriptiva", "Ficha", "Contrato", "Comprobante de Pago"
-  ], []);
-
-  const requiredDocumentTypes: DocumentoRequerido[] = useMemo(() => [
-    "Planos de ubicación", "Memoria descriptiva"
-  ], []);
-
-  const fetchAllData = useCallback(async (skipLoadingIfCached = false) => {
-    // Si es llamada de mutación, invalidar cache para forzar re-fetch
-    if (!skipLoadingIfCached) {
-      invalidateCache('partner-documents');
-      invalidateCache('socio-documents');
-      invalidateCache('people-socios');
-    }
-    // SWR: si hay cache fresco, no hacemos fetch
-    const cached = getCachedData<SocioConDocumentos[]>('partner-documents');
-    if (cached.isFresh && cached.data) {
-      setSociosConDocumentos(cached.data);
-      setLoading(false);
-      return;
-    }
-    // Si hay cache stale, mostramos datos inmediatamente
-    if (cached.data && skipLoadingIfCached) {
-      setSociosConDocumentos(cached.data);
-      setLoading(false);
-    } else if (!cached.data) {
-      setLoading(true);
-    }
-    try {
-      // 🚀 OPTIMIZACIÓN EXTREMA: En lugar de descargar todos los ingresos, usamos la vista ya calculada.
-      // Esto recorta el peso de la petición a la mitad y elimina el procesamiento en el celular.
-      const { data: sociosRes, error: sociosError } = await supabase
-        .from('vw_socio_titulares_estado')
-        .select('id, dni, nombres, apellidoPaterno, apellidoMaterno, localidad, distritoVivienda, mz, lote, is_lote_medido, status, receiptNumber, socio_documentos (id, tipo_documento, link_documento)')
-        .order('apellidoPaterno', { ascending: true });
-
-      if (sociosError) throw sociosError;
-
-      const processedData = (sociosRes || []).map(socio => {
-        // Filtrar socio Retirado
-        if (socio.status === 'Retirado') {
-          return null;
-        }
-
-        const filteredSocioDocuments = (socio.socio_documentos as any[] || []).filter(doc => {
-          if (!allowedDocumentTypes.includes(doc.tipo_documento) || !doc.link_documento) return false;
-          return true;
-        });
-
-        const hasPlanos = filteredSocioDocuments.some(d => d.tipo_documento === 'Planos de ubicación');
-        const hasMemoria = filteredSocioDocuments.some(d => d.tipo_documento === 'Memoria descriptiva');
-        const finalIsLoteMedido = hasPlanos || hasMemoria || (socio.is_lote_medido ?? false);
-
-        const isPaid = socio.status === 'Activo' || socio.status === 'Inactivo';
-
-        const normalize = (text: string) => 
-          text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-          
-        const searchableContent = normalize(`
-          ${socio.nombres} 
-          ${socio.apellidoPaterno} 
-          ${socio.apellidoMaterno} 
-          ${socio.dni} 
-          ${socio.mz || ''} 
-          ${socio.lote || ''} 
-          ${socio.receiptNumber || ''}
-        `);
-
-        return {
-          ...socio,
-          nombreCompleto: `${socio.apellidoPaterno} ${socio.apellidoMaterno} ${socio.nombres}`,
-          is_lote_medido: finalIsLoteMedido,
-          socio_documentos: filteredSocioDocuments,
-          searchableContent,
-          paymentInfo: { 
-            status: isPaid ? 'Pagado' : 'No Pagado', 
-            receipt_number: socio.receiptNumber || null 
-          },
-        };
-      });
-
-      const result = processedData.filter(Boolean) as SocioConDocumentos[];
-      setCachedData('partner-documents', result);
-      setSociosConDocumentos(result);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error al sincronizar expedientes';
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [allowedDocumentTypes]);
-
-  useEffect(() => { fetchAllData(true); }, [fetchAllData]);
 
   const filteredData = useMemo(() => {
     const normalize = (text: string) => 
@@ -427,7 +407,6 @@ function PartnerDocuments() {
       });
       toast.success(`Guardado offline: ${selectedIds.length} expedientes a actualizar.`);
       setRowSelection({});
-      setSociosConDocumentos(prev => prev.map(s => selectedIds.includes(s.id) ? { ...s, is_lote_medido: newValue } : s));
       return;
     }
 
@@ -436,11 +415,11 @@ function PartnerDocuments() {
       if (error) throw error;
       toast.success(`Actualizados ${selectedIds.length} expedientes`);
       setRowSelection({});
-      fetchAllData();
+      refreshAllData();
     } catch (error) {
       toast.error('Error en actualización masiva');
     }
-  }, [canManageEngineering, fetchAllData, requiredDocumentTypes]);
+  }, [canManageEngineering, refreshAllData, requiredDocumentTypes]);
 
   const handleDeleteDocumentDirect = useCallback(async (documentId: number, documentLink: string, documentType: string) => {
     try {
@@ -452,11 +431,11 @@ function PartnerDocuments() {
       await supabase.from('socio_documentos').delete().eq('id', documentId);
 
       toast.success('Documento eliminado');
-      fetchAllData();
+      refreshAllData();
     } catch (error) {
       toast.error('Error al eliminar');
     }
-  }, [fetchAllData]);
+  }, [refreshAllData]);
 
   // Helper para renderizar headers ordenables
   const SortableHeader = ({ column, title }: { column: any, title: string }) => {
@@ -677,18 +656,21 @@ function PartnerDocuments() {
             <p className="text-lg text-gray-500 font-medium leading-relaxed">
               Gestión centralizada de planimetría, memorias descriptivas y control de medición de lotes.
             </p>
+            <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-[#4892CC]/10 text-[#4892CC] rounded-xl text-sm font-bold">
+              <Users className="w-4 h-4" />
+              <span>{filteredData.length} expediente{filteredData.length !== 1 ? 's' : ''} encontrado{filteredData.length !== 1 ? 's' : ''}</span>
+            </div>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto px-6 -mt-12 relative z-20">
         <div className="bg-white p-4 rounded-2xl shadow-glass border border-gray-100 mb-8 flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <div className="relative flex-1 w-full lg:w-[400px]">
             <SearchInputWithDebounce
               placeholder="Buscar por socio, DNI, manzana, lote o recibo..."
               onDebouncedChange={setDebouncedSearchQuery}
-              inputClassName="pl-12 h-14 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-bold"
+              inputClassName="h-14 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-bold w-full"
             />
           </div>
           
@@ -792,8 +774,9 @@ function PartnerDocuments() {
                           const hasReqDocs = s.socio_documentos.some(d => requiredDocumentTypes.includes(d.tipo_documento as any));
                           if (!newValue && hasReqDocs) { toast.warning('Acción bloqueada', { description: 'No se puede desmarcar un lote con planos subidos.' }); return; }
                           
-                          // Optimistic update
-                          setSociosConDocumentos(prev => prev.map(ss => ss.id === socioId ? { ...ss, is_lote_medido: newValue } : ss));
+                          // Optimistic update done in cache via useSupabaseData if needed, 
+                          // but here we just show success since the parent memo recalculates.
+                          refreshAllData();
                           
                           if (!navigator.onLine) {
                             await offlineSync.addJob({
@@ -809,7 +792,6 @@ function PartnerDocuments() {
                             await updateMutation.mutateAsync({ tableName: 'socio_titulares', id: socioId, record: { is_lote_medido: newValue } });
                           } catch { 
                             // Revert on error
-                            setSociosConDocumentos(prev => prev.map(ss => ss.id === socioId ? { ...ss, is_lote_medido: !newValue } : ss));
                           }
                         }}
                       />
@@ -830,7 +812,7 @@ function PartnerDocuments() {
         </Tabs>
       </div>
 
-      <UploadModalWrapper ref={uploadModalRef} onSuccess={fetchAllData} />
+      <UploadModalWrapper ref={uploadModalRef} onSuccess={refreshAllData} />
       <DeleteDialogWrapper ref={deleteDialogRef} onConfirm={handleDeleteDocumentDirect} />
     </div>
   );

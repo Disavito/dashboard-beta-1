@@ -85,7 +85,7 @@ export function DataTable<TData, TValue>({
     pageCount,
     manualPagination,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: manualPagination ? undefined : getPaginationRowModel(),
+    getPaginationRowModel: (manualPagination || enableVirtualization) ? undefined : getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
@@ -101,7 +101,7 @@ export function DataTable<TData, TValue>({
       sorting,
       globalFilter,
       rowSelection: rowSelection || {},
-      pagination,
+      ...(enableVirtualization ? {} : { pagination }),
     },
   });
 
