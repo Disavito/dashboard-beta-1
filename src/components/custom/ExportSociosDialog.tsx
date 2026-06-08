@@ -57,7 +57,6 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
   const { data: fetchedData, loading } = useSupabaseData<any>({
     tableName: 'vw_socio_titulares_estado',
     fetchAll: true,
-    disableRealtime: true,
     enabled: !externalData // Only fetch if externalData is not provided
   });
 

@@ -16,7 +16,6 @@ interface UseSupabaseDataOptions {
   pageSize?: number;    // items per page
   searchQuery?: string; // global search text
   searchColumns?: string[]; // columns to apply the text search to
-  disableRealtime?: boolean; // prevent subscribing to realtime changes
 }
 
 export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
@@ -31,8 +30,7 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
     page,
     pageSize,
     searchQuery,
-    searchColumns,
-    disableRealtime = false
+    searchColumns
   } = options;
   const { user, roles } = useUser();
   const queryClient = useQueryClient();
@@ -187,7 +185,7 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
         toast.success(`${tableName} actualizado correctamente.`);
       }
     },
-    onError: (err: any, _variables, context) => {
+    onError: (err: any, _variables, context: any) => {
       if (context?.previousData) {
         queryClient.setQueryData(queryKey, context.previousData);
       }
@@ -224,7 +222,7 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
         toast.success(`${tableName} añadido correctamente.`);
       }
     },
-    onError: (err: any, _variables, context) => {
+    onError: (err: any, _variables, context: any) => {
       if (context?.previousData) {
         queryClient.setQueryData(queryKey, context.previousData);
       }
@@ -260,7 +258,7 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
         toast.success(`${tableName} eliminado correctamente.`);
       }
     },
-    onError: (err: any, _variables, context) => {
+    onError: (err: any, _variables, context: any) => {
       if (context?.previousData) {
         queryClient.setQueryData(queryKey, context.previousData);
       }
