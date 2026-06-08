@@ -1,4 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabaseClient';
 import {
   Users,
   Activity,
@@ -202,11 +204,25 @@ function Dashboard() {
     return roles.some(role => ['admin', 'finanzas_senior', 'finanzas_junior'].includes(role.toLowerCase()));
   }, [roles, previewAsEngineer]);
 
-  const { data: ingresos } = useSupabaseData<Ingreso>({ tableName: 'ingresos', selectQuery: 'id, date, amount, dni, receipt_number, transaction_type, full_name', fetchAll: true });
-  const { data: gastos } = useSupabaseData<Gasto>({ tableName: 'gastos', selectQuery: 'id, date, amount, description', fetchAll: true });
-  const { data: socios } = useSupabaseData<SocioTitular & { status?: string }>({ tableName: 'vw_socio_titulares_estado', selectQuery: 'id, dni, nombres, apellidoPaterno, mz, lote, status', fetchAll: true });
-  const { data: ingresosLocalidad } = useSupabaseData<any>({ tableName: 'vw_ingresos_localidad', selectQuery: '*', fetchAll: true });
-  const { data: colaboradores } = useSupabaseData<Colaborador>({ tableName: 'colaboradores', selectQuery: 'id, name, cargo' });
+  const { data: ingresos, loading: loadingIngresos, error: errorIngresos } = useSupabaseData<Ingreso>({ tableName: 'ingresos', selectQuery: 'id, date, amount, dni, receipt_number, transaction_type, full_name', limit: 2000 });
+  const { data: gastos, loading: loadingGastos, error: errorGastos } = useSupabaseData<Gasto>({ tableName: 'gastos', selectQuery: 'id, date, amount, description', limit: 2000 });
+  const { data: socios, loading: loadingSocios, error: errorSocios } = useSupabaseData<SocioTitular & { status?: string }>({ tableName: 'vw_socio_titulares_estado', selectQuery: 'id, dni, nombres, apellidoPaterno, mz, lote, status', fetchAll: true });
+  const { data: ingresosLocalidad, loading: loadingLocalidad, error: errorLocalidad } = useSupabaseData<any>({ tableName: 'vw_ingresos_localidad', selectQuery: '*', fetchAll: true });
+  const { data: colaboradores, loading: loadingColab, error: errorColab } = useSupabaseData<Colaborador>({ tableName: 'colaboradores', selectQuery: 'id, name, cargo' });
+
+  // Global stats via RPC for instant loading of ALL-TIME totals
+  const { data: globalStats, isLoading: statsLoading } = useQuery({
+    queryKey: ['dashboard_global_stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_dashboard_stats');
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 1000 * 60 * 5 // 5 minutes
+  });
+
+  const isDataLoading = loadingIngresos || loadingGastos || loadingSocios || loadingLocalidad || loadingColab || statsLoading;
+  const dataError = errorIngresos || errorGastos || errorSocios || errorLocalidad || errorColab;
 
   const periodOptions = useMemo(() => {
     const dates = [...ingresos, ...gastos].map(i => parseISO(i.date)).filter(d => isValid(d));
@@ -241,8 +257,18 @@ function Dashboard() {
     const fGastos = gastos.filter(filterFn);
     const totalI = fIngresos.reduce((sum, i) => sum + i.amount, 0);
     const totalG = Math.abs(fGastos.reduce((sum, g) => sum + g.amount, 0));
-    return { totalIngresos: totalI, totalGastos: totalG, balance: totalI - totalG, ingresos: fIngresos, gastos: fGastos };
-  }, [ingresos, gastos, filterPeriodType, selectedPeriod, dateRange]);
+    
+    // Si estamos viendo "Todo", usamos las estadísticas globales del servidor (RPC)
+    const isAll = filterPeriodType === 'all';
+    
+    return { 
+      totalIngresos: isAll && globalStats ? globalStats.total_income : totalI, 
+      totalGastos: isAll && globalStats ? globalStats.total_expenses : totalG, 
+      balance: isAll && globalStats ? globalStats.net_balance : totalI - totalG, 
+      ingresos: fIngresos, 
+      gastos: fGastos 
+    };
+  }, [ingresos, gastos, filterPeriodType, selectedPeriod, dateRange, globalStats]);
 
   const socioStats = useMemo(() => {
     const total = socios.length;
@@ -250,7 +276,10 @@ function Dashboard() {
     const pagadosDnis = new Set(ingresos.filter(i => isValid(parseISO(i.date)) && isAfter(parseISO(i.date), currentMonthStart) && i.amount > 0).map(i => i.dni));
     const pagadosCount = socios.filter(s => pagadosDnis.has(s.dni)).length;
     
-    const activosCount = socios.filter(s => s.status === 'Activo').length;
+    const activosCount = filterPeriodType === 'all' && globalStats 
+      ? globalStats.active_socios 
+      : socios.filter(s => s.status === 'Activo').length;
+      
     const activosPorcentaje = total > 0 ? Math.round((activosCount / total) * 100) : 0;
 
     return { 
@@ -260,7 +289,7 @@ function Dashboard() {
       porcentaje: total > 0 ? Math.round((pagadosCount / total) * 100) : 0,
       activosPorcentaje
     };
-  }, [socios, ingresos]);
+  }, [socios, ingresos, globalStats, filterPeriodType]);
 
   const chartData = useMemo(() => {
     const monthly: Record<string, { ingresos: number; gastos: number }> = {};
@@ -322,6 +351,7 @@ function Dashboard() {
   const [drillDownIngresos, setDrillDownIngresos] = useState<Ingreso[]>([]);
   const [drillDownGastos, setDrillDownGastos] = useState<Gasto[]>([]);
 
+
   const handleChartClick = useCallback((data: any) => {
     if (!data || !data.activeLabel) return;
     const label = data.activeLabel as string;
@@ -357,11 +387,22 @@ function Dashboard() {
       .sort((a, b) => b.value - a.value);
   }, [ingresosLocalidad, filterPeriodType, dateRange]);
 
-  if (authLoading) {
+  if (authLoading || isDataLoading) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center bg-[#FFFFFF]">
         <Loader2 className="w-12 h-12 text-[#4892CC] animate-spin mb-4" />
-        <p className="text-gray-500 font-bold">Cargando panel...</p>
+        <p className="text-gray-500 font-bold">Cargando panel de administración...</p>
+      </div>
+    );
+  }
+
+  if (dataError) {
+    return (
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#FFFFFF]">
+        <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Error al cargar datos</h2>
+        <p className="text-gray-500 font-medium">{typeof dataError === 'string' ? dataError : (dataError as Error)?.message || 'Ocurrió un error inesperado'}</p>
+        <Button onClick={() => window.location.reload()} className="mt-6 bg-[#4892CC]">Reintentar</Button>
       </div>
     );
   }
@@ -371,7 +412,7 @@ function Dashboard() {
       <header className="relative h-auto py-8 md:h-72 flex items-center overflow-hidden bg-white border-b border-slate-100/60">
         <div className="absolute inset-0 bg-gradient-to-br from-[#4892CC]/[0.06] via-transparent to-corp-teal/[0.02] z-0"></div>
         <div className="container mx-auto px-4 md:px-8 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div>
               <Badge className="mb-3 bg-[#4892CC]/10 text-[#4892CC] border-none font-bold px-4 py-1 rounded-full text-[10px] md:text-xs">
                 SISTEMA DE GESTIÓN V2025
@@ -385,7 +426,7 @@ function Dashboard() {
                   : 'Resumen de tareas, expedientes pendientes y herramientas asignadas.'}
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {/* Dashboard Customizer Component */}
               <DashboardCustomizer
                 widgets={!isAdminOrFinanzas ? engineerLayout : (activeTab === 'titulares' ? titularesLayout : finanzasLayout)}

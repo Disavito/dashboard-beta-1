@@ -52,6 +52,7 @@ import { Input } from '@/components/ui/input';
 import { pdf } from '@react-pdf/renderer';
 import { CierreCajaPDF } from '@/components/custom/CierreCajaPDF';
 import { useUser } from '@/context/UserContext';
+import { useDebounce } from '@/hooks/useDebounce';
 
 type TimeFrame = 'daily' | 'monthly' | 'quarterly' | 'yearly';
 
@@ -61,6 +62,7 @@ const Accounts: React.FC = () => {
   const [timeFrame, setTimeFrame] = useState<TimeFrame>('monthly');
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const { roles, customPermissions } = useUser();
@@ -74,8 +76,8 @@ const Accounts: React.FC = () => {
     queryFn: async () => {
       const [accRes, incRes, gasRes] = await Promise.all([
         supabase.from('cuentas').select('id, name, tipo').order('name'),
-        supabase.from('ingresos').select('id, date, amount, account, transaction_type, full_name, receipt_number').is('deleted_at', null).order('date', { ascending: true }),
-        supabase.from('gastos').select('id, date, amount, account, category, description, numero_gasto').is('deleted_at', null).order('date', { ascending: true })
+        supabase.from('ingresos').select('id, date, amount, account, transaction_type, full_name, receipt_number').is('deleted_at', null).order('date', { ascending: false }).limit(2000),
+        supabase.from('gastos').select('id, date, amount, account, category, description, numero_gasto').is('deleted_at', null).order('date', { ascending: false }).limit(2000)
       ]);
 
       if (accRes.error) throw accRes.error;
@@ -145,8 +147,8 @@ const Accounts: React.FC = () => {
       .filter(t => {
         const matchesAccount = selectedAccount === 'all' || t.account === selectedAccount;
         const matchesTipo = !validAccountNames || validAccountNames.has(t.account);
-        const matchesSearch = t.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                             (t.ref && t.ref.toLowerCase().includes(searchTerm.toLowerCase()));
+        const matchesSearch = t.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) || 
+                             (t.ref && t.ref.toLowerCase().includes(debouncedSearchTerm.toLowerCase()));
         return matchesAccount && matchesTipo && matchesSearch;
       })
       .sort((a, b) => {
@@ -154,7 +156,7 @@ const Accounts: React.FC = () => {
         const valB = b.date ? new Date(b.date).getTime() : 0;
         return (isNaN(valB) ? 0 : valB) - (isNaN(valA) ? 0 : valA);
       });
-  }, [ingresos, gastos, selectedAccount, selectedTipo, filteredAccounts, searchTerm]);
+  }, [ingresos, gastos, selectedAccount, selectedTipo, filteredAccounts, debouncedSearchTerm]);
 
   const stats = useMemo(() => {
     const validAccountNames = selectedTipo === 'all' 

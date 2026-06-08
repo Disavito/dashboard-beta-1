@@ -73,8 +73,8 @@ function navigate(date: Date, mode: ViewMode, direction: number): Date {
 
 // ─────── Componente Principal ────────
 const ReportesPage: React.FC = () => {
-  const { roles, loading: userLoading } = useUser();
-  const isFinanceUser = roles?.includes('admin') || roles?.includes('finanzas_senior') || roles?.includes('finanzas_junior');
+  const { roles, customPermissions, loading: userLoading } = useUser();
+  const isFinanceUser = roles?.includes('admin') || roles?.includes('finanzas_senior') || roles?.includes('finanzas_junior') || customPermissions?.can_manage_finances || customPermissions?.can_view_income || customPermissions?.can_view_expenses;
 
   const [baseDate, setBaseDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('month');
@@ -93,7 +93,7 @@ const ReportesPage: React.FC = () => {
   const label = getLabel(baseDate, viewMode);
 
   // ── Fetch cuentas ──
-  const { data: accounts } = useQuery({
+  const { data: accounts, isError: isErrorAccounts, error: errorAccounts } = useQuery({
     queryKey: ['reporteAccounts'],
     queryFn: async () => {
       const { data } = await supabase.from('cuentas').select('id, name').order('name');
@@ -103,7 +103,7 @@ const ReportesPage: React.FC = () => {
   });
 
   // ── Fetch datos financieros ──
-  const { data: financialData, isLoading: loadingFinancial } = useQuery({
+  const { data: financialData, isLoading: loadingFinancial, isError: isErrorFinancial, error: errorFinancial } = useQuery({
     queryKey: ['reporteFinanciero', startDate, endDate],
     queryFn: async () => {
       const [incRes, expRes] = await Promise.all([
@@ -116,7 +116,7 @@ const ReportesPage: React.FC = () => {
   });
 
   // ── Fetch datos de asistencia ──
-  const { data: jornadaData, isLoading: loadingJornada } = useQuery({
+  const { data: jornadaData, isLoading: loadingJornada, isError: isErrorJornada, error: errorJornada } = useQuery({
     queryKey: ['reporteJornada', startDate, endDate],
     queryFn: async () => {
       const { data } = await supabase
@@ -130,7 +130,7 @@ const ReportesPage: React.FC = () => {
   });
 
   // ── Fetch socios ──
-  const { data: socioStats } = useQuery({
+  const { data: socioStats, isError: isErrorSocios, error: errorSocios } = useQuery({
     queryKey: ['reporteSocios'],
     queryFn: async () => {
       const { data } = await supabase.from('socio_titulares').select('id, localidad, mz, lote');
@@ -146,7 +146,7 @@ const ReportesPage: React.FC = () => {
     },
   });
   // ── Fetch progreso localidades ──
-  const { data: progresoData, isLoading: loadingProgreso } = useQuery({
+  const { data: progresoData, isLoading: loadingProgreso, isError: isErrorProgreso, error: errorProgreso } = useQuery({
     queryKey: ['reporteProgreso'],
     queryFn: async () => {
       const { data } = await supabase.from('view_progreso_localidades').select('*').order('total_socios', { ascending: false });
@@ -155,13 +155,13 @@ const ReportesPage: React.FC = () => {
   });
 
   // ── Fetch Vistas Gerenciales Ocultas ──
-  const { data: gerencialData, isLoading: loadingGerencial } = useQuery({
+  const { data: gerencialData, isLoading: loadingGerencial, isError: isErrorGerencial, error: errorGerencial } = useQuery({
     queryKey: ['reporteGerencial'],
     queryFn: async () => {
       const [resIngresos, resEstado, resMorosidad] = await Promise.all([
-        supabase.from('vw_ingresos_localidad').select('*').order('mes', { ascending: false }).limit(50),
+        supabase.from('vw_ingresos_localidad').select('*').order('mes', { ascending: false }).limit(500),
         supabase.from('view_socio_estado').select('*'),
-        supabase.from('socios_con_ultimo_ingreso').select('*').order('last_income_date', { ascending: true, nullsFirst: true }).limit(50)
+        supabase.from('socios_con_ultimo_ingreso').select('*').order('last_income_date', { ascending: true, nullsFirst: true }).limit(5000)
       ]);
       return {
         ingresosLocalidad: resIngresos.data || [],
@@ -293,7 +293,9 @@ const ReportesPage: React.FC = () => {
     };
   }, [jornadaData]);
 
-  const isLoading = loadingFinancial || loadingJornada || loadingProgreso;
+  const isLoading = loadingFinancial || loadingJornada || loadingProgreso || loadingGerencial;
+  const hasError = isErrorAccounts || isErrorFinancial || isErrorJornada || isErrorSocios || isErrorProgreso || isErrorGerencial;
+  const firstError = errorAccounts || errorFinancial || errorJornada || errorSocios || errorProgreso || errorGerencial;
 
   const exportAdvancedExcel = async () => {
     if (!financialData) return;
@@ -394,6 +396,13 @@ const ReportesPage: React.FC = () => {
         <div className="flex flex-col items-center justify-center py-20">
           <Loader2 className="w-10 h-10 animate-spin text-[#4892CC] mb-4" />
           <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">Generando reportes...</p>
+        </div>
+      ) : hasError ? (
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-red-100 shadow-sm">
+          <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Error al generar reportes</h2>
+          <p className="text-gray-500 font-medium text-center max-w-md">{(firstError as Error)?.message || 'Ha ocurrido un problema al descargar las estadísticas.'}</p>
+          <Button onClick={() => window.location.reload()} className="mt-6 bg-[#4892CC]">Reintentar</Button>
         </div>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -889,9 +898,25 @@ const ReportesPage: React.FC = () => {
             })()}
           </TabsContent>
 
-          {/* ════════ AUDITORIA GERENCIAL ════════ */}
+           {/* ════════ AUDITORIA GERENCIAL ════════ */}
           {isFinanceUser && (
             <TabsContent value="gerencial" className="space-y-6">
+              {/* Filtro de localidad */}
+              <div className="flex flex-wrap gap-3">
+                <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
+                  <MapPin className="w-4 h-4 text-slate-400 ml-2" />
+                  <Select value={localidadFilter} onValueChange={setLocalidadFilter}>
+                    <SelectTrigger className="w-[200px] border-none focus:ring-0 font-bold text-slate-700 text-xs">
+                      <SelectValue placeholder="Localidad" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      <SelectItem value="all">Todas las localidades</SelectItem>
+                      {(socioStats?.localidades || []).map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               {loadingGerencial ? (
                  <div className="p-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-[#4892CC]" /></div>
               ) : gerencialData && (
@@ -899,17 +924,17 @@ const ReportesPage: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                        <Card className="rounded-2xl border border-gray-100 shadow-sm p-5 bg-gradient-to-br from-white to-red-50/30">
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-red-500"/> Riesgo Morosidad</p>
-                          <p className="text-2xl font-black text-red-600 mt-1">{gerencialData.morosidad.filter((m:any) => !m.last_income_date || new Date(m.last_income_date) < subMonths(new Date(), 3)).length}</p>
+                          <p className="text-2xl font-black text-red-600 mt-1">{gerencialData.morosidad.filter((m:any) => (localidadFilter === 'all' || m.localidad === localidadFilter) && (!m.last_income_date || new Date(m.last_income_date) < subMonths(new Date(), 3))).length}</p>
                           <p className="text-[10px] text-slate-400 mt-1">Socios &gt; 3 meses sin pago</p>
                        </Card>
                        <Card className="rounded-2xl border border-gray-100 shadow-sm p-5 bg-gradient-to-br from-white to-amber-50/30">
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1"><FileText className="w-3 h-3 text-amber-500"/> Fichas Faltantes Global</p>
-                          <p className="text-2xl font-black text-slate-900 mt-1">{gerencialData.socioEstado.filter((s:any) => s['FICHA OK'] === false).length}</p>
+                          <p className="text-2xl font-black text-slate-900 mt-1">{gerencialData.socioEstado.filter((s:any) => (localidadFilter === 'all' || s.localidad === localidadFilter) && s['FICHA OK'] === false).length}</p>
                           <p className="text-[10px] text-slate-400 mt-1">Socios sin ficha entregada</p>
                        </Card>
                        <Card className="rounded-2xl border border-gray-100 shadow-sm p-5 bg-gradient-to-br from-white to-emerald-50/30">
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-emerald-500"/> Contratos Completos</p>
-                          <p className="text-2xl font-black text-emerald-600 mt-1">{gerencialData.socioEstado.filter((s:any) => s['CONTRATO OK'] === true).length}</p>
+                          <p className="text-2xl font-black text-emerald-600 mt-1">{gerencialData.socioEstado.filter((s:any) => (localidadFilter === 'all' || s.localidad === localidadFilter) && s['CONTRATO OK'] === true).length}</p>
                           <p className="text-[10px] text-slate-400 mt-1">Socios formalizados al 100%</p>
                        </Card>
                     </div>
@@ -925,7 +950,7 @@ const ReportesPage: React.FC = () => {
                          </CardHeader>
                          <CardContent className="p-0 max-h-[300px] overflow-y-auto">
                             <div className="divide-y divide-slate-50">
-                               {gerencialData.morosidad.slice(0,10).map((m:any, i:number) => (
+                               {gerencialData.morosidad.filter((m:any) => localidadFilter === 'all' || m.localidad === localidadFilter).slice(0,50).map((m:any, i:number) => (
                                   <div key={i} className="px-5 py-3 flex justify-between items-center hover:bg-slate-50 transition-colors">
                                      <div>
                                         <p className="font-bold text-slate-700 text-xs uppercase">{m.nombres} {m.apellidoPaterno}</p>
@@ -951,7 +976,7 @@ const ReportesPage: React.FC = () => {
                          </CardHeader>
                          <CardContent className="p-0 max-h-[300px] overflow-y-auto">
                             <div className="divide-y divide-slate-50">
-                               {gerencialData.ingresosLocalidad.slice(0,10).map((ing:any, i:number) => (
+                               {gerencialData.ingresosLocalidad.filter((ing:any) => localidadFilter === 'all' || ing.localidad === localidadFilter).slice(0,20).map((ing:any, i:number) => (
                                   <div key={i} className="px-5 py-3 flex justify-between items-center hover:bg-slate-50 transition-colors">
                                      <div>
                                         <p className="font-bold text-slate-700 text-xs uppercase">{ing.localidad || 'General'}</p>

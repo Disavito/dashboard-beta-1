@@ -186,8 +186,17 @@ function SocioTitularRegistrationForm({ socioId, onClose, onSuccess }: SocioTitu
     if (val.length === 10) {
       const parsedDate = parse(val, 'dd/MM/yyyy', new Date());
       if (isValid(parsedDate)) {
-        setValue('fechaNacimiento', format(parsedDate, 'yyyy-MM-dd'));
+        const year = parsedDate.getFullYear();
+        if (year < 1900 || year > new Date().getFullYear()) {
+          setValue('fechaNacimiento', '', { shouldValidate: true });
+        } else {
+          setValue('fechaNacimiento', format(parsedDate, 'yyyy-MM-dd'), { shouldValidate: true });
+        }
+      } else {
+        setValue('fechaNacimiento', '', { shouldValidate: true });
       }
+    } else {
+      setValue('fechaNacimiento', '', { shouldValidate: true });
     }
   };
 
@@ -910,7 +919,10 @@ function SocioTitularRegistrationForm({ socioId, onClose, onSuccess }: SocioTitu
 
           <DialogFooter className="p-6 pt-4 border-t border-border">
             <Button type="button" variant="outline" onClick={onClose} className="h-11 sm:h-9 rounded-xl">Cancelar</Button>
-            <Button type="submit" className="h-11 sm:h-9 rounded-xl">{socioId !== undefined ? 'Guardar Cambios' : 'Registrar Socio'}</Button>
+            <Button type="submit" disabled={isConfirmingSubmission} className="h-11 sm:h-9 rounded-xl">
+              {isConfirmingSubmission ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              {socioId !== undefined ? 'Guardar Cambios' : 'Registrar Socio'}
+            </Button>
           </DialogFooter>
         </form>
       </Form>

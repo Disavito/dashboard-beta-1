@@ -34,12 +34,12 @@ export default function AprobacionesPage() {
   const { data: requests, loading, refreshData, setFilters } = useSupabaseData<ApprovalRequest>({
     tableName: 'approval_requests',
     initialSort: { column: 'created_at', ascending: false },
-    fetchAll: true
+    limit: 300
   });
   
   // Para mostrar nombres, necesitamos colaboradores
   const { data: colaboradores } = useSupabaseData<any>({ tableName: 'colaboradores', selectQuery: 'id, name, apellidos, user_id' });
-  const { data: budgets } = useSupabaseData<any>({ tableName: 'presupuestos_operativos', fetchAll: true });
+  const { data: budgets } = useSupabaseData<any>({ tableName: 'presupuestos_operativos', limit: 300 });
 
   // Aplicar filtro si no es administrador o finanzas
   useEffect(() => {

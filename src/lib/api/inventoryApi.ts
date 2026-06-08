@@ -69,7 +69,8 @@ export const fetchAssignments = async (): Promise<InventoryAssignment[]> => {
   const { data, error } = await supabase
     .from('inventory_assignments')
     .select(`*, inventory_items (id, name), colaboradores (id, name, apellidos)`)
-    .order('assigned_at', { ascending: false });
+    .order('assigned_at', { ascending: false })
+    .limit(500);
   if (error) throw error;
   return (data || []) as InventoryAssignment[];
 };

@@ -309,7 +309,7 @@ export const fetchAnnulledAndReturnedIncomes = async (type?: 'annulled' | 'retur
   if (type === 'annulled') query = query.eq('transaction_type', 'Anulación');
   else if (type === 'returned') query = query.eq('transaction_type', 'Devolución');
   else query = query.in('transaction_type', ['Anulación', 'Devolución']);
-  const { data, error } = await query.order('date', { ascending: false });
+  const { data, error } = await query.order('date', { ascending: false }).limit(500);
   if (error) throw error;
   return (data || []).map(item => ({
     id: item.id,
@@ -386,7 +386,7 @@ export const createIncomeFromBoleta = async (data: any) => {
 };
 
 export const fetchDailySummaries = async () => {
-  const { data } = await supabase.from('daily_summaries').select('*').order('fecha_resumen', { ascending: false });
+  const { data } = await supabase.from('daily_summaries').select('*').order('fecha_resumen', { ascending: false }).limit(300);
   return data || [];
 };
 

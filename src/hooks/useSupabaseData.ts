@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 import { useQuery, keepPreviousData, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -37,6 +37,11 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
 
   const [filters, setFilters] = useState<Record<string, any>>(initialFilters);
   const [sort, setSort] = useState(initialSort);
+
+  // Sync external filters changes
+  useEffect(() => {
+    setFilters(initialFilters);
+  }, [JSON.stringify(initialFilters)]);
 
   const queryKey = [
     'supabaseData',

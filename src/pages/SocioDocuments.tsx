@@ -25,6 +25,7 @@ import { UploadDocumentModal, ManualDocumentType } from '@/components/custom/Upl
 import DeletionRequestsTable from '@/components/documents/DeletionRequestsTable';
 import DocumentLinkPill from '@/components/custom/DocumentLinkPill';
 import ConfirmationDialog from '@/components/ui-custom/ConfirmationDialog';
+import { useDebounce } from '@/hooks/useDebounce';
 
 
 interface SocioDocumento {
@@ -54,6 +55,7 @@ function SocioDocuments() {
   const [socios, setSocios] = useState<SocioDocumento[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [localidadFilter, setLocalidadFilter] = useState('all');
   const [localidades, setLocalidades] = useState<string[]>([]);
   
@@ -165,7 +167,7 @@ function SocioDocuments() {
 
   // Lógica de filtrado y ORDENAMIENTO combinada
   const filteredSocios = useMemo(() => {
-    const term = searchTerm.toLowerCase();
+    const term = debouncedSearchTerm.toLowerCase();
     
     // 1. Filtrar
     let result = socios.filter(s => {
@@ -197,7 +199,7 @@ function SocioDocuments() {
     }
 
     return result;
-  }, [socios, searchTerm, localidadFilter, sortConfig]);
+  }, [socios, debouncedSearchTerm, localidadFilter, sortConfig]);
 
   const handleDeleteRequest = async () => {
     try {

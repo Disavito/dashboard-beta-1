@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DataTable } from '@/components/ui-custom/DataTable';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useDebounce } from '@/hooks/useDebounce';
 // Librería xlsx importada dinámicamente cuando se requiere
 
 interface AuditLog {
@@ -274,6 +275,7 @@ function TimelineEntry({ log, index }: { log: AuditLog; index: number }) {
 // ─── Main Page ───────────────────────────────────────────────
 export default function AuditPage() {
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
   const [viewMode, setViewMode] = useState<'tabla' | 'timeline'>('timeline');
 
@@ -286,13 +288,13 @@ export default function AuditPage() {
 
   const filteredLogs = useMemo(() => {
     return logs.filter(log => {
-      const matchSearch = searchTerm === '' ||
-        log.table_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.record_id.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchSearch = debouncedSearchTerm === '' ||
+        log.table_name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        log.action.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        log.record_id.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
       return matchSearch;
     });
-  }, [logs, searchTerm]);
+  }, [logs, debouncedSearchTerm]);
 
   const exportToExcel = async () => {
     const exportData = filteredLogs.map(log => ({
