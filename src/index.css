@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* #FFFFFF */
+    --foreground: 0 1% 21%; /* #373435 */
+    --card: 0 0% 100%;
+    --card-foreground: 0 1% 21%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 1% 21%;
+    --primary: 207 56% 54%; /* #4892CC */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 1% 21%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 207 56% 54%; /* #4892CC */
+    --accent-foreground: 0 1% 21%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 81%; /* #CECECE */
+    --input: 0 0% 81%; /* #CECECE */
+    --ring: 207 56% 54%; /* #4892CC */
+    --radius: 1rem; /* Radio global ajustado a 2xl */
+  }
+
+  .dark {
+    --background: 0 1% 13%;
+    --foreground: 0 0% 98%;
+    --card: 0 1% 13%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 1% 13%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 207 56% 54%; /* #4892CC */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 17%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 17%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 17%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 17%;
+    --input: 0 0% 17%;
+    --ring: 207 56% 54%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Tipografía Premium */
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tighter font-black;
+  }
+}
+
+/* ===== GLOBAL TRANSITIONS ===== */
+/* Hover effects suaves para elementos interactivos — solo propiedades visuales */
+a, button, [role="button"] {
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-duration: 0.15s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== SCROLLBAR PERSONALIZADA ===== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Animaciones suaves - GPU Optimized */
+.premium-card {
+  @apply transition-transform duration-300 hover:shadow-xl hover:shadow-primary/5 border-none;
+  transition-property: transform, box-shadow;
+  will-change: transform, box-shadow;
+}
+
+.glass-effect {
+  @apply bg-white/70 backdrop-blur-xl border border-white/30;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.04);
+}
+
+/* Shimmer effect para skeletons — reemplaza el pulse plano */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 37%, #f1f5f9 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  will-change: background-position;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Staggered fade-in para listas/grids */
+.stagger-fade > * {
+  opacity: 0;
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+.stagger-fade > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-fade > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-fade > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-fade > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-fade > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-fade > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-fade > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-fade > *:nth-child(8) { animation-delay: 420ms; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Page entrance animation */
+.page-enter {
+  animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gradient line separator */
+.gradient-border-b {
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(to right, transparent, rgba(148, 163, 184, 0.2), transparent) 1;
+}
+
+/* Active nav glow */
+.nav-glow {
+  box-shadow: 0 0 0 1px rgba(72, 146, 204, 0.08), 0 1px 3px rgba(72, 146, 204, 0.1);
+}

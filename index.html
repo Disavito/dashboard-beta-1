@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/icon-192.png" />
+    
+    <!-- OPTIMIZACIÓN MÓVIL CRÍTICA -->
+    <!-- viewport-fit=cover: Usa toda la pantalla en iPhones con notch -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Dashboard corporativo FIMAGADI." />
+    
+    <!-- Hace que la app se sienta nativa (oculta barras del navegador si se instala) -->
+    <meta name="theme-color" content="#373435" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <title>Corporación FIMAGADI</title>
+    
+    <!-- Preconexión a fuentes o dominios externos si los hubiera para ganar milisegundos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Preconexión a Supabase para acelerar la primera petición de datos -->
+    <link rel="preconnect" href="https://n8n-supabase.mv7mvl.easypanel.host" crossorigin />
+    <link rel="dns-prefetch" href="https://n8n-supabase.mv7mvl.easypanel.host" />
+    
+    <!-- Fuente optimizada: se precarga y no bloquea el renderizado -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'" />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" />
+    </noscript>
+  </head>
+  <body class="bg-background text-text antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
