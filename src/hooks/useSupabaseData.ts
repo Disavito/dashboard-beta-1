@@ -192,7 +192,9 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
       toast.error(`Error al actualizar ${tableName}`, { description: err.message });
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey });
+      }, 1500);
     }
   });
 
@@ -229,7 +231,9 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
       toast.error(`Error al añadir ${tableName}`, { description: err.message });
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey });
+      }, 1500);
     }
   });
 
@@ -265,7 +269,9 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
       toast.error(`Error al eliminar ${tableName}`, { description: err.message });
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey });
+      }, 1500);
     }
   });
 

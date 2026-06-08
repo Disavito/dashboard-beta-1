@@ -155,7 +155,25 @@ const ClockManager: React.FC<ClockManagerProps> = ({
 
       return { previousState, queryKey };
     },
-    onSuccess: () => {
+    onSuccess: (data, variables, context: any) => {
+      if (context?.queryKey) {
+        queryClient.setQueryData(context.queryKey, (old: any) => {
+          const base = old || { activeJornada: null, completedJornadasToday: [] };
+          const newState = { ...base };
+          
+          if (variables.action === 'clock-in') {
+            newState.activeJornada = data;
+          } else if (variables.action === 'start-lunch' || variables.action === 'end-lunch') {
+            newState.activeJornada = data;
+          } else if (variables.action === 'clock-out') {
+            newState.activeJornada = null;
+            // Prevent duplicate completed jornada if optimistic UI already added it
+            const prevCompleted = newState.completedJornadasToday.filter((j: any) => !j.id.toString().startsWith('temp-'));
+            newState.completedJornadasToday = [...prevCompleted, data];
+          }
+          return newState;
+        });
+      }
       toast.success('Registro actualizado correctamente');
     },
     onError: (error: any, _variables, context) => {
@@ -167,8 +185,11 @@ const ClockManager: React.FC<ClockManagerProps> = ({
     onSettled: () => {
       submittingRef.current = false;
       setIsLocalSubmitting(false);
-      queryClient.invalidateQueries({ queryKey: ['jornadaState', colaborador.id] });
-      queryClient.invalidateQueries({ queryKey: ['adminJornadas'] });
+      // Retrasar invalidación para evitar lectura de datos viejos en la DB (replica lag)
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['jornadaState', colaborador.id] });
+        queryClient.invalidateQueries({ queryKey: ['adminJornadas'] });
+      }, 1500);
     }
   });
 
