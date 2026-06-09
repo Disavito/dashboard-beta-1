@@ -20,7 +20,21 @@ try {
 } catch (error) {
   console.warn('Navigation fallback error:', error);
 }
-// ----------------------------------------------------
+// --- TOMA DE CONTROL HOSTIL (AUTO-CURA PARA USUARIOS EXISTENTES) ---
+self.addEventListener('install', (event) => {
+  // Obliga al nuevo Service Worker a instalarse inmediatamente y matar al viejo
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  // Obliga al nuevo Service Worker a tomar control de todas las pestañas abiertas
+  event.waitUntil(
+    clients.claim().then(() => {
+      // Elimina la caché venenosa de Supabase de los discos duros de los ingenieros
+      return caches.delete('supabase-api-cache');
+    })
+  );
+});
 
 // EVENTO DE AUTO-ACTUALIZACIÓN INMEDIATA (Auto Update)
 // Cuando hay un nuevo despliegue (Github/Easypanel), el navegador le enviará este mensaje
