@@ -75,33 +75,43 @@ export function useGlobalRealtime() {
       })
       .subscribe();
 
-    // Escuchar INSERT/UPDATE en 'socio_titulares'
-    const sociosChannel = supabase.channel('realtime:socios_toasts')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'socio_titulares' }, () => {
-        toast.info('Nuevo socio registrado');
-        queryClient.invalidateQueries({ queryKey: ['supabaseData', 'socio_titulares'] });
-      })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'socio_titulares' }, () => {
-        toast.info('Datos de socio actualizados');
-        queryClient.invalidateQueries({ queryKey: ['supabaseData', 'socio_titulares'] });
-      })
-      .subscribe();
-
     // Escuchar cambios en 'registros_jornada' (Inicio de jornada instantáneo)
     const jornadaChannel = supabase.channel('realtime:jornada_toasts')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'registros_jornada' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'registros_jornada' }, (payload) => {
+        console.log('⚡ [REALTIME JORNADA] Payload recibido:', payload);
         // En lugar de un toast ruidoso por cada check-in, invalidamos la UI silenciosamente y ultra rápido
         queryClient.invalidateQueries({ queryKey: ['adminJornadas'] });
         queryClient.invalidateQueries({ queryKey: ['jornadas'] });
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📡 [REALTIME JORNADA] Status de Conexión:', status);
+      });
 
     // Escuchar cambios en 'lotes'
     const lotesChannel = supabase.channel('realtime:lotes_toasts')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'lotes' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'lotes' }, (payload) => {
+        console.log('⚡ [REALTIME LOTES] Payload recibido:', payload);
         queryClient.invalidateQueries({ queryKey: ['supabaseData', 'lotes'] });
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📡 [REALTIME LOTES] Status de Conexión:', status);
+      });
+
+    // Escuchar INSERT/UPDATE en 'socio_titulares' para log de diagnostico (modificado de arriba)
+    const sociosChannel = supabase.channel('realtime:socios_toasts')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'socio_titulares' }, (payload) => {
+        console.log('⚡ [REALTIME SOCIOS INSERT] Payload:', payload);
+        toast.info('Nuevo socio registrado');
+        queryClient.invalidateQueries({ queryKey: ['supabaseData', 'socio_titulares'] });
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'socio_titulares' }, (payload) => {
+        console.log('⚡ [REALTIME SOCIOS UPDATE] Payload:', payload);
+        toast.info('Datos de socio actualizados');
+        queryClient.invalidateQueries({ queryKey: ['supabaseData', 'socio_titulares'] });
+      })
+      .subscribe((status) => {
+        console.log('📡 [REALTIME SOCIOS] Status de Conexión:', status);
+      });
 
     return () => {
       supabase.removeChannel(docsChannel);
