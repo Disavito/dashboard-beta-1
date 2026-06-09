@@ -20,10 +20,10 @@ try {
 } catch (error) {
   console.warn('Navigation fallback error:', error);
 }
-// --- TOMA DE CONTROL HOSTIL (AUTO-CURA PARA USUARIOS EXISTENTES) ---
+// --- MODO ESPERA PARA PERMITIR ALERTA VISUAL ---
 self.addEventListener('install', (event) => {
-  // Obliga al nuevo Service Worker a instalarse inmediatamente y matar al viejo
-  self.skipWaiting();
+  // El SW se instalará pero se quedará en estado "waiting"
+  // hasta que reciba el mensaje 'SKIP_WAITING' desde la UI (PWAPrompt)
 });
 
 self.addEventListener('activate', (event) => {
