@@ -102,7 +102,7 @@ function SocioDocuments() {
       setLocalidades(uniqueLocs);
 
       const enriched = (sociosData || []).map(socio => {
-        const socioDocs = socio.socio_documentos || [];
+        const socioDocs = (socio.socio_documentos || []).filter((d: any) => d.link_documento && typeof d.link_documento === 'string' && d.link_documento.trim() !== '');
         const socioIngresos = ingresosByDni.get(socio.dni) || [];
         
         if (socioIngresos.length > 1) {

@@ -91,6 +91,8 @@ function SocioStatusAndDocuments({ socioId }: SocioStatusAndDocumentsProps) {
         else paymentStatus = 'Atrasado';
       }
 
+      const validDocs = docsData?.filter(d => d.link_documento && typeof d.link_documento === 'string' && d.link_documento.trim() !== '') || [];
+
       const primaryLot: Lot = {
         id: socioId,
         mz: socio.mz || 'N/A',
@@ -101,7 +103,7 @@ function SocioStatusAndDocuments({ socioId }: SocioStatusAndDocumentsProps) {
         dni: socio.dni || 'N/A',
         paymentStatus,
         receiptNumber: lastTransaction?.receipt_number || 'N/A',
-        documentos: docsData || []
+        documentos: validDocs
       };
 
       const allLots = [primaryLot];
