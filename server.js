@@ -212,22 +212,79 @@ app.post('/api/reniec', requireAuth, async (req, res) => {
   }
 
   try {
-    if (token1) {
+    let bestData = {
+      name: '',
+      apellido_paterno: '',
+      apellido_materno: '',
+      date_of_birth: '',
+      address: '',
+      department: '',
+      province: '',
+      district: ''
+    };
+
+    const isDataComplete = () => {
+      return bestData.name && bestData.apellido_paterno && bestData.apellido_materno && bestData.date_of_birth && bestData.address && bestData.department && bestData.province && bestData.district;
+    };
+
+    const mergeData = (newData) => {
+      if (newData.name && !bestData.name) bestData.name = newData.name;
+      if (newData.apellido_paterno && !bestData.apellido_paterno) bestData.apellido_paterno = newData.apellido_paterno;
+      if (newData.apellido_materno && !bestData.apellido_materno) bestData.apellido_materno = newData.apellido_materno;
+      if (newData.date_of_birth && !bestData.date_of_birth) bestData.date_of_birth = newData.date_of_birth;
+      if (newData.address && !bestData.address) bestData.address = newData.address;
+      if (newData.department && !bestData.department) bestData.department = newData.department;
+      if (newData.province && !bestData.province) bestData.province = newData.province;
+      if (newData.district && !bestData.district) bestData.district = newData.district;
+    };
+
+    let hasAnyData = false;
+    let finalSource = '';
+
+    // 1. Intentar con ConsultasPeru (API 1)
+    if (token1 && !isDataComplete()) {
       try {
-        const response = await axios.post('https://api.consultasperu.com/api/v1/query', {
+        const res1 = await axios.post('https://api.consultasperu.com/api/v1/query', {
           token: token1,
           type_document: type_document || 'dni',
           document_number: document_number
         }, { timeout: 10000 });
-        if (response.data && response.data.success) {
-          return res.status(200).json({ source: 'consultasperu', data: response.data.data, success: true });
+        
+        if (res1.data && res1.data.success) {
+          const sData = res1.data.data;
+          
+          let pPaterno = sData.first_last_name || sData.apellido_paterno || '';
+          let pMaterno = sData.second_last_name || sData.apellido_materno || '';
+          
+          if (!pPaterno && sData.surname) {
+             const words = sData.surname.trim().split(/\s+/);
+             if (words.length > 0) {
+               pPaterno = words[0];
+               if (words.length > 1) pMaterno = words.slice(1).join(' ');
+             }
+          }
+          
+          mergeData({
+            name: sData.name || '',
+            apellido_paterno: pPaterno,
+            apellido_materno: pMaterno,
+            date_of_birth: sData.date_of_birth || '',
+            address: sData.address || '',
+            department: sData.department || '',
+            province: sData.province || '',
+            district: sData.district || ''
+          });
+          
+          hasAnyData = true;
+          finalSource = finalSource ? `${finalSource}, consultasperu` : 'consultasperu';
         }
       } catch (e) {
-        console.warn('Primary API failed, trying secondary...');
+        console.warn('API 1 (ConsultasPeru) failed.');
       }
     }
 
-    if (token2) {
+    // 2. Intentar con MiAPI (API 2)
+    if (token2 && !isDataComplete()) {
       try {
         const res2 = await axios.get(`https://miapi.cloud/v1/dni/${document_number}`, {
           headers: { 'Authorization': `Bearer ${token2}` },
@@ -235,25 +292,26 @@ app.post('/api/reniec', requireAuth, async (req, res) => {
         });
         if (res2.data && res2.data.success && res2.data.datos) {
           const sData = res2.data.datos;
-          // Normalize to look like Consultas Peru API
-          const normalizedData = {
-            name: sData.nombres,
-            apellido_paterno: sData.ape_paterno,
-            apellido_materno: sData.ape_materno,
-            date_of_birth: sData.nacimiento,
+          mergeData({
+            name: sData.nombres || '',
+            apellido_paterno: sData.ape_paterno || '',
+            apellido_materno: sData.ape_materno || '',
+            date_of_birth: sData.nacimiento || '',
             address: sData.domiciliado?.direccion || '',
             department: sData.domiciliado?.departamento || '',
             province: sData.domiciliado?.provincia || '',
             district: sData.domiciliado?.distrito || ''
-          };
-          return res.status(200).json({ source: 'miapi', data: normalizedData, success: true });
+          });
+          hasAnyData = true;
+          finalSource = finalSource ? `${finalSource}, miapi` : 'miapi';
         }
       } catch (e) {
-        console.warn('Secondary API failed, trying tertiary...');
+        console.warn('API 2 (MiAPI) failed.');
       }
     }
 
-    if (token3) {
+    // 3. Intentar con ConsultaDatos (API 3)
+    if (token3 && !isDataComplete()) {
       try {
         // Enlace exacto de ConsultaDatos según la documentación oficial
         const res3 = await axios.get(`https://api2.consultadatos.com/api/dni/${document_number}`, {
@@ -277,7 +335,7 @@ app.post('/api/reniec', requireAuth, async (req, res) => {
             }
           }
 
-          const normalizedData = {
+          mergeData({
             name: sData.NOMBRES || sData.nombres || sData.name || '',
             apellido_paterno: sData.AP_PAT || sData.apellido_paterno || sData.ape_paterno || '',
             apellido_materno: sData.AP_MAT || sData.apellido_materno || sData.ape_materno || '',
@@ -286,12 +344,17 @@ app.post('/api/reniec', requireAuth, async (req, res) => {
             department: parsedDepartment,
             province: parsedProvince,
             district: parsedDistrict
-          };
-          return res.status(200).json({ source: 'consultadatos', data: normalizedData, success: true });
+          });
+          hasAnyData = true;
+          finalSource = finalSource ? `${finalSource}, consultadatos` : 'consultadatos';
         }
       } catch (e) {
-        console.warn('Tertiary API failed.');
+        console.warn('API 3 (ConsultaDatos) failed.');
       }
+    }
+
+    if (hasAnyData) {
+      return res.status(200).json({ source: finalSource, data: bestData, success: true });
     }
 
     res.status(404).json({ success: false, message: 'No data found in any API' });
