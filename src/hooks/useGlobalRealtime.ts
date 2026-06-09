@@ -87,6 +87,22 @@ export function useGlobalRealtime() {
       })
       .subscribe();
 
+    // Escuchar cambios en 'registros_jornada' (Inicio de jornada instantáneo)
+    const jornadaChannel = supabase.channel('realtime:jornada_toasts')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'registros_jornada' }, () => {
+        // En lugar de un toast ruidoso por cada check-in, invalidamos la UI silenciosamente y ultra rápido
+        queryClient.invalidateQueries({ queryKey: ['adminJornadas'] });
+        queryClient.invalidateQueries({ queryKey: ['jornadas'] });
+      })
+      .subscribe();
+
+    // Escuchar cambios en 'lotes'
+    const lotesChannel = supabase.channel('realtime:lotes_toasts')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'lotes' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['supabaseData', 'lotes'] });
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(docsChannel);
       supabase.removeChannel(approvalChannel);
@@ -94,6 +110,8 @@ export function useGlobalRealtime() {
       supabase.removeChannel(gastosChannel);
       supabase.removeChannel(presupuestosChannel);
       supabase.removeChannel(sociosChannel);
+      supabase.removeChannel(jornadaChannel);
+      supabase.removeChannel(lotesChannel);
     };
   }, [queryClient]);
 }
