@@ -14,11 +14,25 @@ export const GlobalRealtimeProvider: React.FC<{ children: React.ReactNode }> = (
         (payload) => {
           const tableName = payload.table;
           
-          // Invalidate views if their underlying physical tables change
-          if (['socio_titulares', 'ingresos', 'socio_documentos'].includes(tableName)) {
+          // --- CORRECCIÓN DE RENDIMIENTO EXTREMO ---
+          // En lugar de borrar la caché y forzar una descarga de 5 segundos de toda la vista (vw_socio_titulares_estado),
+          // inyectamos el cambio en memoria al instante. Si es un UPDATE simple de lote o dato menor, no descargamos nada.
+          if (tableName === 'socio_titulares' && payload.eventType === 'UPDATE' && payload.new) {
+            queryClient.setQueriesData({ queryKey: ['supabaseData', 'vw_socio_titulares_estado'] }, (oldData: any) => {
+              if (!oldData || !oldData.data) return oldData;
+              return {
+                ...oldData,
+                data: oldData.data.map((item: any) => 
+                  item.id === payload.new.id ? { ...item, ...payload.new } : item
+                )
+              };
+            });
+          } else if (['socio_titulares', 'ingresos', 'socio_documentos'].includes(tableName)) {
+            // Solo invalidamos la caché silenciosamente en background para los INSERTs grandes o eliminaciones.
             queryClient.invalidateQueries({ queryKey: ['supabaseData', 'vw_socio_titulares_estado'] });
           }
-          if (['ingresos', 'socio_titulares'].includes(tableName)) {
+
+          if (['ingresos', 'socio_titulares'].includes(tableName) && payload.eventType !== 'UPDATE') {
             queryClient.invalidateQueries({ queryKey: ['supabaseData', 'vw_ingresos_localidad'] });
           }
           
