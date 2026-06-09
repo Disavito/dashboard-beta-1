@@ -9,7 +9,7 @@ export function PWAPrompt() {
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r: any) {
-      console.log('SW Registered:', r);
+      console.log('SW Registered successfully with PWAPrompt:', r);
       // Auto-check for updates every 15 minutes
       if (r) {
         setInterval(() => {
