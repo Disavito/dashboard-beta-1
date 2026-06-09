@@ -24,7 +24,7 @@ export function PWAPrompt() {
 
   useEffect(() => {
     if (needRefresh) {
-      toast.info('🚀 ¡Actualización de FIMAGADI detectada!', {
+      toast.info('🚀 ¡Actualización de FIMAGADI detectada! (v2)', {
         description: 'Hemos subido mejoras al sistema. Para evitar errores o pantallas desactualizadas, por favor actualiza la aplicación ahora.',
         action: {
           label: 'Refrescar Aplicación',
