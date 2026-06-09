@@ -205,8 +205,9 @@ app.post('/api/reniec', requireAuth, async (req, res) => {
   
   const token1 = process.env.CONSULTAS_PERU_API_TOKEN || process.env.VITE_CONSULTAS_PERU_API_TOKEN;
   const token2 = process.env.MIAPI_CLOUD_API_TOKEN || process.env.VITE_MIAPI_CLOUD_API_TOKEN;
+  const token3 = process.env.CONSULTADATOS_TOKEN || process.env.VITE_CONSULTADATOS_TOKEN;
 
-  if (!token1 && !token2) {
+  if (!token1 && !token2 && !token3) {
     return res.status(500).json({ success: false, message: 'API tokens not configured on server' });
   }
 
@@ -227,24 +228,69 @@ app.post('/api/reniec', requireAuth, async (req, res) => {
     }
 
     if (token2) {
-      const res2 = await axios.get(`https://miapi.cloud/v1/dni/${document_number}`, {
-        headers: { 'Authorization': `Bearer ${token2}` },
-        timeout: 10000
-      });
-      if (res2.data && res2.data.success && res2.data.datos) {
-        const sData = res2.data.datos;
-        // Normalize to look like Consultas Peru API
-        const normalizedData = {
-          name: sData.nombres,
-          apellido_paterno: sData.ape_paterno,
-          apellido_materno: sData.ape_materno,
-          date_of_birth: sData.nacimiento,
-          address: sData.domiciliado?.direccion || '',
-          department: sData.domiciliado?.departamento || '',
-          province: sData.domiciliado?.provincia || '',
-          district: sData.domiciliado?.distrito || ''
-        };
-        return res.status(200).json({ source: 'miapi', data: normalizedData, success: true });
+      try {
+        const res2 = await axios.get(`https://miapi.cloud/v1/dni/${document_number}`, {
+          headers: { 'Authorization': `Bearer ${token2}` },
+          timeout: 10000
+        });
+        if (res2.data && res2.data.success && res2.data.datos) {
+          const sData = res2.data.datos;
+          // Normalize to look like Consultas Peru API
+          const normalizedData = {
+            name: sData.nombres,
+            apellido_paterno: sData.ape_paterno,
+            apellido_materno: sData.ape_materno,
+            date_of_birth: sData.nacimiento,
+            address: sData.domiciliado?.direccion || '',
+            department: sData.domiciliado?.departamento || '',
+            province: sData.domiciliado?.provincia || '',
+            district: sData.domiciliado?.distrito || ''
+          };
+          return res.status(200).json({ source: 'miapi', data: normalizedData, success: true });
+        }
+      } catch (e) {
+        console.warn('Secondary API failed, trying tertiary...');
+      }
+    }
+
+    if (token3) {
+      try {
+        // Enlace exacto de ConsultaDatos según la documentación oficial
+        const res3 = await axios.get(`https://api2.consultadatos.com/api/dni/${document_number}`, {
+          headers: { 'Authorization': `Bearer ${token3}` },
+          timeout: 10000
+        });
+        if (res3.data) {
+          // Traductor Universal: agarra los datos vengan como vengan
+          const sData = res3.data.data || res3.data;
+          
+          let parsedDepartment = sData.departamento || sData.department || '';
+          let parsedProvince = sData.provincia || sData.province || '';
+          let parsedDistrict = sData.distrito || sData.district || '';
+          
+          if (sData.UBIGEO_DIR) {
+            const parts = sData.UBIGEO_DIR.split('-');
+            if (parts.length >= 3) {
+              parsedDepartment = parts[0].trim();
+              parsedProvince = parts[1].trim();
+              parsedDistrict = parts[2].trim();
+            }
+          }
+
+          const normalizedData = {
+            name: sData.NOMBRES || sData.nombres || sData.name || '',
+            apellido_paterno: sData.AP_PAT || sData.apellido_paterno || sData.ape_paterno || '',
+            apellido_materno: sData.AP_MAT || sData.apellido_materno || sData.ape_materno || '',
+            date_of_birth: sData.FECHA_NAC || sData.fecha_nacimiento || sData.nacimiento || sData.date_of_birth || '',
+            address: sData.DIRECCION || sData.direccion || sData.address || '',
+            department: parsedDepartment,
+            province: parsedProvince,
+            district: parsedDistrict
+          };
+          return res.status(200).json({ source: 'consultadatos', data: normalizedData, success: true });
+        }
+      } catch (e) {
+        console.warn('Tertiary API failed.');
       }
     }
 
