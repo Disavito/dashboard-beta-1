@@ -265,7 +265,8 @@ function PartnerDocuments() {
         const { data } = await supabase
           .from('socio_documentos')
           .select('socio_id, tipo_documento')
-          .in('socio_id', chunk);
+          .in('socio_id', chunk)
+          .is('deleted_at', null); // <-- FILTRO ANTI-FANTASMAS
         
         if (data) {
           allData.push(...data);
