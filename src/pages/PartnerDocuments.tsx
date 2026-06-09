@@ -297,7 +297,8 @@ function PartnerDocuments() {
       const hasContrato = liveDocs ? liveDocs.has('Contrato') : socio.has_contrato || false;
       const hasComprobante = liveDocs ? liveDocs.has('Comprobante de Pago') : socio.has_comprobante || false;
 
-      const finalIsLoteMedido = hasPlanos || hasMemoria || (socio.is_lote_medido ?? false);
+      // DESCONEXIÓN DE PRUEBA: Solo confiar en el valor puro de la Base de Datos.
+      const finalIsLoteMedido = socio.is_lote_medido ?? false;
       const isPaid = !!socio.receiptNumber && socio.receiptNumber.trim() !== '' && socio.receiptNumber.trim() !== 'N/A';
 
       const normalize = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
