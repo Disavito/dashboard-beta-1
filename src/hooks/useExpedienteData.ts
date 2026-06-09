@@ -33,8 +33,8 @@ export function useExpedienteData(options: UseExpedienteDataOptions = {}) {
     try {
       const [sociosRes, ingresosRes] = await Promise.all([
         supabase.from('socio_titulares').select(`
-          id, nombres, apellidoPaterno, apellidoMaterno, dni, localidad, mz, lote,
-          socio_documentos(id, tipo_documento, link_documento)
+          id, nombres, apellidoPaterno, apellidoMaterno, dni, localidad, mz, lote, is_lote_medido,
+          socio_documentos(id, tipo_documento, link_documento, deleted_at)
         `),
         supabase.from('ingresos').select('dni, receipt_number, transaction_type, amount, date, created_at')
           .neq('dni', null)
@@ -60,7 +60,12 @@ export function useExpedienteData(options: UseExpedienteDataOptions = {}) {
 
       // Enriquecer datos
       const enriched = (sociosRes.data || []).map(socio => {
-        const socioDocs = (socio as any).socio_documentos || [];
+        // Filtrar documentos fantasmas (borrados) y vacíos (sin enlace real)
+        const rawDocs = (socio as any).socio_documentos || [];
+        const socioDocs = rawDocs.filter((d: any) => {
+          return d.deleted_at === null && d.link_documento && typeof d.link_documento === 'string' && d.link_documento.trim() !== '';
+        });
+
         const socioIngresos = ingresosByDni.get(socio.dni) || [];
 
         // Excluir socios con última transacción de anulación/devolución
@@ -82,9 +87,6 @@ export function useExpedienteData(options: UseExpedienteDataOptions = {}) {
           }
         }
 
-        const hasPlano = socioDocs.some((d: any) => d.tipo_documento === 'Planos de ubicación');
-        const hasMemoria = socioDocs.some((d: any) => d.tipo_documento === 'Memoria descriptiva');
-
         return {
           id: socio.id,
           nombres: socio.nombres,
@@ -96,7 +98,7 @@ export function useExpedienteData(options: UseExpedienteDataOptions = {}) {
           lote: socio.lote,
           paymentStatus: socioIncome ? 'Pagado' : 'No Pagado',
           nroRecibo: socioIncome?.nro_recibo || 'N/A',
-          is_lote_medido: hasPlano && hasMemoria,
+          is_lote_medido: !!(socio as any).is_lote_medido,
           documentos: socioDocs,
         } as ExpedienteSocio;
       }).filter(Boolean) as ExpedienteSocio[];
