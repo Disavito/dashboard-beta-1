@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import PageSkeleton from './components/ui-custom/PageSkeleton';
 import { offlineSync } from './lib/offlineSync';
+import { PWAPrompt } from './components/custom/PWAPrompt';
 
 // Page Imports
 const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'));
@@ -43,6 +44,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background font-sans antialiased">
+      <PWAPrompt />
       <Suspense fallback={<PageSkeleton />}>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
