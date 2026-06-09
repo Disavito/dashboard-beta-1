@@ -15,17 +15,18 @@ export const GlobalRealtimeProvider: React.FC<{ children: React.ReactNode }> = (
           const tableName = payload.table;
           
           // --- CORRECCIÓN DE RENDIMIENTO EXTREMO ---
-          // En lugar de borrar la caché y forzar una descarga de 5 segundos de toda la vista (vw_socio_titulares_estado),
-          // inyectamos el cambio en memoria al instante. Si es un UPDATE simple de lote o dato menor, no descargamos nada.
           if (tableName === 'socio_titulares' && payload.eventType === 'UPDATE' && payload.new) {
-            queryClient.setQueriesData({ queryKey: ['supabaseData', 'vw_socio_titulares_estado'] }, (oldData: any) => {
-              if (!oldData || !oldData.data) return oldData;
-              return {
-                ...oldData,
-                data: oldData.data.map((item: any) => 
+            // Buscamos todas las cachés que referencien a esta vista (incluyendo las paginadas/filtradas)
+            const viewQueries = queryClient.getQueriesData({ queryKey: ['supabaseData', 'vw_socio_titulares_estado'] });
+            console.log('⚡ [REALTIME MEMORY] Actualizando cachés de vista encontradas:', viewQueries.length);
+            
+            viewQueries.forEach(([qKey, oldData]: [any, any]) => {
+              if (oldData && oldData.data) {
+                const newData = oldData.data.map((item: any) => 
                   item.id === payload.new.id ? { ...item, ...payload.new } : item
-                )
-              };
+                );
+                queryClient.setQueryData(qKey, { ...oldData, data: newData });
+              }
             });
           } else if (['socio_titulares', 'ingresos', 'socio_documentos'].includes(tableName)) {
             // Solo invalidamos la caché silenciosamente en background para los INSERTs grandes o eliminaciones.
