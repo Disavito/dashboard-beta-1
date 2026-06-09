@@ -56,7 +56,7 @@ export function PWAPrompt() {
   }, []);
 
   const promptUserToUpdate = (reg: ServiceWorkerRegistration) => {
-    toast.info('🚀 ¡Nueva versión del sistema lista!', {
+    toast.info('🚀 ¡Nueva versión del sistema lista! (Prueba Final)', {
       description: 'Hemos subido mejoras a FIMAGADI. Haz clic en "Refrescar" para aplicar los últimos cambios.',
       action: {
         label: 'Refrescar Aplicación',
