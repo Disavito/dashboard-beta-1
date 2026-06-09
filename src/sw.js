@@ -22,22 +22,15 @@ try {
 }
 // ----------------------------------------------------
 
-// Estrategia StaleWhileRevalidate para la API REST de Supabase:
-// - Responde INSTANTÁNEAMENTE desde caché si hay una copia guardada
-// - En paralelo, busca la versión más reciente del servidor
-// - Actualiza el caché con la respuesta fresca para la próxima vez
-registerRoute(
-  ({ url }) => url.hostname.includes('supabase') && url.pathname.includes('/rest/'),
-  new StaleWhileRevalidate({
-    cacheName: 'supabase-api-cache',
-    plugins: [
-      new ExpirationPlugin({
-        maxEntries: 100,         // Máximo 100 consultas cacheadas
-        maxAgeSeconds: 5 * 60,   // Expiran a los 5 minutos
-      }),
-    ],
-  })
-);
+// EVENTO DE AUTO-ACTUALIZACIÓN INMEDIATA (Auto Update)
+// Cuando hay un nuevo despliegue (Github/Easypanel), el navegador le enviará este mensaje
+// para que el Service Worker viejo se cierre instantáneamente y aplique el código nuevo
+// sin necesidad de que el usuario borre su caché manualmente.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
 
 self.addEventListener('push', function(event) {
   let data = {};
