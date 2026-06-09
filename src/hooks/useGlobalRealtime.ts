@@ -103,11 +103,12 @@ export function useGlobalRealtime() {
         console.log('⚡ [REALTIME SOCIOS INSERT] Payload:', payload);
         toast.info('Nuevo socio registrado');
         queryClient.invalidateQueries({ queryKey: ['supabaseData', 'socio_titulares'] });
+        queryClient.invalidateQueries({ queryKey: ['supabaseData', 'vw_socio_titulares_estado'] });
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'socio_titulares' }, (payload) => {
         console.log('⚡ [REALTIME SOCIOS UPDATE] Payload:', payload);
-        toast.info('Datos de socio actualizados');
         queryClient.invalidateQueries({ queryKey: ['supabaseData', 'socio_titulares'] });
+        queryClient.invalidateQueries({ queryKey: ['supabaseData', 'vw_socio_titulares_estado'] });
       })
       .subscribe((status) => {
         console.log('📡 [REALTIME SOCIOS] Status de Conexión:', status);

@@ -78,7 +78,7 @@ const prefetchSocioStatus = async (queryClient: any) => {
       }
       return { data: allData, totalCount: count || allData.length };
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 30, // 30 segundos (suficiente para navegacion SPA sin secuestrar la cache)
   });
 };
 
@@ -120,7 +120,7 @@ const prefetchSocioDocuments = async (queryClient: any) => {
       }
       return { data: allData, totalCount: count || allData.length };
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 30, // 30 segundos
   });
 };
 
