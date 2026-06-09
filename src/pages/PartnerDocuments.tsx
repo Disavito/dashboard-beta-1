@@ -264,7 +264,7 @@ function PartnerDocuments() {
         const chunk = ids.slice(i, i + chunkSize);
         const { data } = await supabase
           .from('socio_documentos')
-          .select('socio_id, tipo_documento')
+          .select('socio_id, tipo_documento, link_documento')
           .in('socio_id', chunk)
           .is('deleted_at', null); // <-- FILTRO ANTI-FANTASMAS
         
@@ -275,8 +275,11 @@ function PartnerDocuments() {
       
       const docMap = new Map<string, Set<string>>();
       allData.forEach(d => {
-        if (!docMap.has(d.socio_id)) docMap.set(d.socio_id, new Set());
-        docMap.get(d.socio_id)?.add(d.tipo_documento);
+        // FILTRO ANTI-VACIOS: Ignorar filas pre-reservadas sin archivo real
+        if (d.link_documento && typeof d.link_documento === 'string' && d.link_documento.trim() !== '') {
+          if (!docMap.has(d.socio_id)) docMap.set(d.socio_id, new Set());
+          docMap.get(d.socio_id)?.add(d.tipo_documento);
+        }
       });
       return docMap;
     }
