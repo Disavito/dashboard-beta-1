@@ -651,9 +651,28 @@ app.post('/api/webhook/generate-contrato', requireWebhookSecret, async (req, res
     
     if (payload.type === 'INSERT' || payload.type === 'UPDATE') {
       const record = payload.record;
+      const oldRecord = payload.old_record;
+      
       if (!record.dni) {
         console.warn('Income record has no DNI. Skipping.');
         return res.status(400).json({ error: 'Income record has no DNI' });
+      }
+      
+      if (!record.receipt_number) {
+        console.warn('Income record has no receipt_number. Skipping.');
+        return res.status(400).json({ error: 'Income record has no receipt_number' });
+      }
+      
+      // Si es un UPDATE, verificamos que hayan cambiado datos que afectan al contrato
+      if (payload.type === 'UPDATE' && oldRecord && record) {
+        const vitalFields = ['dni', 'receipt_number', 'amount', 'concept', 'date'];
+        
+        const hasVitalChanges = vitalFields.some(field => record[field] !== oldRecord[field]);
+        
+        if (!hasVitalChanges) {
+          console.log(`Skipping generate-contrato for ${record.receipt_number}: no vital fields changed`);
+          return res.status(200).json({ success: true, ignored: true, message: 'No vital fields changed' });
+        }
       }
       
       // Find socio by DNI
