@@ -288,7 +288,7 @@ function DashboardLayout() {
       </ScrollArea>
 
       {/* Logout */}
-      <div className="p-4 mt-auto border-t border-border">
+      <div className="p-4 pb-24 lg:pb-4 mt-auto border-t border-border">
         <Button 
           variant="ghost" 
           className="w-full justify-start gap-3 text-red-400 hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition-all duration-200 font-medium"
