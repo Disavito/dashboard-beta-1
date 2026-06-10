@@ -300,8 +300,6 @@ function PartnerDocuments() {
     return rawSocios.map(socio => {
       if (socio.status === 'Retirado') return null;
 
-      const liveDocs = docsExistData?.get(socio.id);
-
       // Como hemos optimizado la Vista de PostgreSQL con validaciones estrictas, ahora es la 
       // única y verdadera fuente de la verdad.
       const hasPlanos = socio.has_planos ?? false;
