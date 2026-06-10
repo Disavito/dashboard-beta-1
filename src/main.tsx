@@ -11,10 +11,6 @@ import { ThemeProvider } from './components/ui-custom/theme-provider.tsx';
 import { UserProvider } from './context/UserContext.tsx';
 import { GlobalRealtimeProvider } from './context/GlobalRealtimeProvider.tsx';
 import { Toaster } from './components/ui/toaster.tsx';
-import { ensureLatestVersion } from './lib/versionControl.ts';
-
-// Ejecuta la auto-cura de versiones antes de iniciar React
-ensureLatestVersion();
 
 // Configuración optimizada del cliente de React Query
 const queryClient = new QueryClient({

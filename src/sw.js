@@ -20,18 +20,24 @@ try {
 } catch (error) {
   console.warn('Navigation fallback error:', error);
 }
-// --- MODO ESPERA PARA PERMITIR ALERTA VISUAL ---
+// --- MODO AUTO-CURACIÓN GLOBAL DE CACHÉ ---
 self.addEventListener('install', (event) => {
-  // El SW se instalará pero se quedará en estado "waiting"
-  // hasta que reciba el mensaje 'SKIP_WAITING' desde la UI (PWAPrompt)
+  // Obliga al nuevo Service Worker a instalarse inmediatamente matando al viejo
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   // Obliga al nuevo Service Worker a tomar control de todas las pestañas abiertas
   event.waitUntil(
     clients.claim().then(() => {
-      // Elimina la caché venenosa de Supabase de los discos duros de los ingenieros
-      return caches.delete('supabase-api-cache');
+      // Elimina ABSOLUTAMENTE TODAS las cachés guardadas del navegador para curar la app
+      return caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+             return caches.delete(cacheName);
+          })
+        );
+      });
     })
   );
 });
