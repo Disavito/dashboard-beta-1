@@ -274,12 +274,14 @@ function PartnerDocuments() {
         const chunk = ids.slice(i, i + chunkSize);
         const { data } = await supabase
           .from('socio_documentos')
-          .select('socio_id, tipo_documento')
+          .select('socio_id, tipo_documento, link_documento')
           .in('socio_id', chunk)
           .is('deleted_at', null); // <-- FILTRO ANTI-FANTASMAS
         
         if (data) {
-          allData.push(...data);
+          // Confirmación extra de seguridad solicitada: solo considerar si el link es real
+          const validData = data.filter(d => d.link_documento && d.link_documento.trim() !== '');
+          allData.push(...validData);
         }
       }
       
