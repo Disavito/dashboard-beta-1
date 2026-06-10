@@ -243,12 +243,21 @@ function PartnerDocuments() {
   const [loteMedidoFilter, setLoteMedidoFilter] = useState('all');
   const [cruceFilter, setCruceFilter] = useState('all');
 
-  // Fetching con caché global (React Query) para evitar el delay de 10 segundos
-  const { data: rawSocios, loading: sociosLoading, refreshData: refreshSocios } = useSupabaseData<any>({
+  const { data: rawSocios, loading: sociosLoading, refreshData: refreshSocios, injectRealtimeEvent } = useSupabaseData<any>({
     tableName: 'vw_socio_titulares_estado',
     initialSort: { column: 'apellidoPaterno', ascending: true },
     fetchAll: true,
   });
+
+  // Realtime updates (Optimized Cache Merging)
+  useEffect(() => {
+    const channel = supabase.channel('partner_docs_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'socio_titulares' }, injectRealtimeEvent)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ingresos' }, injectRealtimeEvent)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'socio_documentos' }, injectRealtimeEvent)
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [injectRealtimeEvent]);
 
   // Fetch document existence on the fly in chunks to prevent URI Too Long errors
   const { data: docsExistData } = useQuery({
@@ -264,7 +273,7 @@ function PartnerDocuments() {
         const chunk = ids.slice(i, i + chunkSize);
         const { data } = await supabase
           .from('socio_documentos')
-          .select('socio_id, tipo_documento, link_documento')
+          .select('socio_id, tipo_documento')
           .in('socio_id', chunk)
           .is('deleted_at', null); // <-- FILTRO ANTI-FANTASMAS
         
@@ -275,11 +284,8 @@ function PartnerDocuments() {
       
       const docMap = new Map<string, Set<string>>();
       allData.forEach(d => {
-        // FILTRO ANTI-VACIOS: Ignorar filas pre-reservadas sin archivo real
-        if (d.link_documento && typeof d.link_documento === 'string' && d.link_documento.trim() !== '') {
-          if (!docMap.has(d.socio_id)) docMap.set(d.socio_id, new Set());
-          docMap.get(d.socio_id)?.add(d.tipo_documento);
-        }
+        if (!docMap.has(d.socio_id)) docMap.set(d.socio_id, new Set());
+        docMap.get(d.socio_id)?.add(d.tipo_documento);
       });
       return docMap;
     }
@@ -807,8 +813,8 @@ function PartnerDocuments() {
           </Card>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl shadow-glass border border-gray-100 mb-8 flex flex-col xl:flex-row gap-4 items-start xl:items-center">
-          <div className="relative w-full xl:min-w-[450px] flex-1">
+        <div className="bg-white p-4 rounded-2xl shadow-glass border border-gray-100 mb-8 flex flex-col md:flex-row gap-4 items-center">
+          <div className="relative flex-1 w-full lg:w-[400px]">
             <SearchInputWithDebounce
               placeholder="Buscar por socio, DNI, manzana, lote o recibo..."
               onDebouncedChange={setDebouncedSearchQuery}
@@ -816,22 +822,22 @@ function PartnerDocuments() {
             />
           </div>
           
-          <div className="flex flex-wrap gap-3 w-full xl:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <LocalidadCombobox
               value={selectedLocalidad}
               onValueChange={setSelectedLocalidad}
-              triggerClassName="h-14 w-full sm:flex-1 min-w-[200px]"
+              triggerClassName="h-14 w-full sm:w-[240px]"
               distritoFilter={selectedDistrito}
             />
 
             <DistritoCombobox
               value={selectedDistrito}
               onValueChange={setSelectedDistrito}
-              triggerClassName="h-14 w-full sm:flex-1 min-w-[200px]"
+              triggerClassName="h-14 w-full sm:w-[240px]"
             />
 
             <Select value={loteMedidoFilter} onValueChange={setLoteMedidoFilter}>
-              <SelectTrigger className="h-14 w-full sm:flex-1 min-w-[180px] bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-bold">
+              <SelectTrigger className="h-14 w-full sm:w-[200px] bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-bold">
                 <SelectValue placeholder="Estado Lote" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-gray-100 shadow-premium">
@@ -842,7 +848,7 @@ function PartnerDocuments() {
             </Select>
 
             <Select value={cruceFilter} onValueChange={setCruceFilter}>
-              <SelectTrigger className="h-14 w-full sm:flex-1 min-w-[220px] bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-bold">
+              <SelectTrigger className="h-14 w-full sm:w-[230px] bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-bold">
                 <SelectValue placeholder="Cruce Operativo" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-gray-100 shadow-premium">
@@ -856,7 +862,7 @@ function PartnerDocuments() {
             {canManageEngineering && Object.keys(rowSelection).length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="h-14 w-full sm:w-auto px-6 bg-[#4892CC] hover:bg-[#3C8B93] rounded-2xl font-bold shadow-lg shadow-[#4892CC]/20">
+                  <Button className="h-14 px-6 bg-[#4892CC] hover:bg-[#3C8B93] rounded-2xl font-bold shadow-lg shadow-[#4892CC]/20">
                     Acciones ({Object.keys(rowSelection).length})
                   </Button>
                 </DropdownMenuTrigger>

@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 import { useQuery, keepPreviousData, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/context/UserContext';
+import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 interface UseSupabaseDataOptions {
   tableName: string;
@@ -344,6 +345,78 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
     }
   }, [tableName, deleteMutation, roles, user]);
 
+  // -------------------------------------------------------------
+  // REAL-TIME CACHE MERGING (Enterprise Grade)
+  // -------------------------------------------------------------
+  
+  const syncRecordById = useCallback(async (id: string | number) => {
+    // Mini-query ultra rápido para obtener la fila procesada por la BD o Vista
+    const { data: record, error } = await supabase.from(tableName).select(selectQuery).eq('id', id).single();
+    if (error || !record) return;
+
+    queryClient.setQueryData<{ data: T[]; count: number }>(queryKey, (old) => {
+      if (!old || !old.data) return old;
+      
+      const exists = old.data.some((item: any) => item.id === id);
+      if (exists) {
+        // UPDATE in place
+        return {
+          ...old,
+          data: old.data.map((item: any) => item.id === id ? record : item)
+        };
+      } else {
+        // INSERT en cache
+        return {
+          ...old,
+          data: [record as T, ...old.data],
+          count: old.count + 1
+        };
+      }
+    });
+  }, [tableName, selectQuery, queryClient, JSON.stringify(queryKey)]);
+
+  const injectRealtimeEvent = useCallback(async (payload: RealtimePostgresChangesPayload<any>) => {
+    const eventType = payload.eventType;
+    const oldRecord = payload.old as any;
+    const newRecord = payload.new as any;
+    
+    // CASO 1: DELETE
+    if (eventType === 'DELETE') {
+        const idToDelete = oldRecord.id || oldRecord.socio_id; 
+        
+        // Si el delete NO es de la tabla base (ej. se borró un pago de un socio) 
+        // No borramos al socio, recargamos el estado del socio.
+        if (tableName.includes('vw_') && payload.table !== tableName.replace('vw_', '').replace('_estado', '')) {
+             const socioId = oldRecord.socio_id || oldRecord.socioTitular_id; 
+             if (socioId) return syncRecordById(socioId);
+             return;
+        }
+
+        queryClient.setQueryData<{ data: T[]; count: number }>(queryKey, (old) => {
+          if (!old || !old.data) return old;
+          return {
+            ...old,
+            data: old.data.filter((item: any) => item.id !== idToDelete),
+            count: Math.max(0, old.count - 1)
+          };
+        });
+        return;
+    }
+
+    // CASO 2: INSERT / UPDATE
+    // Identificar de qué socio o ID es el evento
+    let idToSync = newRecord.id;
+    if (tableName.includes('vw_') && payload.table !== tableName.replace('vw_', '').replace('_estado', '')) {
+        // Si se editó una tabla anexa (ingresos, documentos), buscar la foreign key
+        idToSync = newRecord.socio_id || newRecord.socioTitular_id;
+    }
+    
+    // Descarga 1 sola fila y la mergea al caché general. Latencia ~50ms.
+    if (idToSync) {
+        await syncRecordById(idToSync);
+    }
+  }, [tableName, syncRecordById, queryClient, JSON.stringify(queryKey)]);
+
   return {
     data: queryData?.data || [],
     totalCount: queryData?.totalCount || 0,
@@ -357,5 +430,7 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
     addRecord,
     updateRecord,
     deleteRecord,
+    syncRecordById,
+    injectRealtimeEvent,
   };
 }

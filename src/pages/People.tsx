@@ -127,7 +127,7 @@ function People() {
     return filters;
   }, [selectedLocalidad, selectedDistrito, viewFilter]);
 
-  const { data: rawSocios, totalCount, loading, refreshData } = useSupabaseData<EnrichedSocio>({
+  const { data: rawSocios, totalCount, loading, refreshData, injectRealtimeEvent } = useSupabaseData<EnrichedSocio>({
     tableName: 'vw_socio_titulares_estado',
     initialSort: { column: 'apellidoPaterno', ascending: true },
     page: pagination.pageIndex,
@@ -139,15 +139,15 @@ function People() {
 
   const socios = rawSocios || [];
 
-  // Realtime updates (basic refresh)
+  // Realtime updates (Optimized Cache Merging)
   useEffect(() => {
     const channel = supabase.channel('people_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'socio_titulares' }, () => refreshData(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'ingresos' }, () => refreshData(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'socio_documentos' }, () => refreshData(true))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'socio_titulares' }, injectRealtimeEvent)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ingresos' }, injectRealtimeEvent)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'socio_documentos' }, injectRealtimeEvent)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [refreshData]);
+  }, [injectRealtimeEvent]);
 
   useEffect(() => {
     setMobileVisibleCount(10);
