@@ -807,8 +807,8 @@ function PartnerDocuments() {
           </Card>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl shadow-glass border border-gray-100 mb-8 flex flex-col lg:flex-row gap-4 items-start lg:items-center">
-          <div className="relative flex-1 w-full lg:w-[400px]">
+        <div className="bg-white p-4 rounded-2xl shadow-glass border border-gray-100 mb-8 flex flex-col xl:flex-row gap-4 items-start xl:items-center">
+          <div className="relative w-full xl:min-w-[450px] flex-1">
             <SearchInputWithDebounce
               placeholder="Buscar por socio, DNI, manzana, lote o recibo..."
               onDebouncedChange={setDebouncedSearchQuery}
@@ -816,7 +816,7 @@ function PartnerDocuments() {
             />
           </div>
           
-          <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+          <div className="flex flex-wrap gap-3 w-full xl:w-auto">
             <LocalidadCombobox
               value={selectedLocalidad}
               onValueChange={setSelectedLocalidad}

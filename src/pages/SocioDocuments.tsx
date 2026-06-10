@@ -268,8 +268,8 @@ function SocioDocuments() {
         </TabsList>
 
         <TabsContent value="expedientes" className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-            <div className="relative flex-1 w-full">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+            <div className="relative w-full lg:flex-1 lg:min-w-[400px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input 
                 placeholder="Buscar por DNI, nombre, apellidos, Mz o Lote..." 
