@@ -233,14 +233,14 @@ function People() {
         </Button>
       ),
       cell: ({ row }) => {
-        const status = row.original.status;
+        const status = row.original.status || 'Activo';
         const statusConfig = {
           'Activo': { color: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: CheckCircle2 },
           'Inactivo': { color: 'bg-amber-100 text-amber-700 border-amber-200', icon: AlertCircle },
           'Retirado': { color: 'bg-red-100 text-red-700 border-red-200', icon: UserMinus },
           'Sin Registro': { color: 'bg-gray-100 text-gray-500 border-gray-200', icon: XCircle },
         };
-        const config = statusConfig[status];
+        const config = statusConfig[status as keyof typeof statusConfig] || statusConfig['Activo'];
         const Icon = config.icon;
         return (
           <Badge variant="outline" className={cn("font-black border px-3 py-1 rounded-full text-[10px] uppercase tracking-wider flex items-center gap-1.5 w-fit", config.color)}>
