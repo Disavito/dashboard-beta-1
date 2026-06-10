@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 import { ColumnDef } from '@tanstack/react-table';
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { DataTable } from '@/components/ui-custom/DataTable';
 import { 
   FileWarning, 
@@ -302,6 +302,8 @@ function PartnerDocuments() {
     return rawSocios.map(socio => {
       if (socio.status === 'Retirado') return null;
 
+      const liveDocs = docsExistData?.get(socio.id);
+
       // Confiamos 100% en liveDocs (el cálculo en tiempo real) y descartamos la Vista 
       // de la base de datos para evitar fantasmas de documentos borrados lógicamente.
       const hasPlanos = liveDocs ? liveDocs.has('Planos de ubicación') : false;
@@ -511,7 +513,7 @@ function PartnerDocuments() {
     }
   }, [canManageEngineering, refreshAllData, queryClient]);
 
-  const handleDeleteDocumentDirect = useCallback(async (documentId: number, documentLink: string, documentType: string) => {
+  const handleDeleteDocumentDirect = useCallback(async (_documentId: number, documentLink: string, documentType: string) => {
     try {
       const bucketName = getBucketNameForDocumentType(documentType);
       const url = new URL(documentLink);
@@ -526,7 +528,7 @@ function PartnerDocuments() {
       toast.error('Error al eliminar');
       refreshAllData();
     }
-  }, [refreshAllData, deleteMutation]);
+  }, [refreshAllData]);
 
   // Helper para renderizar headers ordenables
   const SortableHeader = ({ column, title }: { column: any, title: string }) => {
