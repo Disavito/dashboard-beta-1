@@ -89,12 +89,12 @@ interface LoteMedidoCellProps {
   initialValue: boolean;
   disabled: boolean;
   socio: SocioConDocumentos;
+  onUpdate: (id: string, record: any) => Promise<boolean>;
 }
 
-const LoteMedidoCell = React.memo(({ socioId, initialValue, disabled, socio }: LoteMedidoCellProps) => {
+const LoteMedidoCell = React.memo(({ socioId, initialValue, disabled, socio, onUpdate }: LoteMedidoCellProps) => {
   const [checked, setChecked] = useState(initialValue);
   const mountedRef = useRef(true);
-  const updateMutation = useMutation<any, Error, { tableName: string; id: string | number; record: any }>({ mutationKey: ['updateRecord'] });
 
   // Sincronizar si el valor externo cambia (ej. después de un fetchAllData)
   useEffect(() => {
@@ -140,12 +140,13 @@ const LoteMedidoCell = React.memo(({ socioId, initialValue, disabled, socio }: L
     }
 
     try {
-      await updateMutation.mutateAsync({ tableName: 'socio_titulares', id: socioId, record: { is_lote_medido: v } });
+      const success = await onUpdate(socioId, { is_lote_medido: v });
+      if (!success) throw new Error("Update failed");
       // El éxito global de react-query ya muestra el toast
     } catch {
       // Revertir solo esta celda si falla
       if (mountedRef.current) setChecked(!v);
-      // El error global de react-query ya muestra el toast
+      toast.error('Error al guardar el estado del lote');
     }
   };
 
@@ -243,7 +244,7 @@ function PartnerDocuments() {
   const [loteMedidoFilter, setLoteMedidoFilter] = useState('all');
   const [cruceFilter, setCruceFilter] = useState('all');
 
-  const { data: rawSocios, loading: sociosLoading, refreshData: refreshSocios, injectRealtimeEvent } = useSupabaseData<any>({
+  const { data: rawSocios, loading: sociosLoading, refreshData: refreshSocios, injectRealtimeEvent, updateRecord } = useSupabaseData<any>({
     tableName: 'vw_socio_titulares_estado',
     initialSort: { column: 'apellidoPaterno', ascending: true },
     fetchAll: true,
@@ -299,12 +300,13 @@ function PartnerDocuments() {
     return rawSocios.map(socio => {
       if (socio.status === 'Retirado') return null;
 
-      const liveDocs = docsExistData?.get(socio.id);
-      const hasPlanos = liveDocs ? liveDocs.has('Planos de ubicación') : socio.has_planos || false;
-      const hasMemoria = liveDocs ? liveDocs.has('Memoria descriptiva') : socio.has_memoria || false;
-      const hasFicha = liveDocs ? liveDocs.has('Ficha') : socio.has_ficha || false;
-      const hasContrato = liveDocs ? liveDocs.has('Contrato') : socio.has_contrato || false;
-      const hasComprobante = liveDocs ? liveDocs.has('Comprobante de Pago') : socio.has_comprobante || false;
+      // Confiamos 100% en liveDocs (el cálculo en tiempo real) y descartamos la Vista 
+      // de la base de datos para evitar fantasmas de documentos borrados lógicamente.
+      const hasPlanos = liveDocs ? liveDocs.has('Planos de ubicación') : false;
+      const hasMemoria = liveDocs ? liveDocs.has('Memoria descriptiva') : false;
+      const hasFicha = liveDocs ? liveDocs.has('Ficha') : false;
+      const hasContrato = liveDocs ? liveDocs.has('Contrato') : false;
+      const hasComprobante = liveDocs ? liveDocs.has('Comprobante de Pago') : false;
 
       // DESCONEXIÓN DE PRUEBA: Solo confiar en el valor puro de la Base de Datos.
       const finalIsLoteMedido = socio.is_lote_medido ?? false;
@@ -369,9 +371,7 @@ function PartnerDocuments() {
   const [activeTab, setActiveTab] = useState('documents');
   const isDesktop = useMediaQuery('(min-width: 768px)');
   
-  const updateMutation = useMutation<any, Error, { tableName: string; id: string | number; record: any }>({ mutationKey: ['updateRecord'] });
-  const deleteMutation = useMutation<any, Error, { tableName: string; id: string | number; isSoftDelete: boolean }>({ mutationKey: ['deleteRecord'] });
-
+  // Eliminamos los fake mutations locales sin función
   // Refs imperativas — abrir/cerrar modales SIN re-renderizar este componente
   const uploadModalRef = useRef<{ open: (config: any) => void }>(null);
   const deleteDialogRef = useRef<{ open: (config: any) => void }>(null);
@@ -518,9 +518,7 @@ function PartnerDocuments() {
       // Remove from storage
       await supabase.storage.from(bucketName).remove([filePath]);
       
-      // Optimistic UI for deletion
-      await deleteMutation.mutateAsync({ tableName: 'socio_documentos', id: documentId, isSoftDelete: false });
-
+      // No optimistic delete UI manual here, the realtime hook handles it
       toast.success('Documento eliminado');
     } catch (error) {
       toast.error('Error al eliminar');
@@ -606,6 +604,7 @@ function PartnerDocuments() {
           initialValue={row.original.is_lote_medido ?? false}
           disabled={!canManageEngineering}
           socio={row.original}
+          onUpdate={updateRecord}
         />
       ),
     },
@@ -966,7 +965,7 @@ function PartnerDocuments() {
                           }
 
                           try {
-                            await updateMutation.mutateAsync({ tableName: 'socio_titulares', id: socioId, record: { is_lote_medido: newValue } });
+                            await updateRecord(socioId, { is_lote_medido: newValue });
                           } catch { 
                             // Revert on error
                             queryClient.setQueriesData({ queryKey: ['supabaseData', 'vw_socio_titulares_estado'] }, (oldData: any) => {
