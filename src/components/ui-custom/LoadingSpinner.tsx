@@ -1,4 +1,4 @@
-import { Wallet } from 'lucide-react';
+
 
 const LoadingSpinner = () => {
   return (
