@@ -9,6 +9,10 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
+    define: {
+      // Inyecta un timestamp único en cada compilación (deploy) para forzar purga de cachés
+      __APP_VERSION__: JSON.stringify(Date.now().toString()),
+    },
     plugins: [
       react(),
       VitePWA({
