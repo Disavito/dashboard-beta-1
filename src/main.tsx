@@ -30,8 +30,11 @@ const queryClient = new QueryClient({
 // Registrar mutación por defecto para actualizaciones (Offline-First + Optimistic UI)
 queryClient.setMutationDefaults(['updateRecord'], {
   mutationFn: async ({ tableName, id, record }: { tableName: string; id: string | number; record: any }) => {
+    // CQRS: Leer de Vistas, Escribir en Tablas Base.
+    const targetTable = tableName === 'vw_socio_titulares_estado' ? 'socio_titulares' : tableName;
+    
     const { data, error } = await supabase
-      .from(tableName)
+      .from(targetTable)
       .update(record)
       .eq('id', id)
       .select()
@@ -110,12 +113,15 @@ queryClient.setMutationDefaults(['addRecord'], {
 
 queryClient.setMutationDefaults(['deleteRecord'], {
   mutationFn: async ({ tableName, id, isSoftDelete }: { tableName: string; id: string | number; isSoftDelete: boolean }) => {
+    // CQRS: Leer de Vistas, Escribir en Tablas Base.
+    const targetTable = tableName === 'vw_socio_titulares_estado' ? 'socio_titulares' : tableName;
+
     let error;
     if (isSoftDelete) {
-      const res = await supabase.from(tableName).update({ deleted_at: new Date().toISOString() }).eq('id', id);
+      const res = await supabase.from(targetTable).update({ deleted_at: new Date().toISOString() }).eq('id', id);
       error = res.error;
     } else {
-      const res = await supabase.from(tableName).delete().eq('id', id);
+      const res = await supabase.from(targetTable).delete().eq('id', id);
       error = res.error;
     }
     if (error) throw error;
