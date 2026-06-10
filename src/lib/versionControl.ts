@@ -5,8 +5,7 @@
  */
 
 export async function ensureLatestVersion() {
-  // @ts-ignore
-  const currentVersion = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'unknown';
+  const currentVersion = import.meta.env.VITE_BUILD_TIME || 'unknown';
   const savedVersion = localStorage.getItem('fimagadi_app_version');
 
   // Si es la misma versión o estamos en dev sin la variable, no hacemos nada

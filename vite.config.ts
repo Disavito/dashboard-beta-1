@@ -7,12 +7,10 @@ import path from 'path';
 export default defineConfig(({ mode }) => {
   // Carga las variables de entorno basadas en el modo (development, production, etc.)
   const env = loadEnv(mode, process.cwd(), '');
+  // Forzamos un ID único en cada build para el auto-purgador
+  process.env.VITE_BUILD_TIME = Date.now().toString();
 
   return {
-    define: {
-      // Inyecta un timestamp único en cada compilación (deploy) para forzar purga de cachés
-      __APP_VERSION__: JSON.stringify(Date.now().toString()),
-    },
     plugins: [
       react(),
       VitePWA({
