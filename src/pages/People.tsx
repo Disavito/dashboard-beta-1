@@ -127,7 +127,7 @@ function People() {
     return filters;
   }, [selectedLocalidad, selectedDistrito, viewFilter]);
 
-  const { data: rawSocios, totalCount, loading, refreshData, injectRealtimeEvent } = useSupabaseData<EnrichedSocio>({
+  const { data: rawSocios, totalCount, loading, injectRealtimeEvent } = useSupabaseData<EnrichedSocio>({
     tableName: 'vw_socio_titulares_estado',
     initialSort: { column: 'apellidoPaterno', ascending: true },
     page: pagination.pageIndex,
