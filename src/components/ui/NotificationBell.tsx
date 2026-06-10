@@ -71,7 +71,7 @@ const NotificationBell: React.FC = () => {
                 </button>
             </PopoverTrigger>
             
-            <PopoverContent className="w-96 p-0 bg-white border-gray-200 shadow-premium z-[100]" align="end">
+            <PopoverContent className="w-96 p-0 bg-[#1c1c1c] border-white/10 shadow-premium z-[100]" align="end">
                 <Tabs defaultValue="notifications" className="w-full">
                     <div className="p-4 flex items-center justify-between bg-white/5">
                         <TabsList className="bg-black/20">
@@ -123,7 +123,7 @@ const NotificationBell: React.FC = () => {
                                                 </div>
                                                 <div className="flex-1 space-y-1">
                                                     <div className="flex justify-between items-start">
-                                                        <p className={cn("text-[13px] leading-tight", !notif.is_read ? "font-black text-black" : "font-bold text-gray-700")}>
+                                                        <p className={cn("text-[13px] leading-tight", !notif.is_read ? "font-black text-white" : "font-bold text-gray-300")}>
                                                             {notif.title}
                                                         </p>
                                                         {!notif.is_read && <span className="w-2 h-2 rounded-full bg-primary mt-1" />}
