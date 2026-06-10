@@ -559,7 +559,25 @@ app.post('/api/webhook/generate-ficha', requireWebhookSecret, async (req, res) =
     
     if (payload.type === 'INSERT' || payload.type === 'UPDATE') {
       const record = payload.record;
+      const oldRecord = payload.old_record;
       const socioId = record.id;
+      
+      // Si es un UPDATE, verificamos que hayan cambiado los datos relevantes
+      // para no re-generar el PDF si solo cambió "Lote Medido" u "Observación"
+      if (payload.type === 'UPDATE' && oldRecord && record) {
+        const vitalFields = [
+          'nombres', 'apellidoPaterno', 'apellidoMaterno', 'dni', 
+          'mz', 'lote', 'localidad', 'distritoVivienda', 'direccionVivienda', 
+          'distritoDNI', 'direccionDNI', 'celular', 'fechaNacimiento', 'situacionEconomica'
+        ];
+        
+        const hasVitalChanges = vitalFields.some(field => record[field] !== oldRecord[field]);
+        
+        if (!hasVitalChanges) {
+          console.log(`Skipping generate-ficha for ${socioId}: no vital fields changed (e.g. is_lote_medido update)`);
+          return res.status(200).json({ success: true, ignored: true, message: 'No vital fields changed' });
+        }
+      }
       
       const { data: configValor, error: configError } = await supabase
         .rpc('get_configuracion_valor', { p_clave: 'carbone_templates' });
