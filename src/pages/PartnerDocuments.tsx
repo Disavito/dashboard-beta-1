@@ -302,13 +302,13 @@ function PartnerDocuments() {
 
       const liveDocs = docsExistData?.get(socio.id);
 
-      // Confiamos 100% en liveDocs (el cálculo en tiempo real) y descartamos la Vista 
-      // de la base de datos para evitar fantasmas de documentos borrados lógicamente.
-      const hasPlanos = liveDocs ? liveDocs.has('Planos de ubicación') : false;
-      const hasMemoria = liveDocs ? liveDocs.has('Memoria descriptiva') : false;
-      const hasFicha = liveDocs ? liveDocs.has('Ficha') : false;
-      const hasContrato = liveDocs ? liveDocs.has('Contrato') : false;
-      const hasComprobante = liveDocs ? liveDocs.has('Comprobante de Pago') : false;
+      // Como hemos optimizado la Vista de PostgreSQL con validaciones estrictas, ahora es la 
+      // única y verdadera fuente de la verdad.
+      const hasPlanos = socio.has_planos ?? false;
+      const hasMemoria = socio.has_memoria ?? false;
+      const hasFicha = socio.has_ficha ?? false;
+      const hasContrato = socio.has_contrato ?? false;
+      const hasComprobante = socio.has_comprobante ?? false;
 
       // DESCONEXIÓN DE PRUEBA: Solo confiar en el valor puro de la Base de Datos.
       const finalIsLoteMedido = socio.is_lote_medido ?? false;
