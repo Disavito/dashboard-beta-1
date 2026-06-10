@@ -807,7 +807,7 @@ function PartnerDocuments() {
           </Card>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl shadow-glass border border-gray-100 mb-8 flex flex-col md:flex-row gap-4 items-center">
+        <div className="bg-white p-4 rounded-2xl shadow-glass border border-gray-100 mb-8 flex flex-col lg:flex-row gap-4 items-start lg:items-center">
           <div className="relative flex-1 w-full lg:w-[400px]">
             <SearchInputWithDebounce
               placeholder="Buscar por socio, DNI, manzana, lote o recibo..."
@@ -816,22 +816,22 @@ function PartnerDocuments() {
             />
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <div className="flex flex-wrap gap-3 w-full lg:w-auto">
             <LocalidadCombobox
               value={selectedLocalidad}
               onValueChange={setSelectedLocalidad}
-              triggerClassName="h-14 w-full sm:w-[240px]"
+              triggerClassName="h-14 w-full sm:flex-1 min-w-[200px]"
               distritoFilter={selectedDistrito}
             />
 
             <DistritoCombobox
               value={selectedDistrito}
               onValueChange={setSelectedDistrito}
-              triggerClassName="h-14 w-full sm:w-[240px]"
+              triggerClassName="h-14 w-full sm:flex-1 min-w-[200px]"
             />
 
             <Select value={loteMedidoFilter} onValueChange={setLoteMedidoFilter}>
-              <SelectTrigger className="h-14 w-full sm:w-[200px] bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-bold">
+              <SelectTrigger className="h-14 w-full sm:flex-1 min-w-[180px] bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-bold">
                 <SelectValue placeholder="Estado Lote" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-gray-100 shadow-premium">
@@ -842,7 +842,7 @@ function PartnerDocuments() {
             </Select>
 
             <Select value={cruceFilter} onValueChange={setCruceFilter}>
-              <SelectTrigger className="h-14 w-full sm:w-[230px] bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-bold">
+              <SelectTrigger className="h-14 w-full sm:flex-1 min-w-[220px] bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-bold">
                 <SelectValue placeholder="Cruce Operativo" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-gray-100 shadow-premium">
@@ -856,7 +856,7 @@ function PartnerDocuments() {
             {canManageEngineering && Object.keys(rowSelection).length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="h-14 px-6 bg-[#4892CC] hover:bg-[#3C8B93] rounded-2xl font-bold shadow-lg shadow-[#4892CC]/20">
+                  <Button className="h-14 w-full sm:w-auto px-6 bg-[#4892CC] hover:bg-[#3C8B93] rounded-2xl font-bold shadow-lg shadow-[#4892CC]/20">
                     Acciones ({Object.keys(rowSelection).length})
                   </Button>
                 </DropdownMenuTrigger>
