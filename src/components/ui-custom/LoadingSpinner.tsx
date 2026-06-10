@@ -6,9 +6,9 @@ const LoadingSpinner = () => {
       <div className="relative">
         {/* Glow ring */}
         <div className="absolute inset-0 w-16 h-16 rounded-2xl bg-primary/20 animate-ping" style={{ animationDuration: '2s' }} />
-        {/* Icon */}
-        <div className="relative w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-glow-blue animate-pulse">
-          <Wallet className="text-white w-7 h-7" />
+        <div className="relative w-24 h-24 flex flex-col items-center justify-center animate-pulse drop-shadow-xl z-10">
+          <img src="/logo.png" alt="Fimagadi Logo" className="w-16 h-16 object-contain mb-2" />
+          <span className="text-xs font-black tracking-widest text-primary uppercase">FIMAGADI</span>
         </div>
       </div>
       {/* Shimmer bar */}

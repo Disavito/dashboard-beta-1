@@ -65,10 +65,11 @@ const AuthPage: React.FC = () => {
       <Card className="w-full max-w-md border-white/60 shadow-premium-lg rounded-2xl overflow-hidden animate-scale-in backdrop-blur-sm bg-white/90">
         <CardHeader className="text-center p-8 pb-6">
           {/* Logo */}
-          <div className="flex justify-center mb-5">
-            <div className="w-14 h-14 bg-gradient-to-br from-primary to-corp-teal rounded-2xl flex items-center justify-center shadow-glow-blue">
-              <Wallet className="text-white w-7 h-7" />
-            </div>
+          <div className="flex flex-col items-center justify-center mb-6 gap-3">
+            <img src="/logo.png" alt="Fimagadi Logo" className="w-20 h-20 object-contain drop-shadow-xl" />
+            <span className="text-2xl font-black tracking-widest text-slate-900 uppercase">
+              FIMAGADI
+            </span>
           </div>
           <CardTitle className="text-2xl font-black text-slate-900 tracking-tight">
             {isSignIn ? 'Bienvenido de nuevo' : 'Únete a FIMAGADI'}

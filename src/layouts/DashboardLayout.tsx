@@ -202,13 +202,11 @@ function DashboardLayout() {
     <div className="flex flex-col h-full bg-card lg:bg-card/80 lg:backdrop-blur-xl border-r border-border">
       {/* Logo */}
       <div className="p-6 md:p-8">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-corp-teal rounded-xl flex items-center justify-center shadow-md shadow-primary/20 transition-transform duration-300 group-hover:scale-105">
-            <Wallet className="text-white w-5 h-5" />
-          </div>
+        <Link to="/" className="flex flex-col items-center justify-center gap-2 group w-full">
+          <img src="/logo.png" alt="Fimagadi Logo" className="w-12 h-12 md:w-16 md:h-16 object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-md" />
           {!isCollapsed && (
-            <span className="text-lg md:text-xl font-black tracking-tighter text-foreground transition-opacity duration-200">
-              <span className="text-primary">FIMA</span>GADI
+            <span className="text-lg md:text-xl font-black tracking-widest text-foreground transition-opacity duration-200 uppercase">
+              FIMAGADI
             </span>
           )}
         </Link>
