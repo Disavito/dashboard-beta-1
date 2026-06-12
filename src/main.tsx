@@ -165,7 +165,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         client={queryClient}
         persistOptions={{ persister }}
       >
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme" attribute="class">
           <UserProvider>
             <GlobalRealtimeProvider>
               <App />
