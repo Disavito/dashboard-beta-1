@@ -112,6 +112,18 @@ export const clockIn = async (
   observaciones?: string,
   customDate?: Date
 ): Promise<Jornada> => {
+  // Evitar duplicación de jornadas activas (Bugfix)
+  const { data: existingActive } = await supabase
+    .from('registros_jornada')
+    .select('id')
+    .eq('colaborador_id', colaboradorId)
+    .is('hora_fin_jornada', null)
+    .limit(1);
+    
+  if (existingActive && existingActive.length > 0) {
+    throw new Error("Ya tienes una jornada activa en curso. Si acabas de iniciar una, espera un momento.");
+  }
+
   const timestamp = customDate || new Date();
   const newJornada: TablesInsert<'registros_jornada'> = {
     colaborador_id: colaboradorId,
