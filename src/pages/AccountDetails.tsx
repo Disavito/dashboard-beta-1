@@ -111,7 +111,7 @@ const AccountDetails: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#FAFBFC] page-enter flex flex-col items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-[#4892CC]" />
-        <p className="text-slate-500 mt-4 font-medium">Cargando detalles de la cuenta...</p>
+        <p className="text-muted-foreground mt-4 font-medium">Cargando detalles de la cuenta...</p>
       </div>
     );
   }
@@ -130,7 +130,7 @@ const AccountDetails: React.FC = () => {
   if (!account) {
     return (
       <div className="min-h-screen bg-[#FAFBFC] page-enter flex items-center justify-center">
-        <p className="text-slate-500 font-bold">No se encontró la cuenta.</p>
+        <p className="text-muted-foreground font-bold">No se encontró la cuenta.</p>
       </div>
     );
   }
@@ -144,10 +144,10 @@ const AccountDetails: React.FC = () => {
             <Wallet className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">
+            <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">
               {account.name}
             </h1>
-            <p className="text-slate-500 font-medium text-sm">
+            <p className="text-muted-foreground font-medium text-sm">
               Detalle de movimientos y balance de la cuenta
             </p>
           </div>
@@ -156,42 +156,42 @@ const AccountDetails: React.FC = () => {
 
       {/* Resumen */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl">
+        <Card className="bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl">
           <CardHeader className="pb-2">
-            <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Saldo Actual</CardDescription>
+            <CardDescription className="text-muted-foreground/70 font-bold uppercase tracking-widest text-[10px]">Saldo Actual</CardDescription>
             <CardTitle className={cn("text-3xl font-black", account.balance >= 0 ? "text-emerald-600" : "text-red-600")}>
               {formatCurrency(account.balance)}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Badge className="bg-slate-100 text-slate-500 border-none font-bold text-[10px] uppercase">{account.tipo}</Badge>
+            <Badge className="bg-muted text-muted-foreground border-none font-bold text-[10px] uppercase">{account.tipo}</Badge>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl">
+        <Card className="bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl">
           <CardHeader className="pb-2">
-            <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Total Ingresos</CardDescription>
+            <CardDescription className="text-muted-foreground/70 font-bold uppercase tracking-widest text-[10px]">Total Ingresos</CardDescription>
             <CardTitle className="text-3xl font-black text-[#4892CC]">
               {formatCurrency(dailyIncomes.reduce((a, d) => a + d.amount, 0))}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-1 text-slate-400 text-xs font-medium">
+            <div className="flex items-center gap-1 text-muted-foreground/70 text-xs font-medium">
               <TrendingUp className="w-3.5 h-3.5 text-[#4892CC]" />
               <span>{dailyIncomes.length} días con ingresos</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl">
+        <Card className="bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl">
           <CardHeader className="pb-2">
-            <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Total Gastos</CardDescription>
+            <CardDescription className="text-muted-foreground/70 font-bold uppercase tracking-widest text-[10px]">Total Gastos</CardDescription>
             <CardTitle className="text-3xl font-black text-red-500">
               {formatCurrency(dailyExpenses.reduce((a, d) => a + d.amount, 0))}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-1 text-slate-400 text-xs font-medium">
+            <div className="flex items-center gap-1 text-muted-foreground/70 text-xs font-medium">
               <TrendingDown className="w-3.5 h-3.5 text-red-400" />
               <span>{dailyExpenses.length} días con gastos</span>
             </div>
@@ -200,23 +200,23 @@ const AccountDetails: React.FC = () => {
       </div>
 
       {/* Ingresos Diarios */}
-      <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
+      <Card className="bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl overflow-hidden">
         <CardHeader className="border-b border-slate-50 p-6">
-          <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tight">Ingresos Diarios</CardTitle>
-          <CardDescription className="text-slate-400 font-medium">Total de ingresos por día para {account.name}</CardDescription>
+          <CardTitle className="text-xl font-black text-foreground uppercase tracking-tight">Ingresos Diarios</CardTitle>
+          <CardDescription className="text-muted-foreground/70 font-medium">Total de ingresos por día para {account.name}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {dailyIncomes.length === 0 ? (
             <div className="p-12 text-center">
-              <p className="text-slate-400 font-bold">No hay ingresos registrados para esta cuenta.</p>
+              <p className="text-muted-foreground/70 font-bold">No hay ingresos registrados para esta cuenta.</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-50">
               {dailyIncomes.map((daily, index) => (
-                <div key={`income-${daily.date}-${index}`} className="px-6 py-4 flex justify-between items-center hover:bg-slate-50/50 transition-colors">
+                <div key={`income-${daily.date}-${index}`} className="px-6 py-4 flex justify-between items-center hover:bg-muted/50/50 transition-colors">
                   <div className="flex items-center gap-3">
                     <Calendar className="w-4 h-4 text-slate-300" />
-                    <span className="font-semibold text-slate-600 text-sm">{safeFormatDateLong(daily.date)}</span>
+                    <span className="font-semibold text-muted-foreground text-sm">{safeFormatDateLong(daily.date)}</span>
                   </div>
                   <span className="text-lg font-black text-emerald-600">{formatCurrency(daily.amount)}</span>
                 </div>
@@ -227,23 +227,23 @@ const AccountDetails: React.FC = () => {
       </Card>
 
       {/* Gastos Diarios */}
-      <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
+      <Card className="bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl overflow-hidden">
         <CardHeader className="border-b border-slate-50 p-6">
-          <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tight">Gastos Diarios</CardTitle>
-          <CardDescription className="text-slate-400 font-medium">Total de gastos por día para {account.name}</CardDescription>
+          <CardTitle className="text-xl font-black text-foreground uppercase tracking-tight">Gastos Diarios</CardTitle>
+          <CardDescription className="text-muted-foreground/70 font-medium">Total de gastos por día para {account.name}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {dailyExpenses.length === 0 ? (
             <div className="p-12 text-center">
-              <p className="text-slate-400 font-bold">No hay gastos registrados para esta cuenta.</p>
+              <p className="text-muted-foreground/70 font-bold">No hay gastos registrados para esta cuenta.</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-50">
               {dailyExpenses.map((daily, index) => (
-                <div key={`expense-${daily.date}-${index}`} className="px-6 py-4 flex justify-between items-center hover:bg-slate-50/50 transition-colors">
+                <div key={`expense-${daily.date}-${index}`} className="px-6 py-4 flex justify-between items-center hover:bg-muted/50/50 transition-colors">
                   <div className="flex items-center gap-3">
                     <Calendar className="w-4 h-4 text-slate-300" />
-                    <span className="font-semibold text-slate-600 text-sm">{safeFormatDateLong(daily.date)}</span>
+                    <span className="font-semibold text-muted-foreground text-sm">{safeFormatDateLong(daily.date)}</span>
                   </div>
                   <span className="text-lg font-black text-red-500">{formatCurrency(daily.amount)}</span>
                 </div>

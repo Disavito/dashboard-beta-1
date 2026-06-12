@@ -39,16 +39,16 @@ class ModuleErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySta
               <AlertTriangle className="w-8 h-8 text-red-400" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+              <h2 className="text-xl font-black text-foreground uppercase tracking-tight">
                 Error en {this.props.moduleName || 'el módulo'}
               </h2>
-              <p className="text-slate-500 text-sm mt-2">
+              <p className="text-muted-foreground text-sm mt-2">
                 Ha ocurrido un error inesperado. Puedes intentar recargar el módulo.
               </p>
             </div>
             {this.state.error && (
-              <div className="bg-slate-50 rounded-xl p-4 text-left">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Detalle Técnico</p>
+              <div className="bg-muted/50 rounded-xl p-4 text-left">
+                <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest mb-1">Detalle Técnico</p>
                 <p className="text-xs font-mono text-red-600 break-all">{this.state.error.message}</p>
               </div>
             )}

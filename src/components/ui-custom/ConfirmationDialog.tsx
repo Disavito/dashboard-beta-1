@@ -95,12 +95,12 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
         {showReasonInput && (
           <div className="space-y-2 py-2">
-            <Label className="text-sm font-bold text-slate-700">Motivo <span className="text-red-500">*</span></Label>
+            <Label className="text-sm font-bold text-foreground/80">Motivo <span className="text-red-500">*</span></Label>
             <Textarea
               placeholder={reasonPlaceholder}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="min-h-[80px] bg-slate-50 border-slate-200 rounded-xl focus:ring-primary/20 font-medium"
+              className="min-h-[80px] bg-muted/50 border-border rounded-xl focus:ring-primary/20 font-medium"
             />
             {showReasonInput && reason.trim().length === 0 && (
               <p className="text-[11px] text-red-400 font-medium">Debes ingresar un motivo para continuar.</p>

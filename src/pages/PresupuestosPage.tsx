@@ -252,11 +252,11 @@ export default function PresupuestosPage() {
     <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-black text-slate-800 flex items-center gap-3">
+          <h1 className="text-3xl font-black text-foreground/90 flex items-center gap-3">
             <Wallet className="w-8 h-8 text-[#4892CC]" />
             Presupuestos Operativos
           </h1>
-          <p className="text-slate-500 font-medium">
+          <p className="text-muted-foreground font-medium">
             {isAdminOrFinanzas 
               ? 'Administra, aprueba y haz seguimiento a los presupuestos de campo del equipo.' 
               : 'Solicita y gestiona fondos a rendir para tus salidas a campo.'}
@@ -275,16 +275,16 @@ export default function PresupuestosPage() {
           const colaboradorName = colaboradores[p.colaborador_id] || 'Cargando...';
           
           return (
-            <Card key={p.id} className="rounded-2xl border-slate-100 shadow-glass overflow-hidden flex flex-col justify-between">
+            <Card key={p.id} className="rounded-2xl border-border/50 shadow-glass overflow-hidden flex flex-col justify-between">
               <div>
                 <CardHeader className="pb-3 border-b border-slate-50">
                   <div className="flex justify-between items-start gap-2">
                     <div className="space-y-1">
-                      <CardTitle className="text-lg font-bold text-slate-800 line-clamp-1">{p.motivo}</CardTitle>
+                      <CardTitle className="text-lg font-bold text-foreground/90 line-clamp-1">{p.motivo}</CardTitle>
                       <span className="text-xs font-semibold text-[#4892CC] block">
                         Por: {colaboradorName}
                       </span>
-                      <span className="text-[10px] text-slate-400 block">
+                      <span className="text-[10px] text-muted-foreground/70 block">
                         Solicitado: {format(parseISO(p.created_at), 'dd/MM/yyyy HH:mm', { locale: es })}
                       </span>
                     </div>
@@ -305,7 +305,7 @@ export default function PresupuestosPage() {
                         </span>
                       )}
                       {p.estado === 'Cerrado' && (
-                        <span className="bg-slate-100 text-slate-600 text-[11px] px-2.5 py-1 rounded-full font-bold flex items-center whitespace-nowrap">
+                        <span className="bg-muted text-muted-foreground text-[11px] px-2.5 py-1 rounded-full font-bold flex items-center whitespace-nowrap">
                           <Check className="w-3 h-3 mr-1"/> Cerrado
                         </span>
                       )}
@@ -315,23 +315,23 @@ export default function PresupuestosPage() {
                 
                 <CardContent className="pt-4 space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-500 font-medium">Monto Solicitado:</span>
+                    <span className="text-muted-foreground font-medium">Monto Solicitado:</span>
                     <span className="font-bold">S/ {p.monto_solicitado.toFixed(2)}</span>
                   </div>
                   {p.estado !== 'Pendiente' && p.estado !== 'Rechazado' && (
                     <>
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-500 font-medium">Monto Aprobado:</span>
+                        <span className="text-muted-foreground font-medium">Monto Aprobado:</span>
                         <span className="font-bold text-[#4892CC]">S/ {p.monto_aprobado.toFixed(2)}</span>
                       </div>
-                      <div className="w-full h-px bg-slate-100 my-2" />
+                      <div className="w-full h-px bg-muted my-2" />
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-500 font-medium">Gastos Rendidos:</span>
+                        <span className="text-muted-foreground font-medium">Gastos Rendidos:</span>
                         <span className="font-bold text-emerald-600">S/ {p.monto_rendido.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between text-sm bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                        <span className="text-slate-700 font-bold">Saldo por Rendir:</span>
-                        <span className={`font-black ${porRendir > 0 ? 'text-amber-500' : 'text-slate-400'}`}>
+                      <div className="flex justify-between text-sm bg-muted/50 p-2.5 rounded-xl border border-border/50">
+                        <span className="text-foreground/80 font-bold">Saldo por Rendir:</span>
+                        <span className={`font-black ${porRendir > 0 ? 'text-amber-500' : 'text-muted-foreground/70'}`}>
                           S/ {Math.max(0, porRendir).toFixed(2)}
                         </span>
                       </div>
@@ -339,8 +339,8 @@ export default function PresupuestosPage() {
                   )}
                   
                   {p.notas && (
-                    <div className="bg-slate-50 p-2.5 rounded-xl text-xs text-slate-500 border border-slate-100 mt-2">
-                      <span className="font-bold block text-slate-600">Notas/Detalle:</span>
+                    <div className="bg-muted/50 p-2.5 rounded-xl text-xs text-muted-foreground border border-border/50 mt-2">
+                      <span className="font-bold block text-muted-foreground">Notas/Detalle:</span>
                       {p.notas}
                     </div>
                   )}
@@ -349,7 +349,7 @@ export default function PresupuestosPage() {
 
               {/* Acciones de Administrador */}
               {isAdminOrFinanzas && (
-                <div className="p-4 border-t border-slate-50 bg-slate-50/50 flex gap-2">
+                <div className="p-4 border-t border-slate-50 bg-muted/50/50 flex gap-2">
                   {p.estado === 'Pendiente' && (
                     <>
                       <Button 
@@ -384,10 +384,10 @@ export default function PresupuestosPage() {
           );
         })}
         {presupuestos.length === 0 && (
-          <div className="col-span-full py-16 text-center bg-white rounded-2xl border border-dashed border-slate-200">
+          <div className="col-span-full py-16 text-center bg-card dark:bg-slate-900 rounded-2xl border border-dashed border-border">
             <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-slate-700">Sin Presupuestos</h3>
-            <p className="text-slate-500">No hay solicitudes de presupuestos operativos registradas.</p>
+            <h3 className="text-lg font-bold text-foreground/80">Sin Presupuestos</h3>
+            <p className="text-muted-foreground">No hay solicitudes de presupuestos operativos registradas.</p>
           </div>
         )}
       </div>
@@ -401,11 +401,11 @@ export default function PresupuestosPage() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Motivo de la salida / Compra</label>
+              <label className="text-sm font-bold text-foreground/80">Motivo de la salida / Compra</label>
               <Input placeholder="Ej. Viaje a Obra Sur - Viáticos y Gasolina" value={motivo} onChange={e => setMotivo(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Monto Estimado (S/)</label>
+              <label className="text-sm font-bold text-foreground/80">Monto Estimado (S/)</label>
               <Input type="number" placeholder="1500.00" value={monto} onChange={e => setMonto(e.target.value)} />
             </div>
           </div>
@@ -426,18 +426,18 @@ export default function PresupuestosPage() {
             <DialogDescription>Valida y asigna el monto definitivo para este presupuesto.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-sm">
-              <span className="text-slate-500 font-bold block">Motivo:</span>
-              <span className="text-slate-800 font-medium">{selectedPresupuesto?.motivo}</span>
-              <span className="text-slate-500 font-bold block mt-2">Monto Solicitado:</span>
-              <span className="text-slate-800 font-bold">S/ {selectedPresupuesto?.monto_solicitado.toFixed(2)}</span>
+            <div className="bg-muted/50 p-3 rounded-xl border border-border/50 text-sm">
+              <span className="text-muted-foreground font-bold block">Motivo:</span>
+              <span className="text-foreground/90 font-medium">{selectedPresupuesto?.motivo}</span>
+              <span className="text-muted-foreground font-bold block mt-2">Monto Solicitado:</span>
+              <span className="text-foreground/90 font-bold">S/ {selectedPresupuesto?.monto_solicitado.toFixed(2)}</span>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Monto Aprobado (S/)</label>
+              <label className="text-sm font-bold text-foreground/80">Monto Aprobado (S/)</label>
               <Input type="number" placeholder="Monto aprobado" value={montoAprobado} onChange={e => setMontoAprobado(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Notas de Aprobación</label>
+              <label className="text-sm font-bold text-foreground/80">Notas de Aprobación</label>
               <Input placeholder="Ej. Aprobado para viáticos y transporte. Transferido." value={notasAprobacion} onChange={e => setNotasAprobacion(e.target.value)} />
             </div>
           </div>
@@ -458,14 +458,14 @@ export default function PresupuestosPage() {
             <DialogDescription>Especifica la razón del rechazo de esta solicitud.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-sm">
-              <span className="text-slate-500 font-bold block">Motivo:</span>
-              <span className="text-slate-800 font-medium">{selectedPresupuesto?.motivo}</span>
-              <span className="text-slate-500 font-bold block mt-2">Monto Solicitado:</span>
-              <span className="text-slate-800 font-bold">S/ {selectedPresupuesto?.monto_solicitado.toFixed(2)}</span>
+            <div className="bg-muted/50 p-3 rounded-xl border border-border/50 text-sm">
+              <span className="text-muted-foreground font-bold block">Motivo:</span>
+              <span className="text-foreground/90 font-medium">{selectedPresupuesto?.motivo}</span>
+              <span className="text-muted-foreground font-bold block mt-2">Monto Solicitado:</span>
+              <span className="text-foreground/90 font-bold">S/ {selectedPresupuesto?.monto_solicitado.toFixed(2)}</span>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Notas / Razón de Rechazo</label>
+              <label className="text-sm font-bold text-foreground/80">Notas / Razón de Rechazo</label>
               <Input placeholder="Ej. Fuera de presupuesto o falta documentación" value={notasRechazo} onChange={e => setNotasRechazo(e.target.value)} />
             </div>
           </div>

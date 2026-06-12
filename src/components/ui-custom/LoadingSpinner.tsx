@@ -12,11 +12,11 @@ const LoadingSpinner = () => {
         </div>
       </div>
       {/* Shimmer bar */}
-      <div className="mt-6 w-48 h-1.5 rounded-full overflow-hidden bg-slate-100">
+      <div className="mt-6 w-48 h-1.5 rounded-full overflow-hidden bg-muted">
         <div className="h-full w-1/2 bg-gradient-to-r from-transparent via-primary/40 to-transparent rounded-full" 
              style={{ animation: 'shimmer 1.8s ease-in-out infinite' }} />
       </div>
-      <p className="mt-4 text-sm font-bold text-slate-400 tracking-wide">Cargando...</p>
+      <p className="mt-4 text-sm font-bold text-muted-foreground/70 tracking-wide">Cargando...</p>
     </div>
   );
 };

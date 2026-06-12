@@ -165,7 +165,7 @@ function Income() {
       header: 'Nº Recibo',
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <span className="font-mono font-bold text-slate-700">{row.getValue('receipt_number')}</span>
+          <span className="font-mono font-bold text-foreground/80">{row.getValue('receipt_number')}</span>
           {/* Referencia corregida a socio_titulares */}
           {row.original.socio_titulares?.is_payment_observed && (
             <TooltipProvider>
@@ -188,20 +188,20 @@ function Income() {
       header: 'Socio',
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <span className="font-bold uppercase text-xs text-slate-900">{row.getValue('full_name')}</span>
-          <span className="text-[10px] text-slate-500 font-medium">{row.original.socio_titulares?.localidad || 'Sin localidad'}</span>
+          <span className="font-bold uppercase text-xs text-foreground">{row.getValue('full_name')}</span>
+          <span className="text-[10px] text-muted-foreground font-medium">{row.original.socio_titulares?.localidad || 'Sin localidad'}</span>
         </div>
       ),
     },
     {
       accessorKey: 'dni',
       header: 'DNI',
-      cell: ({ row }) => <span className="font-mono text-xs bg-slate-100 px-2 py-1 rounded text-slate-600">{row.getValue('dni')}</span>,
+      cell: ({ row }) => <span className="font-mono text-xs bg-muted px-2 py-1 rounded text-muted-foreground">{row.getValue('dni')}</span>,
     },
     {
       accessorKey: 'numeroOperacion',
       header: 'Operación',
-      cell: ({ row }) => <span className="text-xs font-medium text-slate-500">{row.getValue('numeroOperacion') || '-'}</span>,
+      cell: ({ row }) => <span className="text-xs font-medium text-muted-foreground">{row.getValue('numeroOperacion') || '-'}</span>,
     },
     {
       accessorKey: 'amount',
@@ -245,10 +245,10 @@ function Income() {
 
   if (loading || userLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-50">
+      <div className="flex h-screen items-center justify-center bg-muted/50">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="animate-spin h-12 w-12 text-corp-blue" />
-          <p className="text-slate-500 font-medium animate-pulse">Cargando registros...</p>
+          <p className="text-muted-foreground font-medium animate-pulse">Cargando registros...</p>
         </div>
       </div>
     );
@@ -259,15 +259,15 @@ function Income() {
       <div className="max-w-7xl mx-auto space-y-6">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Ingresos</h1>
-            <p className="text-slate-500 font-medium">Gestión y búsqueda avanzada de pagos</p>
+            <h1 className="text-3xl font-black text-foreground tracking-tight uppercase">Ingresos</h1>
+            <p className="text-muted-foreground font-medium">Gestión y búsqueda avanzada de pagos</p>
           </div>
           <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="h-12 px-4 rounded-xl border-slate-200 text-slate-600 font-bold shadow-sm hover:bg-slate-50 gap-2"
+                  className="h-12 px-4 rounded-xl border-border text-muted-foreground font-bold shadow-sm hover:bg-muted/50 gap-2"
                 >
                   <Download className="h-4 w-4" /> Exportar
                 </Button>
@@ -322,21 +322,21 @@ function Income() {
           </div>
         </header>
 
-        <Card className="border border-gray-100 shadow-sm bg-white rounded-2xl overflow-hidden">
+        <Card className="border border-border/50 shadow-sm bg-card dark:bg-slate-900 rounded-2xl overflow-hidden">
           <CardContent className="p-6">
             <div className="flex flex-col lg:flex-row gap-4 mb-8">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
                 <Input
                   placeholder="Busca por nombre, DNI, recibo u operación..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-12 h-14 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-corp-blue/20 text-slate-700 font-medium placeholder:text-slate-400"
+                  className="pl-12 h-14 bg-muted/50 border-none rounded-2xl focus:ring-2 focus:ring-corp-blue/20 text-foreground/80 font-medium placeholder:text-muted-foreground/70"
                 />
                 {searchInput && (
                   <button 
                     onClick={() => setSearchInput('')}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-muted-foreground"
                   >
                     <FilterX className="h-5 w-5" />
                   </button>
@@ -365,7 +365,7 @@ function Income() {
 
             {/* Vista Escritorio */}
             {!isMobile && (
-              <div className="hidden md:block rounded-xl border border-slate-100 overflow-hidden">
+              <div className="hidden md:block rounded-xl border border-border/50 overflow-hidden">
                 <DataTable
                   columns={incomeColumns}
                   data={filteredData}
@@ -388,16 +388,16 @@ function Income() {
                   const isObserved = income.socio_titulares?.is_payment_observed;
                   return (
                   <Card key={income.id} className={cn(
-                    "border-none shadow-md bg-white rounded-2xl overflow-hidden",
+                    "border-none shadow-md bg-card dark:bg-slate-900 rounded-2xl overflow-hidden",
                     isObserved && "ring-2 ring-amber-400 ring-inset"
                   )}>
                     <div className={cn(
-                      "p-4 border-b border-slate-100 flex justify-between items-center",
-                      isObserved ? "bg-amber-50" : "bg-slate-50/50"
+                      "p-4 border-b border-border/50 flex justify-between items-center",
+                      isObserved ? "bg-amber-50" : "bg-muted/50/50"
                     )}>
                       <div className="flex items-center gap-2">
                         <CalendarIcon className="h-4 w-4 text-corp-blue" />
-                        <span className="text-xs font-bold text-slate-600">
+                        <span className="text-xs font-bold text-muted-foreground">
                           {isValid(incomeDate) ? format(incomeDate, 'dd/MM/yyyy') : 'Fecha inválida'}
                         </span>
                       </div>
@@ -407,24 +407,24 @@ function Income() {
                             Socio Observado
                           </Badge>
                         )}
-                        <Badge variant="outline" className="bg-white font-mono text-corp-blue border-corp-blue/20">
+                        <Badge variant="outline" className="bg-card dark:bg-slate-900 font-mono text-corp-blue border-corp-blue/20">
                           <Hash className="h-3 w-3 mr-1" /> {income.receipt_number}
                         </Badge>
                       </div>
                     </div>
                     <CardContent className="p-4 space-y-4">
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-slate-400">
+                        <div className="flex items-center gap-2 text-muted-foreground/70">
                           <User className="h-3.5 w-3.5" />
                           <span className="text-[10px] font-bold uppercase tracking-wider">Socio Titular</span>
                         </div>
-                        <p className="font-black text-slate-900 uppercase leading-tight">{income.full_name}</p>
+                        <p className="font-black text-foreground uppercase leading-tight">{income.full_name}</p>
                         <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="secondary" className="text-[10px] bg-slate-100 text-slate-600 border-none">
+                          <Badge variant="secondary" className="text-[10px] bg-muted text-muted-foreground border-none">
                             DNI: {income.dni}
                           </Badge>
                           {income.socio_titulares?.localidad && (
-                            <div className="flex items-center gap-1 text-slate-500 text-[10px] font-medium">
+                            <div className="flex items-center gap-1 text-muted-foreground text-[10px] font-medium">
                               <MapPin className="h-3 w-3" /> {income.socio_titulares.localidad}
                             </div>
                           )}
@@ -440,11 +440,11 @@ function Income() {
 
                       <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50">
                         <div className="space-y-1">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase">Operación</span>
-                          <p className="text-xs font-mono font-bold text-slate-600">{income.numeroOperacion || '-'}</p>
+                          <span className="text-[10px] font-bold text-muted-foreground/70 uppercase">Operación</span>
+                          <p className="text-xs font-mono font-bold text-muted-foreground">{income.numeroOperacion || '-'}</p>
                         </div>
                         <div className="text-right space-y-1">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase">Monto</span>
+                          <span className="text-[10px] font-bold text-muted-foreground/70 uppercase">Monto</span>
                           <p className={cn(
                             "text-lg font-black",
                             income.amount >= 0 ? "text-emerald-600" : "text-red-600"
@@ -480,7 +480,7 @@ function Income() {
                   {mobileVisibleCount < filteredData.length ? (
                     <div className="flex flex-col items-center gap-2">
                       <Loader2 className="h-6 w-6 animate-spin text-[#4892CC]" />
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Cargando más registros...</span>
+                      <span className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Cargando más registros...</span>
                     </div>
                   ) : (
                     <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Has llegado al final</span>
@@ -488,8 +488,8 @@ function Income() {
                 </div>
                 </>
               ) : (
-                <div className="text-center py-12 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                  <p className="text-slate-400 font-bold">No se encontraron ingresos</p>
+                <div className="text-center py-12 bg-muted/50 rounded-2xl border-2 border-dashed border-border">
+                  <p className="text-muted-foreground/70 font-bold">No se encontraron ingresos</p>
                 </div>
               )}
             </div>
@@ -502,12 +502,12 @@ function Income() {
         setIsDialogOpen(open);
         if (!open) setSelectedIncome(null);
       }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-100 shadow-premium">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card dark:bg-slate-900 rounded-2xl border border-border/50 shadow-premium">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black text-slate-900 uppercase tracking-tight">
+            <DialogTitle className="text-2xl font-black text-foreground uppercase tracking-tight">
               {selectedIncome ? 'Editar Transacción' : 'Registrar Nueva Transacción'}
             </DialogTitle>
-            <DialogDescription className="text-slate-500 font-medium">
+            <DialogDescription className="text-muted-foreground font-medium">
               {selectedIncome ? 'Modifique los datos del registro seleccionado.' : 'Complete los datos para registrar un ingreso, gasto o devolución.'}
             </DialogDescription>
           </DialogHeader>

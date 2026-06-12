@@ -61,7 +61,7 @@ const DeletionRequestsTable = () => {
         {
             accessorKey: 'created_at',
             header: 'Fecha',
-            cell: ({ row }) => <span className="text-xs font-mono text-gray-500">{new Date(row.original.created_at).toLocaleDateString()}</span>,
+            cell: ({ row }) => <span className="text-xs font-mono text-muted-foreground">{new Date(row.original.created_at).toLocaleDateString()}</span>,
         },
         {
             accessorKey: 'socio_details',
@@ -70,10 +70,10 @@ const DeletionRequestsTable = () => {
                 const socio = row.original.socio_details;
                 return (
                     <div className="flex flex-col">
-                        <span className="font-bold text-gray-900 uppercase text-[11px]">
+                        <span className="font-bold text-foreground uppercase text-[11px]">
                             {socio?.nombres} {socio?.apellidoPaterno}
                         </span>
-                        <span className="text-[10px] text-gray-400 font-mono">DNI: {socio?.dni}</span>
+                        <span className="text-[10px] text-muted-foreground/70 font-mono">DNI: {socio?.dni}</span>
                     </div>
                 );
             }
@@ -94,7 +94,7 @@ const DeletionRequestsTable = () => {
                 const status = row.original.request_status;
                 if (status === 'Pending') return <Badge className="bg-amber-100 text-amber-700 border-none text-[10px] font-black uppercase">Pendiente</Badge>;
                 if (status === 'Approved') return <Badge className="bg-emerald-100 text-emerald-700 border-none text-[10px] font-black uppercase">Aprobado & Borrado</Badge>;
-                return <Badge className="bg-gray-100 text-gray-500 border-none text-[10px] font-black uppercase">Rechazado</Badge>;
+                return <Badge className="bg-muted text-muted-foreground border-none text-[10px] font-black uppercase">Rechazado</Badge>;
             },
         },
         {
@@ -150,8 +150,8 @@ const DeletionRequestsTable = () => {
                     <Trash2 className="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                    <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">Bandeja de Eliminación</h2>
-                    <p className="text-sm text-gray-500 font-medium">Solo los administradores pueden confirmar el borrado definitivo.</p>
+                    <h2 className="text-xl font-black text-foreground uppercase tracking-tight">Bandeja de Eliminación</h2>
+                    <p className="text-sm text-muted-foreground font-medium">Solo los administradores pueden confirmar el borrado definitivo.</p>
                 </div>
             </div>
             

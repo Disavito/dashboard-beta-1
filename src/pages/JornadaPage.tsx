@@ -45,7 +45,7 @@ const JornadaPage = () => {
     <div className="max-w-5xl mx-auto py-6 px-4">
       {isAdmin ? (
         <Tabs defaultValue="mi-jornada" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 bg-gray-100/50 p-1 rounded-2xl">
+          <TabsList className="grid w-full grid-cols-3 mb-8 bg-muted/50 p-1 rounded-2xl">
             <TabsTrigger value="mi-jornada" className="rounded-xl font-bold uppercase text-xs">Mi Jornada</TabsTrigger>
             <TabsTrigger value="seguimiento" className="rounded-xl font-bold uppercase text-xs">Seguimiento</TabsTrigger>
             <TabsTrigger value="registro-manual" className="rounded-xl font-bold uppercase text-xs">Admin</TabsTrigger>

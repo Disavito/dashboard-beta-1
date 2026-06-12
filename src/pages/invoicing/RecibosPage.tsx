@@ -206,10 +206,10 @@ export default function RecibosPage() {
             <Wallet className="h-7 w-7 text-[#4892CC]" />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+            <h1 className="text-3xl font-black text-foreground tracking-tight">
               Emitir Recibo {nextReceiptNumber && <span className="text-[#4892CC] text-2xl">({nextReceiptNumber})</span>}
             </h1>
-            <p className="text-sm text-gray-500 font-medium">Vinculación automática con Socio Documentos.</p>
+            <p className="text-sm text-muted-foreground font-medium">Vinculación automática con Socio Documentos.</p>
           </div>
         </div>
         
@@ -225,7 +225,7 @@ export default function RecibosPage() {
         </Button>
       </div>
 
-      <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm">
+      <div className="bg-card dark:bg-slate-900 border border-border/50 rounded-2xl p-8 shadow-sm">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -235,14 +235,14 @@ export default function RecibosPage() {
                   name="dni"
                   render={({ field }) => (
                     <FormItem>
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">DNI del Socio</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">DNI del Socio</label>
                       <div className="flex gap-3">
                         <FormControl>
                           <Input 
                             placeholder="8 dígitos" 
                             {...field} 
                             maxLength={8} 
-                            className="h-14 bg-gray-50 border-none rounded-2xl text-lg font-bold" 
+                            className="h-14 bg-muted/50 border-none rounded-2xl text-lg font-bold" 
                           />
                         </FormControl>
                         <Button 
@@ -264,11 +264,11 @@ export default function RecibosPage() {
                 name="fecha_emision"
                 render={({ field }) => (
                   <FormItem>
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Fecha Emisión</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Fecha Emisión</label>
                     <FormControl>
                       <DateMaskInput 
                         {...field} 
-                        className="h-14 bg-gray-50 border-none rounded-2xl font-bold" 
+                        className="h-14 bg-muted/50 border-none rounded-2xl font-bold" 
                       />
                     </FormControl>
                     <FormMessage />
@@ -282,9 +282,9 @@ export default function RecibosPage() {
               name="client_name"
               render={({ field }) => (
                 <FormItem>
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Nombre del Titular</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Nombre del Titular</label>
                   <FormControl>
-                    <Input {...field} readOnly className="h-14 bg-gray-100 border-none rounded-2xl font-black text-gray-700 uppercase" />
+                    <Input {...field} readOnly className="h-14 bg-muted border-none rounded-2xl font-black text-foreground/80 uppercase" />
                   </FormControl>
                 </FormItem>
               )}
@@ -296,14 +296,14 @@ export default function RecibosPage() {
                   name="monto"
                   render={({ field }) => (
                     <FormItem>
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Monto Total (S/.)</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Monto Total (S/.)</label>
                       <FormControl>
                         <Input 
                           type="number" 
                           step="0.01" 
                           {...field} 
                           onChange={e => field.onChange(parseFloat(e.target.value))} 
-                          className="h-14 bg-gray-50 border-none rounded-2xl font-black text-2xl text-[#4892CC]" 
+                          className="h-14 bg-muted/50 border-none rounded-2xl font-black text-2xl text-[#4892CC]" 
                         />
                       </FormControl>
                       <FormMessage />
@@ -315,10 +315,10 @@ export default function RecibosPage() {
                   name="metodo_pago"
                   render={({ field }) => (
                     <FormItem>
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Método de Pago</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Método de Pago</label>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="h-14 bg-gray-50 border-none rounded-2xl font-bold">
+                          <SelectTrigger className="h-14 bg-muted/50 border-none rounded-2xl font-bold">
                             <SelectValue />
                           </SelectTrigger>
                         </FormControl>
@@ -336,9 +336,9 @@ export default function RecibosPage() {
               name="concepto"
               render={({ field }) => (
                 <FormItem>
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Concepto del Pago</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Concepto del Pago</label>
                   <FormControl>
-                    <Input {...field} className="h-14 bg-gray-50 border-none rounded-2xl font-medium" />
+                    <Input {...field} className="h-14 bg-muted/50 border-none rounded-2xl font-medium" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -351,7 +351,7 @@ export default function RecibosPage() {
                 name="numero_operacion"
                 render={({ field }) => (
                   <FormItem className="animate-in fade-in slide-in-from-top-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">N° de Operación Bancaria</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">N° de Operación Bancaria</label>
                     <FormControl>
                       <Input {...field} className="h-14 bg-[#E8F1F8] border-none rounded-2xl font-mono font-bold text-[#4892CC]" />
                     </FormControl>
@@ -364,7 +364,7 @@ export default function RecibosPage() {
             {/* SECCIÓN DE PAGO OBSERVADO */}
             <div className={cn(
               "p-6 rounded-2xl transition-all duration-300 border-2",
-              isObserved ? "bg-amber-50 border-amber-200" : "bg-gray-50/50 border-transparent"
+              isObserved ? "bg-amber-50 border-amber-200" : "bg-muted/50/50 border-transparent"
             )}>
               <FormField
                 control={form.control}
@@ -375,12 +375,12 @@ export default function RecibosPage() {
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
-                        className="h-6 w-6 rounded-lg border-gray-300 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
+                        className="h-6 w-6 rounded-lg border-border data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel className="text-sm font-black text-gray-700 uppercase tracking-tight flex items-center gap-2">
-                        <AlertCircle className={cn("h-4 w-4", isObserved ? "text-amber-600" : "text-gray-400")} />
+                      <FormLabel className="text-sm font-black text-foreground/80 uppercase tracking-tight flex items-center gap-2">
+                        <AlertCircle className={cn("h-4 w-4", isObserved ? "text-amber-600" : "text-muted-foreground/70")} />
                         Observar este pago
                       </FormLabel>
                     </div>
@@ -397,7 +397,7 @@ export default function RecibosPage() {
                       <FormControl>
                         <Textarea 
                           placeholder="Describa el motivo de la observación (ej. Monto incompleto, falta firma, etc.)"
-                          className="min-h-[100px] bg-white border-amber-100 rounded-2xl focus:ring-amber-500/20 font-medium text-amber-900 placeholder:text-amber-300"
+                          className="min-h-[100px] bg-card dark:bg-slate-900 border-amber-100 rounded-2xl focus:ring-amber-500/20 font-medium text-amber-900 placeholder:text-amber-300"
                           {...field}
                         />
                       </FormControl>

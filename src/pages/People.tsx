@@ -170,26 +170,26 @@ function People() {
     {
       accessorKey: 'dni',
       header: ({ column }) => (
-        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-gray-700" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-foreground/80" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           DNI <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       ),
-      cell: ({ row }) => <span className="font-mono text-sm text-gray-900">{row.getValue('dni')}</span>,
+      cell: ({ row }) => <span className="font-mono text-sm text-foreground">{row.getValue('dni')}</span>,
     },
     {
       accessorKey: 'nombres',
       header: ({ column }) => (
-        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-gray-700" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-foreground/80" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Socio Titular <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       ),
       sortingFn: sortNames,
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <span className="font-bold uppercase text-gray-900 leading-tight">
+          <span className="font-bold uppercase text-foreground leading-tight">
             {row.original.nombres} {row.original.apellidoPaterno}
           </span>
-          <span className="text-[10px] text-gray-400 uppercase font-medium">
+          <span className="text-[10px] text-muted-foreground/70 uppercase font-medium">
             {row.original.apellidoMaterno}
           </span>
         </div>
@@ -200,15 +200,15 @@ function People() {
       header: 'Ubicación',
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <span className="uppercase text-[11px] font-bold text-gray-700">{row.getValue('localidad')}</span>
-          <span className="text-[10px] font-mono text-gray-400">Mz: {row.original.mz || '-'} Lt: {row.original.lote || '-'}</span>
+          <span className="uppercase text-[11px] font-bold text-foreground/80">{row.getValue('localidad')}</span>
+          <span className="text-[10px] font-mono text-muted-foreground/70">Mz: {row.original.mz || '-'} Lt: {row.original.lote || '-'}</span>
         </div>
       ),
     },
     {
       accessorKey: 'receiptNumber',
       header: ({ column }) => (
-        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-gray-700" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-foreground/80" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Último Mov. <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       ),
@@ -221,14 +221,14 @@ function People() {
           )}>
             {row.original.receiptNumber}
           </span>
-          <span className="text-[9px] text-gray-400 uppercase font-black">{row.original.lastTransactionType || 'Sin registro'}</span>
+          <span className="text-[9px] text-muted-foreground/70 uppercase font-black">{row.original.lastTransactionType || 'Sin registro'}</span>
         </div>
       ),
     },
     {
       accessorKey: 'status',
       header: ({ column }) => (
-        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-gray-700" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-foreground/80" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Estado <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       ),
@@ -238,7 +238,7 @@ function People() {
           'Activo': { color: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: CheckCircle2 },
           'Inactivo': { color: 'bg-amber-100 text-amber-700 border-amber-200', icon: AlertCircle },
           'Retirado': { color: 'bg-red-100 text-red-700 border-red-200', icon: UserMinus },
-          'Sin Registro': { color: 'bg-gray-100 text-gray-500 border-gray-200', icon: XCircle },
+          'Sin Registro': { color: 'bg-muted text-muted-foreground border-border', icon: XCircle },
         };
         const config = statusConfig[status as keyof typeof statusConfig] || statusConfig['Activo'];
         const Icon = config.icon;
@@ -254,7 +254,7 @@ function People() {
       id: 'observaciones',
       accessorFn: (row: any) => `${row.observacion || ''} ${row.payment_observation_detail || ''}`.trim(),
       header: ({ column }) => (
-        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-gray-700" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button variant="ghost" className="pl-0 hover:bg-transparent font-semibold text-foreground/80" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Observaciones <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       ),
@@ -335,27 +335,27 @@ function People() {
 
   if ((loading && socios.length === 0) || userLoading) return (
     <div className="min-h-screen bg-[#FAFBFC] page-enter pb-10">
-      <div className="w-full bg-white border-b border-gray-100 py-12 px-8 shadow-sm mb-8">
+      <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8">
         <div className="max-w-7xl mx-auto">
           <div className="h-8 w-64 bg-slate-200 rounded-xl animate-pulse mb-3" />
-          <div className="h-4 w-96 bg-slate-100 rounded-lg animate-pulse" />
+          <div className="h-4 w-96 bg-muted rounded-lg animate-pulse" />
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex gap-4 mb-6">
-          <div className="h-10 w-64 bg-white rounded-xl border animate-pulse" />
-          <div className="h-10 w-40 bg-white rounded-xl border animate-pulse" />
-          <div className="h-10 w-40 bg-white rounded-xl border animate-pulse" />
+          <div className="h-10 w-64 bg-card dark:bg-slate-900 rounded-xl border animate-pulse" />
+          <div className="h-10 w-40 bg-card dark:bg-slate-900 rounded-xl border animate-pulse" />
+          <div className="h-10 w-40 bg-card dark:bg-slate-900 rounded-xl border animate-pulse" />
         </div>
-        <Card className="rounded-2xl border-gray-100 shadow-glass overflow-hidden">
+        <Card className="rounded-2xl border-border/50 shadow-glass overflow-hidden">
           <div className="divide-y divide-gray-50">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="flex items-center gap-6 px-6 py-4">
-                <div className="h-4 w-24 bg-slate-100 rounded animate-pulse" />
-                <div className="h-4 w-48 bg-slate-100 rounded animate-pulse" />
-                <div className="h-4 w-20 bg-slate-100 rounded animate-pulse" />
-                <div className="h-6 w-16 bg-slate-100 rounded-full animate-pulse" />
-                <div className="h-4 w-24 bg-slate-100 rounded animate-pulse ml-auto" />
+                <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+                <div className="h-4 w-48 bg-muted rounded animate-pulse" />
+                <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+                <div className="h-6 w-16 bg-muted rounded-full animate-pulse" />
+                <div className="h-4 w-24 bg-muted rounded animate-pulse ml-auto" />
               </div>
             ))}
           </div>
@@ -366,13 +366,13 @@ function People() {
 
   return (
     <div className="min-h-screen bg-[#FAFBFC] page-enter pb-10">
-      <div className="w-full bg-white border-b border-gray-100 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
+      <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#4892CC]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <h1 className="text-4xl font-black text-gray-900 tracking-tight">Gestión de Socios</h1>
-              <p className="text-gray-500 font-medium mt-1">Control de estados basado en el movimiento más reciente.</p>
+              <h1 className="text-4xl font-black text-foreground tracking-tight">Gestión de Socios</h1>
+              <p className="text-muted-foreground font-medium mt-1">Control de estados basado en el movimiento más reciente.</p>
               <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-[#4892CC]/10 text-[#4892CC] rounded-xl text-sm font-bold">
                 <Users className="w-4 h-4" />
                 <span>{totalCount} socio{totalCount !== 1 ? 's' : ''} encontrado{totalCount !== 1 ? 's' : ''}</span>
@@ -387,13 +387,13 @@ function People() {
 
       <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-8">
         {/* Filtros Enterprise (Minimalistas y Profesionales) */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
+        <div className="bg-card dark:bg-slate-900 rounded-xl border border-border shadow-sm p-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
           <div className="flex items-center gap-3 w-full lg:w-auto flex-wrap">
             <div className="relative w-full sm:w-[280px] shrink-0">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70 z-10" />
               <DebouncedSearchInput 
                 placeholder="Buscar socio..." 
-                className="pl-9 bg-white border border-gray-200 focus:ring-1 focus:ring-slate-300 h-9 rounded-md font-medium w-full shadow-sm text-sm transition-all" 
+                className="pl-9 bg-card dark:bg-slate-900 border border-border focus:ring-1 focus:ring-slate-300 h-9 rounded-md font-medium w-full shadow-sm text-sm transition-all" 
                 value={debouncedSearch}
                 onChange={setDebouncedSearch}
               />
@@ -402,7 +402,7 @@ function People() {
             {/* Filtros Combinados (Dropdowns) */}
             <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
               <Select value={viewFilter} onValueChange={setViewFilter}>
-                <SelectTrigger className="h-9 w-full sm:w-[170px] rounded-md border shadow-sm text-xs font-medium bg-white text-gray-700 border-gray-200 hover:bg-gray-50 focus:ring-1 focus:ring-slate-300">
+                <SelectTrigger className="h-9 w-full sm:w-[170px] rounded-md border shadow-sm text-xs font-medium bg-card dark:bg-slate-900 text-foreground/80 border-border hover:bg-muted/50 focus:ring-1 focus:ring-slate-300">
                   <SelectValue placeholder="Estado y Alertas" />
                 </SelectTrigger>
                 <SelectContent className="rounded-md">
@@ -410,9 +410,9 @@ function People() {
                   <SelectItem value="activos" className="text-emerald-700 font-medium">Activos</SelectItem>
                   <SelectItem value="alertas_pago" className="text-red-600 font-medium">Alertas de Pago</SelectItem>
                   <SelectItem value="alertas_generales" className="text-amber-600 font-medium">Alertas Generales</SelectItem>
-                  <SelectItem value="inactivos" className="text-slate-600">Inactivos</SelectItem>
-                  <SelectItem value="retirados" className="text-slate-600">Retirados</SelectItem>
-                  <SelectItem value="sin_registro" className="text-slate-400">No Registrados</SelectItem>
+                  <SelectItem value="inactivos" className="text-muted-foreground">Inactivos</SelectItem>
+                  <SelectItem value="retirados" className="text-muted-foreground">Retirados</SelectItem>
+                  <SelectItem value="sin_registro" className="text-muted-foreground/70">No Registrados</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -421,7 +421,7 @@ function People() {
                 onValueChange={setSelectedLocalidad}
                 triggerClassName={cn(
                   "h-9 rounded-md border shadow-sm text-xs font-medium transition-colors px-3 w-full sm:w-auto",
-                  selectedLocalidad !== 'all' ? "bg-slate-100 text-slate-800 border-slate-300" : "bg-white text-gray-600 hover:bg-gray-50 border-gray-200"
+                  selectedLocalidad !== 'all' ? "bg-muted text-foreground/90 border-border" : "bg-card dark:bg-slate-900 text-muted-foreground hover:bg-muted/50 border-border"
                 )}
                 distritoFilter={selectedDistrito}
               />
@@ -431,7 +431,7 @@ function People() {
                 onValueChange={setSelectedDistrito}
                 triggerClassName={cn(
                   "h-9 rounded-md border shadow-sm text-xs font-medium transition-colors px-3 w-full sm:w-auto",
-                  selectedDistrito !== 'all' ? "bg-slate-100 text-slate-800 border-slate-300" : "bg-white text-gray-600 hover:bg-gray-50 border-gray-200"
+                  selectedDistrito !== 'all' ? "bg-muted text-foreground/90 border-border" : "bg-card dark:bg-slate-900 text-muted-foreground hover:bg-muted/50 border-border"
                 )}
               />
 
@@ -439,7 +439,7 @@ function People() {
                 <Button 
                   variant="ghost" 
                   onClick={() => { setSelectedLocalidad('all'); setSelectedDistrito('all'); setViewFilter('all'); }}
-                  className="h-9 rounded-md px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                  className="h-9 rounded-md px-2 text-muted-foreground/70 hover:text-muted-foreground hover:bg-muted"
                   title="Limpiar filtros"
                 >
                   <XCircle className="h-4 w-4" />
@@ -452,7 +452,7 @@ function People() {
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="outline" 
-                className="h-9 border-gray-200 text-gray-700 gap-2 rounded-md font-medium px-4 hover:bg-gray-100 shadow-sm shrink-0 w-full lg:w-auto mt-2 lg:mt-0"
+                className="h-9 border-border text-foreground/80 gap-2 rounded-md font-medium px-4 hover:bg-muted shadow-sm shrink-0 w-full lg:w-auto mt-2 lg:mt-0"
               >
                 <Download className="h-4 w-4" /> <span className="hidden sm:inline">Exportar</span>
               </Button>
@@ -503,7 +503,7 @@ function People() {
                 className="gap-2 font-medium cursor-pointer"
                 onClick={() => setIsExportDialogOpen(true)}
               >
-                <Settings2 className="h-4 w-4 text-slate-500" />
+                <Settings2 className="h-4 w-4 text-muted-foreground" />
                 Exportación Avanzada...
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -544,15 +544,15 @@ function People() {
                       "w-full border shadow-sm rounded-2xl overflow-hidden transition-colors",
                       socio.is_payment_observed ? "bg-red-50/60 border-red-100" :
                       socio.isObservado ? "bg-amber-50/60 border-amber-100" :
-                      "bg-white border-gray-100"
+                      "bg-card dark:bg-slate-900 border-border/50"
                     )}
                   >
                     <div className="p-5 space-y-3">
                       {/* Header: Nombre + Estado */}
                       <div className="flex justify-between items-start gap-2">
                         <div className="flex flex-col min-w-0">
-                          <span className="text-[10px] font-mono font-bold text-gray-400">DNI {socio.dni}</span>
-                          <h3 className="text-base font-black text-gray-900 uppercase leading-tight mt-0.5 truncate">
+                          <span className="text-[10px] font-mono font-bold text-muted-foreground/70">DNI {socio.dni}</span>
+                          <h3 className="text-base font-black text-foreground uppercase leading-tight mt-0.5 truncate">
                             {socio.nombres} {socio.apellidoPaterno} {socio.apellidoMaterno}
                           </h3>
                         </div>
@@ -560,7 +560,7 @@ function People() {
                           "font-black border px-2.5 py-0.5 rounded-full text-[9px] uppercase tracking-wider shrink-0",
                           socio.status === 'Activo' ? "bg-emerald-100 text-emerald-700" : 
                           socio.status === 'Inactivo' ? "bg-amber-100 text-amber-700" : 
-                          socio.status === 'Retirado' ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"
+                          socio.status === 'Retirado' ? "bg-red-100 text-red-700" : "bg-muted text-muted-foreground"
                         )}>
                           {socio.status}
                         </Badge>
@@ -569,20 +569,20 @@ function People() {
                       {/* Info Grid: Localidad, Mz/Lt, Recibo */}
                       <div className="grid grid-cols-3 gap-3 py-3 border-y border-gray-50">
                         <div>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Comunidad</p>
-                          <p className="text-xs font-bold text-gray-700 uppercase truncate">{socio.localidad || 'N/A'}</p>
+                          <p className="text-[9px] font-black text-muted-foreground/70 uppercase tracking-widest mb-0.5">Comunidad</p>
+                          <p className="text-xs font-bold text-foreground/80 uppercase truncate">{socio.localidad || 'N/A'}</p>
                         </div>
                         <div>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Ubicación</p>
-                          <p className="text-xs font-bold text-gray-700">Mz {socio.mz || '-'} Lt {socio.lote || '-'}</p>
+                          <p className="text-[9px] font-black text-muted-foreground/70 uppercase tracking-widest mb-0.5">Ubicación</p>
+                          <p className="text-xs font-bold text-foreground/80">Mz {socio.mz || '-'} Lt {socio.lote || '-'}</p>
                         </div>
                         <div>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Recibo</p>
+                          <p className="text-[9px] font-black text-muted-foreground/70 uppercase tracking-widest mb-0.5">Recibo</p>
                           <p className={cn(
                             "text-xs font-bold font-mono",
                             socio.lastTransactionType?.toLowerCase().includes('anulacion') ? "text-red-400 line-through" : "text-blue-600"
                           )}>{socio.receiptNumber}</p>
-                          <p className="text-[8px] text-gray-400 uppercase font-black truncate">{socio.lastTransactionType || ''}</p>
+                          <p className="text-[8px] text-muted-foreground/70 uppercase font-black truncate">{socio.lastTransactionType || ''}</p>
                         </div>
                       </div>
 
@@ -630,10 +630,10 @@ function People() {
 
                       {/* Acciones */}
                       <div className="flex justify-end gap-2 pt-1">
-                        <Button variant="outline" size="sm" className="h-9 rounded-xl font-bold border-gray-100 text-blue-600 text-xs" onClick={() => { setSocioToEdit(socio); setIsEditDialogOpen(true); }}>
+                        <Button variant="outline" size="sm" className="h-9 rounded-xl font-bold border-border/50 text-blue-600 text-xs" onClick={() => { setSocioToEdit(socio); setIsEditDialogOpen(true); }}>
                           <Edit className="h-3.5 w-3.5 mr-1.5" /> Editar
                         </Button>
-                        <Button variant="outline" size="sm" className="h-9 w-9 p-0 rounded-xl border-gray-100 text-red-400" onClick={() => { setSocioToDelete(socio); setIsDeleteDialogOpen(true); }}>
+                        <Button variant="outline" size="sm" className="h-9 w-9 p-0 rounded-xl border-border/50 text-red-400" onClick={() => { setSocioToDelete(socio); setIsDeleteDialogOpen(true); }}>
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
@@ -645,7 +645,7 @@ function People() {
                 {mobileVisibleCount < socios.length ? (
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="h-6 w-6 animate-spin text-[#4892CC]" />
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Cargando más socios...</span>
+                    <span className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Cargando más socios...</span>
                   </div>
                 ) : (
                   <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Has llegado al final</span>
@@ -653,8 +653,8 @@ function People() {
               </div>
             </>
           ) : (
-            <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
-              <p className="text-gray-400 font-bold">No se encontraron socios</p>
+            <div className="text-center py-20 bg-card dark:bg-slate-900 rounded-2xl border border-dashed border-border">
+              <p className="text-muted-foreground/70 font-bold">No se encontraron socios</p>
             </div>
           )}
         </div>
@@ -663,19 +663,19 @@ function People() {
 
       {/* Diálogos */}
       <Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white border-none rounded-2xl p-0 overflow-hidden">
+        <DialogContent className="max-w-2xl bg-card dark:bg-slate-900 border-none rounded-2xl p-0 overflow-hidden">
           <SocioTitularRegistrationForm onClose={() => setIsRegistrationDialogOpen(false)} onSuccess={() => setIsRegistrationDialogOpen(false)} />
         </DialogContent>
       </Dialog>
 
       <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-white border-none rounded-[2rem]">
+        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-card dark:bg-slate-900 border-none rounded-[2rem]">
           <ExportSociosDialog onClose={() => setIsExportDialogOpen(false)} data={socios} />
         </DialogContent>
       </Dialog>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white border-none rounded-2xl p-0 overflow-hidden">
+        <DialogContent className="max-w-2xl bg-card dark:bg-slate-900 border-none rounded-2xl p-0 overflow-hidden">
           {socioToEdit && <SocioTitularRegistrationForm socioId={socioToEdit.id} onClose={() => setIsEditDialogOpen(false)} onSuccess={() => setIsEditDialogOpen(false)} />}
         </DialogContent>
       </Dialog>

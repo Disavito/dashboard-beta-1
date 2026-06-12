@@ -126,16 +126,16 @@ export function DataTable<TData, TValue>({
       <div 
         ref={enableVirtualization ? parentRef : null}
         className={cn(
-          "rounded-2xl border border-gray-100 bg-white overflow-auto shadow-sm",
+          "rounded-2xl border border-border/50 bg-card dark:bg-slate-900 overflow-auto shadow-sm",
           enableVirtualization ? "max-h-[60vh]" : ""
         )}
       >
         <Table>
-          <TableHeader className="bg-gray-50/50 sticky top-0 z-20 shadow-sm">
+          <TableHeader className="bg-muted/50/50 sticky top-0 z-20 shadow-sm">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent border-gray-100">
+              <TableRow key={headerGroup.id} className="hover:bg-transparent border-border/50">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="h-12 text-gray-500 font-bold text-xs uppercase tracking-wider whitespace-nowrap px-4 bg-gray-50/95 backdrop-blur-sm">
+                  <TableHead key={header.id} className="h-12 text-muted-foreground font-bold text-xs uppercase tracking-wider whitespace-nowrap px-4 bg-muted/50/95 backdrop-blur-sm">
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
@@ -148,7 +148,7 @@ export function DataTable<TData, TValue>({
                 <TableCell colSpan={columns.length} className="h-48 text-center">
                   <div className="flex flex-col items-center justify-center gap-3">
                     <Loader2 className="h-8 w-8 animate-spin text-[#4892CC]" />
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Cargando datos...</p>
+                    <p className="text-xs font-bold text-muted-foreground/70 uppercase tracking-widest">Cargando datos...</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -165,10 +165,10 @@ export function DataTable<TData, TValue>({
                     return (
                       <TableRow 
                         key={row.id} 
-                        className={cn("border-gray-50 hover:bg-slate-50/70 transition-colors duration-150", rowClassName?.(row))}
+                        className={cn("border-gray-50 hover:bg-muted/50/70 transition-colors duration-150", rowClassName?.(row))}
                       >
                         {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id} className="py-4 px-4 text-sm text-gray-600 whitespace-nowrap">
+                          <TableCell key={cell.id} className="py-4 px-4 text-sm text-muted-foreground whitespace-nowrap">
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </TableCell>
                         ))}
@@ -185,10 +185,10 @@ export function DataTable<TData, TValue>({
                 rows.map((row) => (
                   <TableRow 
                     key={row.id} 
-                    className={cn("border-gray-50 hover:bg-slate-50/70 transition-colors duration-150", rowClassName?.(row))}
+                    className={cn("border-gray-50 hover:bg-muted/50/70 transition-colors duration-150", rowClassName?.(row))}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-4 px-4 text-sm text-gray-600 whitespace-nowrap">
+                      <TableCell key={cell.id} className="py-4 px-4 text-sm text-muted-foreground whitespace-nowrap">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
@@ -199,11 +199,11 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-64 text-center">
                   <div className="flex flex-col items-center justify-center py-12">
-                    <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
+                    <div className="w-16 h-16 bg-muted/50 rounded-2xl flex items-center justify-center mb-4">
                       <EmptyIcon className="h-8 w-8 text-gray-300" />
                     </div>
-                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-tight">{emptyTitle}</h3>
-                    <p className="text-xs text-gray-400 mt-1 max-w-[200px] mx-auto">{emptyDescription}</p>
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-tight">{emptyTitle}</h3>
+                    <p className="text-xs text-muted-foreground/70 mt-1 max-w-[200px] mx-auto">{emptyDescription}</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -214,14 +214,14 @@ export function DataTable<TData, TValue>({
 
       {!enableVirtualization && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-2">
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+          <div className="text-xs font-bold text-muted-foreground/70 uppercase tracking-widest">
             Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="rounded-xl border-gray-200 font-bold text-gray-600 hover:bg-[#E8F1F8] hover:text-[#4892CC] transition-all duration-200"
+              className="rounded-xl border-border font-bold text-muted-foreground hover:bg-[#E8F1F8] hover:text-[#4892CC] transition-all duration-200"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
@@ -230,7 +230,7 @@ export function DataTable<TData, TValue>({
             <Button
               variant="outline"
               size="sm"
-              className="rounded-xl border-gray-200 font-bold text-gray-600 hover:bg-[#E8F1F8] hover:text-[#4892CC] transition-all duration-200"
+              className="rounded-xl border-border font-bold text-muted-foreground hover:bg-[#E8F1F8] hover:text-[#4892CC] transition-all duration-200"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >

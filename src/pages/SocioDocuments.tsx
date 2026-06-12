@@ -229,14 +229,14 @@ function SocioDocuments() {
   const SortableHeader = ({ label, sortKey, className }: { label: string, sortKey: SortConfig['key'], className?: string }) => {
     const isActive = sortConfig.key === sortKey;
     return (
-      <th className={cn("p-4 cursor-pointer hover:bg-gray-100/80 transition-colors group", className)} onClick={() => handleSort(sortKey)}>
+      <th className={cn("p-4 cursor-pointer hover:bg-muted/80 transition-colors group", className)} onClick={() => handleSort(sortKey)}>
         <div className="flex items-center gap-2">
           {label}
           <div className="flex flex-col">
             {isActive ? (
               sortConfig.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-[#4892CC]" /> : <ArrowDown className="w-3 h-3 text-[#4892CC]" />
             ) : (
-              <ArrowUpDown className="w-3 h-3 text-gray-300 group-hover:text-gray-400" />
+              <ArrowUpDown className="w-3 h-3 text-gray-300 group-hover:text-muted-foreground/70" />
             )}
           </div>
         </div>
@@ -251,13 +251,13 @@ function SocioDocuments() {
           <FileText className="w-6 h-6" />
           <h1 className="text-2xl font-bold">Socio y Documentos</h1>
         </div>
-        <p className="text-gray-500 text-sm">
+        <p className="text-muted-foreground text-sm">
           Tabla de socios con enlaces directos a sus documentos, estado de pago y filtros de búsqueda.
         </p>
       </div>
 
       <Tabs defaultValue="expedientes" className="w-full">
-        <TabsList className="bg-white border border-gray-200 p-1 mb-4">
+        <TabsList className="bg-card dark:bg-slate-900 border border-border p-1 mb-4">
           <TabsTrigger value="expedientes" className="data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-semibold px-6">
             EXPEDIENTES
           </TabsTrigger>
@@ -268,19 +268,19 @@ function SocioDocuments() {
         </TabsList>
 
         <TabsContent value="expedientes" className="space-y-4">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center bg-card dark:bg-slate-900 p-4 rounded-xl border border-border/50 shadow-sm">
             <div className="relative w-full lg:flex-1 lg:min-w-[400px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
               <Input 
                 placeholder="Buscar por DNI, nombre, apellidos, Mz o Lote..." 
-                className="pl-10 bg-white border-gray-200 focus:ring-[#4892CC]/30"
+                className="pl-10 bg-card dark:bg-slate-900 border-border focus:ring-[#4892CC]/30"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <Select value={localidadFilter} onValueChange={setLocalidadFilter}>
-              <SelectTrigger className="w-full md:w-[250px] bg-white border-gray-200">
-                <Filter className="w-4 h-4 mr-2 text-gray-400" />
+              <SelectTrigger className="w-full md:w-[250px] bg-card dark:bg-slate-900 border-border">
+                <Filter className="w-4 h-4 mr-2 text-muted-foreground/70" />
                 <SelectValue placeholder="Todas las localidades" />
               </SelectTrigger>
               <SelectContent>
@@ -292,11 +292,11 @@ function SocioDocuments() {
             </Select>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+          <div className="bg-card dark:bg-slate-900 rounded-xl border border-border overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-100 bg-gray-50/50 text-gray-600 text-xs font-bold">
+                  <tr className="border-b border-border/50 bg-muted/50/50 text-muted-foreground text-xs font-bold">
                     <th className="p-4 w-10"><Checkbox disabled /></th>
                     <SortableHeader label="Nombre Completo" sortKey="nombreCompleto" />
                     <SortableHeader label="DNI" sortKey="dni" />
@@ -318,19 +318,19 @@ function SocioDocuments() {
                     </tr>
                   ) : filteredSocios.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="p-12 text-center text-gray-400 italic">
+                      <td colSpan={10} className="p-12 text-center text-muted-foreground/70 italic">
                         No se encontraron resultados.
                       </td>
                     </tr>
                   ) : filteredSocios.map((socio) => (
-                    <tr key={socio.id} className="hover:bg-gray-50/50 transition-colors group text-sm">
+                    <tr key={socio.id} className="hover:bg-muted/50/50 transition-colors group text-sm">
                       <td className="p-4"><Checkbox /></td>
-                      <td className="p-4 font-medium text-gray-700 uppercase">
+                      <td className="p-4 font-medium text-foreground/80 uppercase">
                         {socio.nombres} {socio.apellidoPaterno} {socio.apellidoMaterno}
                       </td>
-                      <td className="p-4 text-gray-500 font-mono">{socio.dni || 'N/A'}</td>
-                      <td className="p-4 text-center font-bold text-gray-700">{socio.mz || 'N/A'}</td>
-                      <td className="p-4 text-center font-bold text-gray-700">{socio.lote || 'N/A'}</td>
+                      <td className="p-4 text-muted-foreground font-mono">{socio.dni || 'N/A'}</td>
+                      <td className="p-4 text-center font-bold text-foreground/80">{socio.mz || 'N/A'}</td>
+                      <td className="p-4 text-center font-bold text-foreground/80">{socio.lote || 'N/A'}</td>
                       <td className="p-4 text-center">
                         <Checkbox checked={socio.is_lote_medido} disabled className="data-[state=checked]:bg-[#4892CC] data-[state=checked]:border-[#4892CC]" />
                       </td>
@@ -346,12 +346,12 @@ function SocioDocuments() {
                           {socio.paymentStatus}
                         </Badge>
                       </td>
-                      <td className="p-4 text-center text-gray-500">{socio.nroRecibo}</td>
+                      <td className="p-4 text-center text-muted-foreground">{socio.nroRecibo}</td>
                       
                       <td className="p-4">
                         <div className="flex flex-wrap gap-1.5">
                           {socio.documentos.length === 0 ? (
-                            <span className="text-gray-400 italic text-xs">Sin documentos</span>
+                            <span className="text-muted-foreground/70 italic text-xs">Sin documentos</span>
                           ) : (
                             socio.documentos.map((doc: any, idx: number) => (
                               <DocumentLinkPill
@@ -379,7 +379,7 @@ function SocioDocuments() {
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
-                                  className="h-7 text-[10px] font-bold border-gray-200 hover:bg-gray-50"
+                                  className="h-7 text-[10px] font-bold border-border hover:bg-muted/50"
                                   onClick={() => setUploadModal({ 
                                     isOpen: true, 
                                     socioId: socio.id, 
@@ -394,7 +394,7 @@ function SocioDocuments() {
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
-                                  className="h-7 text-[10px] font-bold border-gray-200 hover:bg-gray-50"
+                                  className="h-7 text-[10px] font-bold border-border hover:bg-muted/50"
                                   onClick={() => setUploadModal({ 
                                     isOpen: true, 
                                     socioId: socio.id, 
@@ -418,7 +418,7 @@ function SocioDocuments() {
         </TabsContent>
 
         <TabsContent value="solicitudes">
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <div className="bg-card dark:bg-slate-900 rounded-xl border border-border p-6 shadow-sm">
             <DeletionRequestsTable />
           </div>
         </TabsContent>

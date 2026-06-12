@@ -227,7 +227,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
             name="transaction_type"
             render={({ field }) => (
               <FormItem className="md:col-span-2">
-                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Tipo de Transacción</FormLabel>
+                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Tipo de Transacción</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger className={cn(
@@ -257,9 +257,9 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
             name="date"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Fecha</FormLabel>
+                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Fecha</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} className="h-12 bg-slate-50 border-none rounded-xl font-medium" />
+                  <Input type="date" {...field} className="h-12 bg-muted/50 border-none rounded-xl font-medium" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -271,9 +271,9 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
             name="receipt_number"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nº Recibo / Documento</FormLabel>
+                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Nº Recibo / Documento</FormLabel>
                 <FormControl>
-                  <Input placeholder="R-00001" {...field} className="h-12 bg-slate-50 border-none rounded-xl font-mono font-bold" />
+                  <Input placeholder="R-00001" {...field} className="h-12 bg-muted/50 border-none rounded-xl font-mono font-bold" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -285,19 +285,19 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
             name="dni"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">DNI del Socio</FormLabel>
+                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">DNI del Socio</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input 
                       placeholder={transactionType === 'Gasto' ? "Opcional para gastos" : "8 dígitos"}
                       {...field} 
                       maxLength={8} 
-                      className="pl-10 h-12 bg-slate-50 border-none rounded-xl font-mono" 
+                      className="pl-10 h-12 bg-muted/50 border-none rounded-xl font-mono" 
                     />
                     {isSearchingDni ? (
                       <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-corp-blue animate-spin" />
                     ) : (
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
                     )}
                   </div>
                 </FormControl>
@@ -311,12 +311,12 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
             name="full_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nombre Completo</FormLabel>
+                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Nombre Completo</FormLabel>
                 <FormControl>
                   <Input 
                     placeholder={transactionType === 'Gasto' ? "Concepto / Nombre del gasto" : "Nombre del socio"} 
                     {...field} 
-                    className="h-12 bg-slate-50 border-none rounded-xl font-bold uppercase" 
+                    className="h-12 bg-muted/50 border-none rounded-xl font-bold uppercase" 
                     readOnly={isSearchingDni || (Boolean(dniValue) && dniValue!.length === 8 && !dniNotFound)}
                   />
                 </FormControl>
@@ -330,7 +330,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
             name="amount"
             render={({ field }) => (
               <FormItem className="md:col-span-2">
-                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">
                   Monto (S/.)
                 </FormLabel>
                 <FormControl>
@@ -343,8 +343,8 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
                       disabled={transactionType === 'Anulación'}
                       onChange={e => field.onChange(parseFloat(e.target.value))}
                       className={cn(
-                        "h-16 pl-12 bg-slate-50 border-none rounded-2xl font-black text-2xl transition-all",
-                        transactionType === 'Anulación' && "bg-slate-100 text-slate-400",
+                        "h-16 pl-12 bg-muted/50 border-none rounded-2xl font-black text-2xl transition-all",
+                        transactionType === 'Anulación' && "bg-muted text-muted-foreground/70",
                         (transactionType === 'Devolución' || transactionType === 'Gasto') && "text-red-600",
                         (transactionType === 'Ingreso' || transactionType === 'Recibo de Pago') && "text-emerald-600"
                       )} 
@@ -374,10 +374,10 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
             name="account"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Cuenta / Método</FormLabel>
+                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Cuenta / Método</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger className="h-12 bg-slate-50 border-none rounded-xl font-medium">
+                    <SelectTrigger className="h-12 bg-muted/50 border-none rounded-xl font-medium">
                       <SelectValue placeholder="Seleccionar cuenta" />
                     </SelectTrigger>
                   </FormControl>
@@ -397,14 +397,14 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
             name="numeroOperacion"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nº Operación (Opcional)</FormLabel>
+                <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Nº Operación (Opcional)</FormLabel>
                 <FormControl>
                   <Input 
                     type="number" 
                     placeholder="Ej: 123456" 
                     value={field.value || ''} 
                     onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : null)}
-                    className="h-12 bg-slate-50 border-none rounded-xl font-mono" 
+                    className="h-12 bg-muted/50 border-none rounded-xl font-mono" 
                   />
                 </FormControl>
                 <FormMessage />
@@ -415,7 +415,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
 
         <div className={cn(
           "p-6 rounded-2xl transition-all duration-300 border-2",
-          isObserved ? "bg-amber-50 border-amber-200" : "bg-slate-50/50 border-transparent"
+          isObserved ? "bg-amber-50 border-amber-200" : "bg-muted/50/50 border-transparent"
         )}>
           <FormField
             control={form.control}
@@ -426,12 +426,12 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    className="h-6 w-6 rounded-lg border-slate-300 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
+                    className="h-6 w-6 rounded-lg border-border data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
-                  <FormLabel className="text-sm font-black text-slate-700 uppercase tracking-tight flex items-center gap-2">
-                    <AlertCircle className={cn("h-4 w-4", isObserved ? "text-amber-600" : "text-slate-400")} />
+                  <FormLabel className="text-sm font-black text-foreground/80 uppercase tracking-tight flex items-center gap-2">
+                    <AlertCircle className={cn("h-4 w-4", isObserved ? "text-amber-600" : "text-muted-foreground/70")} />
                     Observar este socio
                   </FormLabel>
                 </div>
@@ -448,7 +448,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
                   <FormControl>
                     <Textarea 
                       placeholder="Describa el motivo de la observación del socio..."
-                      className="min-h-[80px] bg-white border-amber-100 rounded-xl focus:ring-amber-500/20 font-medium text-amber-900"
+                      className="min-h-[80px] bg-card dark:bg-slate-900 border-amber-100 rounded-xl focus:ring-amber-500/20 font-medium text-amber-900"
                       {...field}
                       value={field.value || ''}
                     />
@@ -465,7 +465,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
             type="button" 
             variant="outline" 
             onClick={onClose} 
-            className="flex-1 h-14 rounded-xl font-bold border-slate-200 text-slate-500 hover:bg-slate-50"
+            className="flex-1 h-14 rounded-xl font-bold border-border text-muted-foreground hover:bg-muted/50"
           >
             <X className="h-4 w-4 mr-2" /> Cancelar
           </Button>

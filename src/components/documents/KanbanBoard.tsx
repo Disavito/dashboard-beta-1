@@ -188,7 +188,7 @@ const KanbanCard = ({ item, onOpenUploadModal }: { item: any; onOpenUploadModal:
   const renderKanbanBadge = (status: boolean | null, label: string, onClick?: () => void) => {
     if (!status) {
       return (
-        <Badge variant="outline" className="text-[10px] uppercase tracking-wider font-bold bg-gray-100 text-gray-400 border-dashed border-gray-200">
+        <Badge variant="outline" className="text-[10px] uppercase tracking-wider font-bold bg-muted text-muted-foreground/70 border-dashed border-border">
           <XCircle className="w-3 h-3 mr-1" />
           {label}
         </Badge>
@@ -211,22 +211,22 @@ const KanbanCard = ({ item, onOpenUploadModal }: { item: any; onOpenUploadModal:
   const isDigitalReceipt = item.has_comprobante || receiptNumber.startsWith('R-') || receiptNumber.startsWith('B');
 
   return (
-    <Card className="mb-3 bg-white hover:border-slate-300 hover:shadow-md transition-all cursor-pointer group rounded-lg overflow-hidden border border-slate-200/60 shadow-sm">
+    <Card className="mb-3 bg-card dark:bg-slate-900 hover:border-border hover:shadow-md transition-all cursor-pointer group rounded-lg overflow-hidden border border-border/60 shadow-sm">
       <div className="p-3">
         <div className="flex justify-between items-start mb-2">
           <div>
-            <span className="text-[9px] font-mono font-bold text-gray-400">DNI {item.dni}</span>
-            <h4 className="text-sm font-black text-gray-900 leading-tight uppercase">{fullName}</h4>
+            <span className="text-[9px] font-mono font-bold text-muted-foreground/70">DNI {item.dni}</span>
+            <h4 className="text-sm font-black text-foreground leading-tight uppercase">{fullName}</h4>
           </div>
         </div>
         
         <div className="grid grid-cols-2 gap-2 mb-3 mt-2">
-          <div className="bg-gray-50 rounded-lg p-1.5 flex items-center gap-1.5">
-            <MapPin className="w-3 h-3 text-gray-400" />
-            <span className="text-[10px] font-bold text-gray-600 truncate">{item.localidad || 'S/L'}</span>
+          <div className="bg-muted/50 rounded-lg p-1.5 flex items-center gap-1.5">
+            <MapPin className="w-3 h-3 text-muted-foreground/70" />
+            <span className="text-[10px] font-bold text-muted-foreground truncate">{item.localidad || 'S/L'}</span>
           </div>
-          <div className="bg-gray-50 rounded-lg p-1.5">
-            <span className="text-[10px] font-bold text-gray-600 truncate">Mz {item.mz || '-'} Lt {item.lote || '-'}</span>
+          <div className="bg-muted/50 rounded-lg p-1.5">
+            <span className="text-[10px] font-bold text-muted-foreground truncate">Mz {item.mz || '-'} Lt {item.lote || '-'}</span>
           </div>
         </div>
 
@@ -256,13 +256,13 @@ const KanbanCard = ({ item, onOpenUploadModal }: { item: any; onOpenUploadModal:
                 key={t} 
                 variant="outline" 
                 size="sm" 
-                className="h-7 px-2 text-[10px] font-medium text-slate-600 bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 hover:text-slate-900 rounded-md w-full justify-center shadow-sm"
+                className="h-7 px-2 text-[10px] font-medium text-muted-foreground bg-card dark:bg-slate-900 hover:bg-muted/50 border-border hover:border-border hover:text-foreground rounded-md w-full justify-center shadow-sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   onOpenUploadModal(item.id, fullName, t);
                 }}
               >
-                <Upload className="w-3 h-3 mr-1.5 text-slate-400" />
+                <Upload className="w-3 h-3 mr-1.5 text-muted-foreground/70" />
                 {t.split(' ')[0]}
               </Button>
             ))}
@@ -353,7 +353,7 @@ export function KanbanBoard({ data, onOpenUploadModal }: KanbanBoardProps) {
             <Ticket className="w-4 h-4 text-sky-600" />
             <h3 className="font-black text-xs uppercase tracking-wider">⚡ Por Medir</h3>
           </div>
-          <Badge className="bg-white text-sky-700 font-bold border-none">{col1.length}</Badge>
+          <Badge className="bg-card dark:bg-slate-900 text-sky-700 font-bold border-none">{col1.length}</Badge>
         </div>
         <ScrollArea className="bg-sky-50/50 border border-sky-100 border-t-0 rounded-b-2xl flex-1 p-3">
           {col1.map(item => <KanbanCard key={item.id} item={item} onOpenUploadModal={onOpenUploadModal} />)}
@@ -368,7 +368,7 @@ export function KanbanBoard({ data, onOpenUploadModal }: KanbanBoardProps) {
             <AlertCircle className="w-4 h-4 text-rose-600" />
             <h3 className="font-black text-xs uppercase tracking-wider">⚠️ Medidos sin Pago</h3>
           </div>
-          <Badge className="bg-white text-rose-700 font-bold border-none">{col2.length}</Badge>
+          <Badge className="bg-card dark:bg-slate-900 text-rose-700 font-bold border-none">{col2.length}</Badge>
         </div>
         <ScrollArea className="bg-rose-50/50 border border-rose-100 border-t-0 rounded-b-2xl flex-1 p-3">
           {col2.map(item => <KanbanCard key={item.id} item={item} onOpenUploadModal={onOpenUploadModal} />)}
@@ -383,7 +383,7 @@ export function KanbanBoard({ data, onOpenUploadModal }: KanbanBoardProps) {
             <FileText className="w-4 h-4 text-amber-600" />
             <h3 className="font-black text-xs uppercase tracking-wider">📐 En Gabinete</h3>
           </div>
-          <Badge className="bg-white text-amber-700 font-bold border-none">{col3.length}</Badge>
+          <Badge className="bg-card dark:bg-slate-900 text-amber-700 font-bold border-none">{col3.length}</Badge>
         </div>
         <ScrollArea className="bg-amber-50/50 border border-amber-100 border-t-0 rounded-b-2xl flex-1 p-3">
           {col3.map(item => <KanbanCard key={item.id} item={item} onOpenUploadModal={onOpenUploadModal} />)}
@@ -399,7 +399,7 @@ export function KanbanBoard({ data, onOpenUploadModal }: KanbanBoardProps) {
               <CheckSquare className="w-4 h-4 text-emerald-600" />
               <h3 className="font-black text-xs uppercase tracking-wider">✅ Para Impresión</h3>
             </div>
-            <Badge className="bg-white text-emerald-700 font-bold border-none">{col4.length}</Badge>
+            <Badge className="bg-card dark:bg-slate-900 text-emerald-700 font-bold border-none">{col4.length}</Badge>
           </div>
           {col4.length > 0 && (
             <Button 

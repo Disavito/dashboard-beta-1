@@ -180,7 +180,7 @@ export default function SyncStatusIndicator() {
 
             {/* Mutaciones React Query (En vuelo / pausadas) */}
             {isMutating > 0 && (
-              <div className="flex items-center justify-between p-4 rounded-xl border bg-slate-50 border-slate-200 dark:bg-muted/40 dark:border-border">
+              <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/50 border-border dark:bg-muted/40 dark:border-border">
                 <div className="flex items-center gap-3">
                   <Loader2 className="w-5 h-5 animate-spin text-primary" />
                   <div>
@@ -234,13 +234,13 @@ export default function SyncStatusIndicator() {
                         <div className="flex items-start justify-between gap-6">
                           <div>
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
                                 {getJobLabel(job.type)}
                               </span>
                               <Badge className={cn(
                                 "border-none text-[8px] uppercase font-bold py-0 h-4 px-1.5 flex items-center justify-center",
                                 job.status === 'error' ? "bg-red-100 text-red-700" :
-                                job.status === 'syncing' ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-700"
+                                job.status === 'syncing' ? "bg-sky-100 text-sky-700" : "bg-muted text-foreground/80"
                               )}>
                                 {job.status === 'error' ? 'Error' : job.status === 'syncing' ? 'Cargando...' : 'Pendiente'}
                               </Badge>

@@ -339,11 +339,11 @@ function DashboardLayout() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setCmdOpen(true)}
-              className="hidden sm:inline-flex items-center gap-2 h-8 px-3 text-xs text-slate-400 bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200/60 rounded-lg transition-all duration-200 cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-2 h-8 px-3 text-xs text-muted-foreground/70 bg-muted/80 hover:bg-slate-200/80 border border-border/60 rounded-lg transition-all duration-200 cursor-pointer"
             >
               <Search className="w-3.5 h-3.5" />
               <span>Buscar…</span>
-              <kbd className="ml-1 pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded border border-slate-200 bg-white px-1.5 font-mono text-[10px] font-medium text-slate-400">
+              <kbd className="ml-1 pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded border border-border bg-card dark:bg-slate-900 px-1.5 font-mono text-[10px] font-medium text-muted-foreground/70">
                 Ctrl K
               </kbd>
             </button>

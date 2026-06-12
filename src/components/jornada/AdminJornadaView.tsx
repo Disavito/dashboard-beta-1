@@ -101,11 +101,11 @@ const AdminJornadaView: React.FC = () => {
     <>
       <div className="space-y-8">
         {/* Filtros Superiores */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 border border-gray-100 shadow-premium rounded-2xl bg-white">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 border border-border/50 shadow-premium rounded-2xl bg-card dark:bg-slate-900">
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Colaborador</label>
+            <label className="text-[10px] font-black uppercase text-muted-foreground/70 tracking-widest ml-1">Colaborador</label>
             <Select value={selectedColaboradorId} onValueChange={setSelectedColaboradorId} disabled={isLoadingColaboradores}>
-              <SelectTrigger className="h-12 rounded-xl border-gray-100 bg-gray-50 font-bold">
+              <SelectTrigger className="h-12 rounded-xl border-border/50 bg-muted/50 font-bold">
                 <Users className="mr-2 h-4 w-4 text-[#4892CC]" />
                 <SelectValue placeholder="Seleccionar colaborador" />
               </SelectTrigger>
@@ -119,23 +119,23 @@ const AdminJornadaView: React.FC = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Periodo</label>
+            <label className="text-[10px] font-black uppercase text-muted-foreground/70 tracking-widest ml-1">Periodo</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant={"outline"} className={cn("w-full h-12 justify-start text-left font-bold rounded-xl border-gray-100 bg-gray-50")}>
+                <Button variant={"outline"} className={cn("w-full h-12 justify-start text-left font-bold rounded-xl border-border/50 bg-muted/50")}>
                   <CalendarIcon className="mr-2 h-4 w-4 text-[#4892CC]" />
                   <span>{renderDateRange()}</span>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 rounded-2xl overflow-hidden border border-gray-100 shadow-premium">
+              <PopoverContent className="w-auto p-0 rounded-2xl overflow-hidden border border-border/50 shadow-premium">
                 <Calendar mode="single" selected={selectedDate} onSelect={(d) => setSelectedDate(d || new Date())} initialFocus />
               </PopoverContent>
             </Popover>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Vista</label>
-            <ToggleGroup type="single" value={filterType} onValueChange={(value) => value && setFilterType(value as 'day' | 'week' | 'month')} className="w-full grid grid-cols-3 bg-gray-50 p-1 rounded-xl border border-gray-100">
+            <label className="text-[10px] font-black uppercase text-muted-foreground/70 tracking-widest ml-1">Vista</label>
+            <ToggleGroup type="single" value={filterType} onValueChange={(value) => value && setFilterType(value as 'day' | 'week' | 'month')} className="w-full grid grid-cols-3 bg-muted/50 p-1 rounded-xl border border-border/50">
               <ToggleGroupItem value="day" className="rounded-lg font-bold text-[10px] uppercase">Día</ToggleGroupItem>
               <ToggleGroupItem value="week" className="rounded-lg font-bold text-[10px] uppercase">Sem.</ToggleGroupItem>
               <ToggleGroupItem value="month" className="rounded-lg font-bold text-[10px] uppercase">Mes</ToggleGroupItem>
@@ -155,10 +155,10 @@ const AdminJornadaView: React.FC = () => {
         )}
 
         {/* Tabla de Registros */}
-        <div className="border border-gray-100 shadow-premium rounded-2xl overflow-hidden bg-white">
+        <div className="border border-border/50 shadow-premium rounded-2xl overflow-hidden bg-card dark:bg-slate-900">
           <div className="p-6 border-b border-gray-50 flex items-center justify-between">
             <h3 className="text-lg font-black uppercase tracking-tight">Detalle de Asistencia</h3>
-            <div className="flex items-center gap-2 text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full">
+            <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground/70 bg-muted/50 px-3 py-1.5 rounded-full">
               <Info className="h-3.5 w-3.5" />
               {jornadas?.length || 0} registros encontrados
             </div>
@@ -166,7 +166,7 @@ const AdminJornadaView: React.FC = () => {
           
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="bg-gray-50/50">
+              <TableHeader className="bg-muted/50/50">
                 <TableRow className="border-none">
                   <TableHead className="text-[10px] font-black uppercase tracking-widest">Colaborador</TableHead>
                   <TableHead className="text-[10px] font-black uppercase tracking-widest">Fecha</TableHead>
@@ -181,11 +181,11 @@ const AdminJornadaView: React.FC = () => {
               <TableBody>
                 {jornadas && jornadas.length > 0 ? (
                   jornadas.map((jornada) => (
-                    <TableRow key={jornada.id} className="group border-gray-50 hover:bg-gray-50/50 transition-colors">
+                    <TableRow key={jornada.id} className="group border-gray-50 hover:bg-muted/50/50 transition-colors">
                       <TableCell className="font-bold text-sm">
                         {jornada.colaboradores?.name} {jornada.colaboradores?.apellidos}
                       </TableCell>
-                      <TableCell className="whitespace-nowrap text-xs font-medium text-gray-500">
+                      <TableCell className="whitespace-nowrap text-xs font-medium text-muted-foreground">
                         {format(parseISO(jornada.fecha), "dd/MM/yy", { locale: es })}
                       </TableCell>
                       <TableCell>
@@ -206,7 +206,7 @@ const AdminJornadaView: React.FC = () => {
                         </div>
                       </TableCell>
 
-                      <TableCell className="text-center font-mono text-xs text-gray-400">
+                      <TableCell className="text-center font-mono text-xs text-muted-foreground/70">
                         {formatTime(jornada.hora_inicio_almuerzo)} - {formatTime(jornada.hora_fin_almuerzo)}
                       </TableCell>
                       

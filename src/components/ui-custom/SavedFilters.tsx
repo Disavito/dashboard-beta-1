@@ -60,7 +60,7 @@ export default function SavedFilters({
         <Button
           variant="outline"
           className={cn(
-            'h-14 px-4 rounded-2xl border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all gap-2 font-bold text-slate-600',
+            'h-14 px-4 rounded-2xl border-border bg-muted/50 hover:bg-muted transition-all gap-2 font-bold text-muted-foreground',
             savedFilters.length > 0 && 'border-corp-blue/30 text-corp-blue'
           )}
         >
@@ -81,11 +81,11 @@ export default function SavedFilters({
 
       <PopoverContent
         align="end"
-        className="w-72 p-0 rounded-2xl border border-slate-100 bg-card shadow-xl overflow-hidden"
+        className="w-72 p-0 rounded-2xl border border-border/50 bg-card shadow-xl overflow-hidden"
       >
         {/* Header */}
-        <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/60">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+        <div className="px-4 py-3 border-b border-border/50 bg-muted/50/60">
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">
             Filtros Guardados
           </p>
         </div>
@@ -95,7 +95,7 @@ export default function SavedFilters({
           {savedFilters.length === 0 ? (
             <div className="px-4 py-6 text-center">
               <Bookmark className="h-8 w-8 mx-auto text-slate-200 mb-2" />
-              <p className="text-xs text-slate-400 font-medium">
+              <p className="text-xs text-muted-foreground/70 font-medium">
                 Aún no tienes filtros guardados
               </p>
             </div>
@@ -103,7 +103,7 @@ export default function SavedFilters({
             savedFilters.map((sf) => (
               <div
                 key={sf.id}
-                className="group flex items-center justify-between gap-2 px-4 py-2.5 hover:bg-slate-50 transition-colors cursor-pointer"
+                className="group flex items-center justify-between gap-2 px-4 py-2.5 hover:bg-muted/50 transition-colors cursor-pointer"
                 onClick={() => handleApply(sf.id)}
               >
                 <div className="flex items-center gap-2 min-w-0">
@@ -129,7 +129,7 @@ export default function SavedFilters({
         </div>
 
         {/* Save new filter */}
-        <div className="border-t border-slate-100 p-3">
+        <div className="border-t border-border/50 p-3">
           {isAdding ? (
             <div className="flex items-center gap-2">
               <Input
@@ -144,7 +144,7 @@ export default function SavedFilters({
                   }
                 }}
                 placeholder="Nombre del filtro..."
-                className="h-9 text-sm rounded-xl bg-slate-50 border-slate-200 placeholder:text-slate-400"
+                className="h-9 text-sm rounded-xl bg-muted/50 border-border placeholder:text-muted-foreground/70"
               />
               <Button
                 size="icon"

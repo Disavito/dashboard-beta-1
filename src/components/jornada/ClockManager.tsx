@@ -298,12 +298,12 @@ const ClockManager: React.FC<ClockManagerProps> = ({
   const hasEndedLunch = !!jornada?.hora_fin_almuerzo;
   const hasEnded = !!jornada?.hora_fin_jornada;
 
-  if (isLoading) return <div className="p-8 text-center font-medium text-slate-500">Sincronizando...</div>;
+  if (isLoading) return <div className="p-8 text-center font-medium text-muted-foreground">Sincronizando...</div>;
 
   return (
     <div className={cn(
-      "max-w-md mx-auto bg-white rounded-2xl shadow-premium overflow-hidden border",
-      bypassTimeRestrictions ? "border-amber-200 ring-4 ring-amber-50" : "border-gray-100"
+      "max-w-md mx-auto bg-card dark:bg-slate-900 rounded-2xl shadow-premium overflow-hidden border",
+      bypassTimeRestrictions ? "border-amber-200 ring-4 ring-amber-50" : "border-border/50"
     )}>
       <div className={cn("p-8 pb-12 text-white relative", bypassTimeRestrictions ? "bg-amber-500" : "bg-[#4892CC]")}>
         <div className="relative z-10">
@@ -315,7 +315,7 @@ const ClockManager: React.FC<ClockManagerProps> = ({
                 {format(targetDate, "EEEE, d 'de' MMMM yyyy", { locale: es })}
               </p>
             </div>
-            {bypassTimeRestrictions && <Badge className="bg-white/20 border-none">MODO ADMIN</Badge>}
+            {bypassTimeRestrictions && <Badge className="bg-card dark:bg-slate-900/20 border-none">MODO ADMIN</Badge>}
           </div>
 
           <div className="mt-6">
@@ -332,34 +332,34 @@ const ClockManager: React.FC<ClockManagerProps> = ({
                 )}
               </div>
             ) : completedJornadasToday.length > 0 ? (
-              <Badge className="bg-white/20 text-white border-none px-4 py-1 rounded-full flex items-center gap-2 w-fit font-bold">
-                <span className="w-2 h-2 bg-white rounded-full" /> {completedJornadasToday.length} TURNO(S) COMPLETADO(S) HOY
+              <Badge className="bg-card dark:bg-slate-900/20 text-white border-none px-4 py-1 rounded-full flex items-center gap-2 w-fit font-bold">
+                <span className="w-2 h-2 bg-card dark:bg-slate-900 rounded-full" /> {completedJornadasToday.length} TURNO(S) COMPLETADO(S) HOY
               </Badge>
             ) : (
-              <Badge className="bg-white/10 text-white/70 border-none px-4 py-1 rounded-full">ESPERANDO INICIO</Badge>
+              <Badge className="bg-card dark:bg-slate-900/10 text-white/70 border-none px-4 py-1 rounded-full">ESPERANDO INICIO</Badge>
             )}
           </div>
         </div>
       </div>
 
       <div className="px-8 -mt-6 relative z-20">
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50 flex flex-col items-center mb-4">
-          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Hora actual del registro</p>
-          <p className="text-4xl font-mono font-black text-gray-800">
+        <div className="bg-card dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-gray-50 flex flex-col items-center mb-4">
+          <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest mb-1">Hora actual del registro</p>
+          <p className="text-4xl font-mono font-black text-foreground/90">
             {format(currentTime, 'HH:mm:ss')}
           </p>
         </div>
 
-        <div className="bg-slate-50 rounded-2xl p-4 grid grid-cols-2 gap-4 border border-slate-100">
+        <div className="bg-muted/50 rounded-2xl p-4 grid grid-cols-2 gap-4 border border-border/50">
           <div className="space-y-1">
-            <p className="text-[9px] font-bold text-slate-400 uppercase">Entrada</p>
-            <p className="text-lg font-mono font-bold text-slate-700">
+            <p className="text-[9px] font-bold text-muted-foreground/70 uppercase">Entrada</p>
+            <p className="text-lg font-mono font-bold text-foreground/80">
               {jornada?.hora_inicio_jornada ? format(parseISO(jornada.hora_inicio_jornada), 'HH:mm:ss') : '--:--:--'}
             </p>
           </div>
           <div className="space-y-1 text-right">
-            <p className="text-[9px] font-bold text-slate-400 uppercase">Salida</p>
-            <p className="text-lg font-mono font-bold text-slate-700">
+            <p className="text-[9px] font-bold text-muted-foreground/70 uppercase">Salida</p>
+            <p className="text-lg font-mono font-bold text-foreground/80">
               {jornada?.hora_fin_jornada ? format(parseISO(jornada.hora_fin_jornada), 'HH:mm:ss') : '--:--:--'}
             </p>
           </div>
@@ -377,7 +377,7 @@ const ClockManager: React.FC<ClockManagerProps> = ({
               <div className="space-y-2">
                 <Label className="text-[10px] font-bold text-amber-800/60 uppercase">Motivo Obligatorio</Label>
                 <Select value={justification} onValueChange={setJustification}>
-                  <SelectTrigger className="w-full h-12 bg-white border-amber-200 rounded-xl text-amber-900">
+                  <SelectTrigger className="w-full h-12 bg-card dark:bg-slate-900 border-amber-200 rounded-xl text-amber-900">
                     <SelectValue placeholder="Seleccione un motivo..." />
                   </SelectTrigger>
                   <SelectContent className="z-[100]">
@@ -392,7 +392,7 @@ const ClockManager: React.FC<ClockManagerProps> = ({
                 <Label className="text-[10px] font-bold text-amber-800/60 uppercase">Observaciones</Label>
                 <Textarea 
                   placeholder="Detalle el motivo..."
-                  className="bg-white border-amber-200 rounded-xl min-h-[80px] resize-none text-amber-900"
+                  className="bg-card dark:bg-slate-900 border-amber-200 rounded-xl min-h-[80px] resize-none text-amber-900"
                   value={observations}
                   onChange={(e) => setObservations(e.target.value)}
                 />
@@ -469,13 +469,13 @@ const ClockManager: React.FC<ClockManagerProps> = ({
           )}
 
           {completedJornadasToday.length > 0 && !showJustification && !hasStarted && (
-            <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-100 animate-in fade-in duration-500">
-               <p className="text-xs font-bold text-slate-500 uppercase mb-3">Turnos Completados Hoy ({completedJornadasToday.length})</p>
+            <div className="mt-4 p-4 rounded-xl bg-muted/50 border border-border/50 animate-in fade-in duration-500">
+               <p className="text-xs font-bold text-muted-foreground uppercase mb-3">Turnos Completados Hoy ({completedJornadasToday.length})</p>
                <div className="space-y-2">
                  {completedJornadasToday.map((j, i) => (
-                   <div key={j.id} className="text-xs font-mono text-slate-600 flex justify-between items-center bg-white p-2 rounded-lg border border-slate-100">
+                   <div key={j.id} className="text-xs font-mono text-muted-foreground flex justify-between items-center bg-card dark:bg-slate-900 p-2 rounded-lg border border-border/50">
                       <span className="font-bold">Turno {completedJornadasToday.length - i}</span>
-                      <span className="text-slate-400">
+                      <span className="text-muted-foreground/70">
                         {j.hora_inicio_jornada ? format(parseISO(j.hora_inicio_jornada), 'HH:mm') : '--:--'} - {j.hora_fin_jornada ? format(parseISO(j.hora_fin_jornada), 'HH:mm') : '--:--'}
                       </span>
                    </div>
@@ -487,15 +487,15 @@ const ClockManager: React.FC<ClockManagerProps> = ({
       </div>
 
       <div className="px-8 pb-8">
-        <div className="bg-slate-50 rounded-2xl p-4 flex justify-between items-center border border-slate-100">
+        <div className="bg-muted/50 rounded-2xl p-4 flex justify-between items-center border border-border/50">
           <div className="text-center">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Ventana Entrada</p>
-            <p className="text-xs font-bold text-slate-600">09:20 - 09:45</p>
+            <p className="text-[9px] font-black text-muted-foreground/70 uppercase tracking-tighter">Ventana Entrada</p>
+            <p className="text-xs font-bold text-muted-foreground">09:20 - 09:45</p>
           </div>
           <div className="h-8 w-px bg-slate-200" />
           <div className="text-center">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Ventana Salida</p>
-            <p className="text-xs font-bold text-slate-600">18:20 - 18:40</p>
+            <p className="text-[9px] font-black text-muted-foreground/70 uppercase tracking-tighter">Ventana Salida</p>
+            <p className="text-xs font-bold text-muted-foreground">18:20 - 18:40</p>
           </div>
         </div>
       </div>

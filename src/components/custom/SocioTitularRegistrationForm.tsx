@@ -774,7 +774,7 @@ function SocioTitularRegistrationForm({ socioId, onClose, onSuccess }: SocioTitu
                                       setOpenLocalitiesPopover(false);
                                       setLocalitiesSearch('');
                                     }}
-                                    className="text-[#4892CC] font-bold border-b border-slate-100 pb-2 mb-1"
+                                    className="text-[#4892CC] font-bold border-b border-border/50 pb-2 mb-1"
                                   >
                                     <Check className="mr-2 h-4 w-4 opacity-0" />
                                     Agregar nueva: "{localitiesSearch.trim()}"

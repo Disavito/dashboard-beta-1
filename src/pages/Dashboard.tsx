@@ -391,7 +391,7 @@ function Dashboard() {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center bg-[#FFFFFF]">
         <Loader2 className="w-12 h-12 text-[#4892CC] animate-spin mb-4" />
-        <p className="text-gray-500 font-bold">Cargando panel de administración...</p>
+        <p className="text-muted-foreground font-bold">Cargando panel de administración...</p>
       </div>
     );
   }
@@ -400,8 +400,8 @@ function Dashboard() {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center bg-[#FFFFFF]">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Error al cargar datos</h2>
-        <p className="text-gray-500 font-medium">{typeof dataError === 'string' ? dataError : (dataError as Error)?.message || 'Ocurrió un error inesperado'}</p>
+        <h2 className="text-xl font-bold text-foreground mb-2">Error al cargar datos</h2>
+        <p className="text-muted-foreground font-medium">{typeof dataError === 'string' ? dataError : (dataError as Error)?.message || 'Ocurrió un error inesperado'}</p>
         <Button onClick={() => window.location.reload()} className="mt-6 bg-[#4892CC]">Reintentar</Button>
       </div>
     );
@@ -409,7 +409,7 @@ function Dashboard() {
 
   return (
     <div className="pb-20 bg-[#FAFBFC] min-h-screen page-enter">
-      <header className="relative h-auto py-8 md:h-72 flex items-center overflow-hidden bg-white border-b border-slate-100/60">
+      <header className="relative h-auto py-8 md:h-72 flex items-center overflow-hidden bg-card dark:bg-slate-900 border-b border-border/50/60">
         <div className="absolute inset-0 bg-gradient-to-br from-[#4892CC]/[0.06] via-transparent to-corp-teal/[0.02] z-0"></div>
         <div className="container mx-auto px-4 md:px-8 relative z-10">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -417,10 +417,10 @@ function Dashboard() {
               <Badge className="mb-3 bg-[#4892CC]/10 text-[#4892CC] border-none font-bold px-4 py-1 rounded-full text-[10px] md:text-xs">
                 SISTEMA DE GESTIÓN V2025
               </Badge>
-              <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">
+              <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
                 Panel de <span className="text-[#4892CC]">Administración</span>
               </h1>
-              <p className="text-gray-500 font-medium mt-2">
+              <p className="text-muted-foreground font-medium mt-2">
                 {isAdminOrFinanzas
                   ? 'Consolidado completo de activos, equipo y flujo de caja.'
                   : 'Resumen de tareas, expedientes pendientes y herramientas asignadas.'}
@@ -436,13 +436,13 @@ function Dashboard() {
                 onReset={() => resetToDefault(!isAdminOrFinanzas ? 'engineer' : activeTab)}
               />
 
-              <div className="bg-white shadow-sm border border-gray-100 p-1.5 rounded-2xl flex items-center gap-2 h-11 pr-4">
+              <div className="bg-card dark:bg-slate-900 shadow-sm border border-border/50 p-1.5 rounded-2xl flex items-center gap-2 h-11 pr-4">
                 <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center cursor-pointer" onClick={() => setPreviewAsEngineer(!previewAsEngineer)} title="Click para simular vista">
                   <Activity className="text-emerald-500 w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none">{previewAsEngineer ? 'Simulando' : 'Estado'}</p>
-                  <p className="text-xs font-black text-gray-900 mt-0.5 leading-none">{previewAsEngineer ? 'Vista Ing.' : 'En Línea'}</p>
+                  <p className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-widest leading-none">{previewAsEngineer ? 'Simulando' : 'Estado'}</p>
+                  <p className="text-xs font-black text-foreground mt-0.5 leading-none">{previewAsEngineer ? 'Vista Ing.' : 'En Línea'}</p>
                 </div>
               </div>
             </div>
@@ -466,11 +466,11 @@ function Dashboard() {
         <Tabs value={activeTab} onValueChange={(v) => { if (!isEditMode) setActiveTab(v as any); }} className="space-y-8">
           {isAdminOrFinanzas && (
             <div className="flex justify-center">
-              <TabsList className="bg-white/80 backdrop-blur-xl border border-slate-200/60 p-1.5 rounded-2xl h-14 shadow-premium">
-                <TabsTrigger disabled={isEditMode} value="titulares" className="rounded-xl px-8 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-corp-teal data-[state=active]:text-white data-[state=active]:shadow-md font-bold text-gray-500 transition-all duration-300">
+              <TabsList className="bg-card dark:bg-slate-900/80 backdrop-blur-xl border border-border/60 p-1.5 rounded-2xl h-14 shadow-premium">
+                <TabsTrigger disabled={isEditMode} value="titulares" className="rounded-xl px-8 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-corp-teal data-[state=active]:text-white data-[state=active]:shadow-md font-bold text-muted-foreground transition-all duration-300">
                   <Users className="w-4 h-4 mr-2" /> Titulares y Equipo
                 </TabsTrigger>
-                <TabsTrigger disabled={isEditMode} value="finanzas" className="rounded-xl px-8 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-corp-teal data-[state=active]:text-white data-[state=active]:shadow-md font-bold text-gray-500 transition-all duration-300">
+                <TabsTrigger disabled={isEditMode} value="finanzas" className="rounded-xl px-8 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-corp-teal data-[state=active]:text-white data-[state=active]:shadow-md font-bold text-muted-foreground transition-all duration-300">
                   <Wallet className="w-4 h-4 mr-2" /> Finanzas y Balance
                 </TabsTrigger>
               </TabsList>
@@ -497,31 +497,31 @@ function Dashboard() {
                           return (
                             <SortableWidget key={widget.id} id={widget.id} isEditMode={isEditMode} className="col-span-1 lg:col-span-3">
                               <div className="grid gap-6 grid-cols-1 md:grid-cols-3 stagger-fade">
-                                <Card className="rounded-2xl border border-gray-100 shadow-premium bg-white p-8 hover:shadow-premium-lg hover:scale-[1.02] transition-all duration-300">
+                                <Card className="rounded-2xl border border-border/50 shadow-premium bg-card dark:bg-slate-900 p-8 hover:shadow-premium-lg hover:scale-[1.02] transition-all duration-300">
                                   <div className="flex justify-between items-start mb-6">
                                     <div className="w-14 h-14 bg-[#E8F1F8] rounded-2xl flex items-center justify-center"><Users className="text-[#4892CC] w-7 h-7" /></div>
-                                    <Badge className="bg-gray-100 text-gray-500 border-none font-bold">Total</Badge>
+                                    <Badge className="bg-muted text-muted-foreground border-none font-bold">Total</Badge>
                                   </div>
-                                  <h3 className="text-5xl font-black text-gray-900"><AnimatedNumber value={socioStats.total} /></h3>
-                                  <p className="text-gray-400 font-bold text-sm uppercase tracking-wider mt-2">Socios Titulares</p>
+                                  <h3 className="text-5xl font-black text-foreground"><AnimatedNumber value={socioStats.total} /></h3>
+                                  <p className="text-muted-foreground/70 font-bold text-sm uppercase tracking-wider mt-2">Socios Titulares</p>
                                 </Card>
 
-                                <Card className="rounded-2xl border border-gray-100 shadow-premium bg-white p-8 hover:shadow-premium-lg hover:scale-[1.02] transition-all duration-300">
+                                <Card className="rounded-2xl border border-border/50 shadow-premium bg-card dark:bg-slate-900 p-8 hover:shadow-premium-lg hover:scale-[1.02] transition-all duration-300">
                                   <div className="flex justify-between items-start mb-6">
                                     <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center"><UserCheck className="text-emerald-500 w-7 h-7" /></div>
                                     <Badge className="bg-emerald-100 text-emerald-600 border-none font-bold">{socioStats.porcentaje}%</Badge>
                                   </div>
                                   <h3 className="text-5xl font-black text-emerald-600"><AnimatedNumber value={socioStats.pagados} /></h3>
-                                  <p className="text-gray-400 font-bold text-sm uppercase tracking-wider mt-2">Pagos Mes Actual</p>
+                                  <p className="text-muted-foreground/70 font-bold text-sm uppercase tracking-wider mt-2">Pagos Mes Actual</p>
                                 </Card>
 
-                                <Card className="rounded-2xl border border-gray-100 shadow-premium bg-white p-8 hover:shadow-premium-lg hover:scale-[1.02] transition-all duration-300">
+                                <Card className="rounded-2xl border border-border/50 shadow-premium bg-card dark:bg-slate-900 p-8 hover:shadow-premium-lg hover:scale-[1.02] transition-all duration-300">
                                   <div className="flex justify-between items-start mb-6">
                                     <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center"><UserMinus className="text-amber-500 w-7 h-7" /></div>
                                     <Badge className="bg-amber-100 text-amber-600 border-none font-bold">Pendiente</Badge>
                                   </div>
                                   <h3 className="text-5xl font-black text-amber-600"><AnimatedNumber value={socioStats.pendientes} /></h3>
-                                  <p className="text-gray-400 font-bold text-sm uppercase tracking-wider mt-2">Por Regularizar</p>
+                                  <p className="text-muted-foreground/70 font-bold text-sm uppercase tracking-wider mt-2">Por Regularizar</p>
                                 </Card>
                               </div>
                             </SortableWidget>
@@ -529,19 +529,19 @@ function Dashboard() {
                         case 'equipo_trabajo':
                           return (
                             <SortableWidget key={widget.id} id={widget.id} isEditMode={isEditMode} className="col-span-1 lg:col-span-2">
-                              <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-premium h-full">
+                              <div className="bg-card dark:bg-slate-900 p-8 rounded-3xl border border-border/50 shadow-premium h-full">
                                 <div className="flex items-center gap-3 mb-6">
                                   <div className="w-10 h-10 bg-[#E8F1F8] rounded-2xl flex items-center justify-center"><Briefcase className="text-[#4892CC] w-5 h-5" /></div>
-                                  <h2 className="text-2xl font-black text-gray-900">Equipo de Trabajo</h2>
+                                  <h2 className="text-2xl font-black text-foreground">Equipo de Trabajo</h2>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   {colaboradores.slice(0, 4).map((colab, idx) => (
-                                    <div key={colab.id} className="bg-slate-50/50 p-6 rounded-2xl border border-gray-100 flex items-center justify-between group hover:border-[#4892CC]/30 hover:shadow-md transition-all duration-200" style={{ animationDelay: `${idx * 80}ms` }}>
+                                    <div key={colab.id} className="bg-muted/50/50 p-6 rounded-2xl border border-border/50 flex items-center justify-between group hover:border-[#4892CC]/30 hover:shadow-md transition-all duration-200" style={{ animationDelay: `${idx * 80}ms` }}>
                                       <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center font-black text-[#4892CC] group-hover:bg-[#E8F1F8] transition-colors duration-200">{colab.name.charAt(0)}</div>
+                                        <div className="w-12 h-12 bg-card dark:bg-slate-900 rounded-2xl flex items-center justify-center font-black text-[#4892CC] group-hover:bg-[#E8F1F8] transition-colors duration-200">{colab.name.charAt(0)}</div>
                                         <div>
-                                          <p className="font-black text-gray-900">{colab.name}</p>
-                                          <p className="text-xs text-gray-400 font-bold uppercase">{colab.cargo || 'Colaborador'}</p>
+                                          <p className="font-black text-foreground">{colab.name}</p>
+                                          <p className="text-xs text-muted-foreground/70 font-bold uppercase">{colab.cargo || 'Colaborador'}</p>
                                         </div>
                                       </div>
                                     </div>
@@ -553,14 +553,14 @@ function Dashboard() {
                         case 'distribucion_socios':
                           return (
                             <SortableWidget key={widget.id} id={widget.id} isEditMode={isEditMode} className="col-span-1 lg:col-span-1">
-                              <Card className="rounded-2xl border border-gray-100 shadow-premium bg-[#373435] p-8 text-white relative overflow-hidden h-full">
+                              <Card className="rounded-2xl border border-border/50 shadow-premium bg-[#373435] p-8 text-white relative overflow-hidden h-full">
                                 <div className="relative z-10">
                                   <PieChartIcon className="w-12 h-12 text-[#4892CC] mb-6" />
                                   <h3 className="text-2xl font-black mb-2">Distribución</h3>
-                                  <p className="text-gray-400 font-medium mb-8">Participación de socios por comunidad.</p>
+                                  <p className="text-muted-foreground/70 font-medium mb-8">Participación de socios por comunidad.</p>
                                   <div className="space-y-4">
                                     <div className="flex justify-between items-center"><span className="text-sm font-bold text-gray-300">Activos</span><span className="text-sm font-black">{socioStats.activosPorcentaje}%</span></div>
-                                    <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-[#4892CC] to-corp-teal rounded-full transition-all duration-700" style={{ width: `${socioStats.activosPorcentaje}%` }} /></div>
+                                    <div className="w-full h-2 bg-card dark:bg-slate-900/10 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-[#4892CC] to-corp-teal rounded-full transition-all duration-700" style={{ width: `${socioStats.activosPorcentaje}%` }} /></div>
                                   </div>
                                 </div>
                                 <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[#4892CC]/10 rounded-full blur-3xl" />
@@ -593,15 +593,15 @@ function Dashboard() {
                           return (
                             <SortableWidget key={widget.id} id={widget.id} isEditMode={isEditMode} className="col-span-1 md:col-span-4">
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <Card className="rounded-2xl border border-gray-100 shadow-sm p-5 bg-white">
-                                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Socios</p>
-                                  <p className="text-3xl font-black text-slate-900 mt-1"><AnimatedNumber value={socios.length} /></p>
-                                  <p className="text-[10px] text-slate-400 font-medium mt-1">Registrados en el padrón</p>
+                                <Card className="rounded-2xl border border-border/50 shadow-sm p-5 bg-card dark:bg-slate-900">
+                                  <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Total Socios</p>
+                                  <p className="text-3xl font-black text-foreground mt-1"><AnimatedNumber value={socios.length} /></p>
+                                  <p className="text-[10px] text-muted-foreground/70 font-medium mt-1">Registrados en el padrón</p>
                                 </Card>
-                                <Card className="rounded-2xl border border-gray-100 shadow-sm p-5 bg-white">
+                                <Card className="rounded-2xl border border-border/50 shadow-sm p-5 bg-card dark:bg-slate-900">
                                   <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Con Datos</p>
                                   <p className="text-3xl font-black text-emerald-600 mt-1"><AnimatedNumber value={socios.filter(s => s.mz && s.lote).length} /></p>
-                                  <p className="text-[10px] text-slate-400 font-medium mt-1">Mz y Lote asignado</p>
+                                  <p className="text-[10px] text-muted-foreground/70 font-medium mt-1">Mz y Lote asignado</p>
                                 </Card>
                                 <Card className="rounded-2xl border border-amber-100 shadow-sm p-5 bg-amber-50/30">
                                   <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Sin Mz</p>
@@ -623,22 +623,22 @@ function Dashboard() {
                                 <div className="flex items-center gap-4 mb-6">
                                   <div className="p-3 bg-[#4892CC] rounded-xl"><AlertCircle className="w-6 h-6 text-white"/></div>
                                   <div>
-                                    <h3 className="text-xl font-black text-gray-900">Gabinete / Documentos</h3>
-                                    <p className="text-sm text-gray-500 font-medium">Expedientes que requieren tu edición</p>
+                                    <h3 className="text-xl font-black text-foreground">Gabinete / Documentos</h3>
+                                    <p className="text-sm text-muted-foreground font-medium">Expedientes que requieren tu edición</p>
                                   </div>
                                 </div>
                                 <div className="space-y-4">
-                                  <div className="p-4 bg-white rounded-xl border border-gray-100 flex items-center justify-between">
+                                  <div className="p-4 bg-card dark:bg-slate-900 rounded-xl border border-border/50 flex items-center justify-between">
                                     <div>
-                                      <p className="font-bold text-gray-800">Cargar Planos Faltantes</p>
-                                      <p className="text-xs text-gray-400 font-medium mt-1">Hay {socios.filter(s => !s.mz).length} terrenos sin plano registrado.</p>
+                                      <p className="font-bold text-foreground/90">Cargar Planos Faltantes</p>
+                                      <p className="text-xs text-muted-foreground/70 font-medium mt-1">Hay {socios.filter(s => !s.mz).length} terrenos sin plano registrado.</p>
                                     </div>
                                     <Badge className="bg-red-50 text-red-600 border-red-200">Alta Prioridad</Badge>
                                   </div>
-                                  <div className="p-4 bg-white rounded-xl border border-gray-100 flex items-center justify-between">
+                                  <div className="p-4 bg-card dark:bg-slate-900 rounded-xl border border-border/50 flex items-center justify-between">
                                     <div>
-                                      <p className="font-bold text-gray-800">Revisión de Memorias</p>
-                                      <p className="text-xs text-gray-400 font-medium mt-1">Hay {socios.filter(s => !s.lote).length} terrenos sin memoria registrada.</p>
+                                      <p className="font-bold text-foreground/90">Revisión de Memorias</p>
+                                      <p className="text-xs text-muted-foreground/70 font-medium mt-1">Hay {socios.filter(s => !s.lote).length} terrenos sin memoria registrada.</p>
                                     </div>
                                     <Badge className="bg-amber-50 text-amber-600 border-amber-200">Pendiente</Badge>
                                   </div>
@@ -649,12 +649,12 @@ function Dashboard() {
                         case 'acceso_rapido':
                           return (
                             <SortableWidget key={widget.id} id={widget.id} isEditMode={isEditMode} className="col-span-1 md:col-span-2">
-                              <Card className="rounded-2xl border border-gray-100 shadow-premium bg-white p-8 h-full">
+                              <Card className="rounded-2xl border border-border/50 shadow-premium bg-card dark:bg-slate-900 p-8 h-full">
                                 <div className="flex items-center gap-4 mb-6">
                                   <div className="p-3 bg-emerald-50 rounded-xl"><Activity className="w-6 h-6 text-emerald-500"/></div>
                                   <div>
-                                    <h3 className="text-xl font-black text-gray-900">Acceso Rápido</h3>
-                                    <p className="text-sm text-gray-500 font-medium">Navega directamente a tus módulos</p>
+                                    <h3 className="text-xl font-black text-foreground">Acceso Rápido</h3>
+                                    <p className="text-sm text-muted-foreground font-medium">Navega directamente a tus módulos</p>
                                   </div>
                                 </div>
                                 <div className="space-y-3">
@@ -688,12 +688,12 @@ function Dashboard() {
             <TabsContent value="finanzas" className="space-y-8 animate-fade-in-up">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white rounded-2xl shadow-sm flex items-center justify-center"><TrendingUp className="text-[#4892CC] w-5 h-5" /></div>
-                  <h2 className="text-2xl font-black text-gray-900">Análisis de Flujo</h2>
+                  <div className="w-10 h-10 bg-card dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center"><TrendingUp className="text-[#4892CC] w-5 h-5" /></div>
+                  <h2 className="text-2xl font-black text-foreground">Análisis de Flujo</h2>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 bg-white p-2 rounded-2xl border border-gray-200 shadow-sm">
+                <div className="flex flex-wrap items-center gap-3 bg-card dark:bg-slate-900 p-2 rounded-2xl border border-border shadow-sm">
                   <Select value={filterPeriodType} onValueChange={(v: any) => { setFilterPeriodType(v); setSelectedPeriod(undefined); }}>
-                    <SelectTrigger className="w-[180px] border-none bg-transparent font-bold text-gray-700 focus:ring-0"><SelectValue placeholder="Tipo" /></SelectTrigger>
+                    <SelectTrigger className="w-[180px] border-none bg-transparent font-bold text-foreground/80 focus:ring-0"><SelectValue placeholder="Tipo" /></SelectTrigger>
                     <SelectContent className="rounded-2xl">
                       <SelectItem value="month">Mensual</SelectItem>
                       <SelectItem value="quarter">Trimestral</SelectItem>
@@ -704,7 +704,7 @@ function Dashboard() {
                   </Select>
                   {filterPeriodType !== 'all' && filterPeriodType !== 'custom' && (
                     <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-                      <SelectTrigger className="w-[180px] border-l border-gray-100 bg-transparent font-bold text-[#4892CC] focus:ring-0"><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
+                      <SelectTrigger className="w-[180px] border-l border-border/50 bg-transparent font-bold text-[#4892CC] focus:ring-0"><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
                       <SelectContent className="rounded-2xl">
                         {filterPeriodType === 'month' && periodOptions.months.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
                         {filterPeriodType === 'quarter' && periodOptions.quarters.map(q => <SelectItem key={q.value} value={q.value}>{q.label}</SelectItem>)}
@@ -736,7 +736,7 @@ function Dashboard() {
                           return (
                             <SortableWidget key={widget.id} id={widget.id} isEditMode={isEditMode} className="col-span-1 lg:col-span-3">
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-fade">
-                                <Card className="rounded-2xl border-none shadow-lg bg-white p-6 hover:shadow-xl transition-shadow duration-300">
+                                <Card className="rounded-2xl border-none shadow-lg bg-card dark:bg-slate-900 p-6 hover:shadow-xl transition-shadow duration-300">
                                   <p className="text-emerald-600 font-bold text-xs uppercase tracking-widest mb-1">Ingresos</p>
                                   <h4 className="text-2xl font-black text-emerald-700"><AnimatedNumber value={filteredData.totalIngresos} isCurrency={true} /></h4>
                                   <div className="mt-3 h-[40px] w-full">
@@ -753,7 +753,7 @@ function Dashboard() {
                                     </ResponsiveContainer>
                                   </div>
                                 </Card>
-                                <Card className="rounded-2xl border-none shadow-lg bg-white p-6 hover:shadow-xl transition-shadow duration-300">
+                                <Card className="rounded-2xl border-none shadow-lg bg-card dark:bg-slate-900 p-6 hover:shadow-xl transition-shadow duration-300">
                                   <p className="text-red-600 font-bold text-xs uppercase tracking-widest mb-1">Gastos</p>
                                   <h4 className="text-2xl font-black text-red-700"><AnimatedNumber value={filteredData.totalGastos} isCurrency={true} /></h4>
                                   <div className="mt-3 h-[40px] w-full">
@@ -793,13 +793,13 @@ function Dashboard() {
                         case 'grafico_flujo':
                           return (
                             <SortableWidget key={widget.id} id={widget.id} isEditMode={isEditMode} className="col-span-1 lg:col-span-2">
-                              <Card className="rounded-2xl border border-gray-100 shadow-premium bg-white p-8">
+                              <Card className="rounded-2xl border border-border/50 shadow-premium bg-card dark:bg-slate-900 p-8">
                                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                                   <div>
-                                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Ingresos vs Gastos</h3>
-                                    <p className="text-slate-400 text-sm font-medium">Comparativa acumulada</p>
+                                    <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Ingresos vs Gastos</h3>
+                                    <p className="text-muted-foreground/70 text-sm font-medium">Comparativa acumulada</p>
                                   </div>
-                                  <Badge className="bg-gray-100 text-gray-500 border-none font-medium text-[10px]">Click para detalle</Badge>
+                                  <Badge className="bg-muted text-muted-foreground border-none font-medium text-[10px]">Click para detalle</Badge>
                                 </div>
                                 <div className="h-[350px] w-full cursor-pointer">
                                   <ResponsiveContainer width="100%" height="100%">
@@ -823,14 +823,14 @@ function Dashboard() {
                         case 'ingresos_localidad':
                           return (
                             <SortableWidget key={widget.id} id={widget.id} isEditMode={isEditMode} className="col-span-1 lg:col-span-2">
-                              <Card className="rounded-3xl border-none shadow-premium bg-white p-6 md:p-8">
+                              <Card className="rounded-3xl border-none shadow-premium bg-card dark:bg-slate-900 p-6 md:p-8">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                                   <div>
-                                    <h2 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                                    <h2 className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
                                       <Activity className="w-5 h-5 text-emerald-500" />
                                       Ingresos por Localidad
                                     </h2>
-                                    <p className="text-gray-500 font-medium text-sm">Distribución geográfica de la recaudación</p>
+                                    <p className="text-muted-foreground font-medium text-sm">Distribución geográfica de la recaudación</p>
                                   </div>
                                 </div>
                                 <div className="h-[300px] w-full">
@@ -871,19 +871,19 @@ function Dashboard() {
                             <SortableWidget key={widget.id} id={widget.id} isEditMode={isEditMode} className="col-span-1 lg:col-span-1">
                               <div className="space-y-6">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 bg-white rounded-2xl shadow-sm flex items-center justify-center"><AlertCircle className="text-amber-500 w-5 h-5" /></div>
-                                  <h2 className="text-2xl font-black text-gray-900">Auditoría</h2>
+                                  <div className="w-10 h-10 bg-card dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center"><AlertCircle className="text-amber-500 w-5 h-5" /></div>
+                                  <h2 className="text-2xl font-black text-foreground">Auditoría</h2>
                                 </div>
-                                <Card className="rounded-2xl border border-gray-100 shadow-premium bg-white p-6 space-y-4">
-                                  <div className="p-5 rounded-3xl bg-gray-50 border border-gray-100 cursor-pointer hover:bg-white hover:shadow-md transition-all group" onClick={() => { if (!isEditMode) { setSpecialDialogType('returned'); setIsSpecialDialogOpen(true); } }}>
+                                <Card className="rounded-2xl border border-border/50 shadow-premium bg-card dark:bg-slate-900 p-6 space-y-4">
+                                  <div className="p-5 rounded-3xl bg-muted/50 border border-border/50 cursor-pointer hover:bg-card dark:bg-slate-900 hover:shadow-md transition-all group" onClick={() => { if (!isEditMode) { setSpecialDialogType('returned'); setIsSpecialDialogOpen(true); } }}>
                                     <div className="flex items-center justify-between mb-2"><RefreshCcw className="w-5 h-5 text-[#4892CC]" /><Badge className="bg-amber-100 text-amber-600 border-none">Devoluciones</Badge></div>
                                     <p className="text-2xl font-black text-red-600"><AnimatedNumber value={specialStats.returned} isCurrency={true} /></p>
-                                    <p className="text-xs text-gray-400 font-bold uppercase mt-1">Monto total devuelto</p>
+                                    <p className="text-xs text-muted-foreground/70 font-bold uppercase mt-1">Monto total devuelto</p>
                                   </div>
-                                  <div className="p-5 rounded-3xl bg-gray-50 border border-gray-100 cursor-pointer hover:bg-white hover:shadow-md transition-all group" onClick={() => { if (!isEditMode) { setSpecialDialogType('annulled'); setIsSpecialDialogOpen(true); } }}>
+                                  <div className="p-5 rounded-3xl bg-muted/50 border border-border/50 cursor-pointer hover:bg-card dark:bg-slate-900 hover:shadow-md transition-all group" onClick={() => { if (!isEditMode) { setSpecialDialogType('annulled'); setIsSpecialDialogOpen(true); } }}>
                                     <div className="flex items-center justify-between mb-2"><XCircle className="w-5 h-5 text-red-500" /><Badge className="bg-red-100 text-red-600 border-none">Anulaciones</Badge></div>
-                                    <p className="text-2xl font-black text-gray-900"><AnimatedNumber value={specialStats.annulled} /></p>
-                                    <p className="text-xs text-gray-400 font-bold uppercase mt-1">Boletas invalidadas</p>
+                                    <p className="text-2xl font-black text-foreground"><AnimatedNumber value={specialStats.annulled} /></p>
+                                    <p className="text-xs text-muted-foreground/70 font-bold uppercase mt-1">Boletas invalidadas</p>
                                   </div>
                                 </Card>
                               </div>
@@ -900,9 +900,9 @@ function Dashboard() {
           ) : (
             <TabsContent value="finanzas" className="py-20 text-center">
               <div className="max-w-md mx-auto">
-                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6"><Lock className="w-10 h-10 text-gray-400" /></div>
-                <h3 className="text-2xl font-black text-gray-900 mb-2">Acceso Restringido</h3>
-                <p className="text-gray-500 font-medium">No tienes permisos para ver datos financieros.</p>
+                <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6"><Lock className="w-10 h-10 text-muted-foreground/70" /></div>
+                <h3 className="text-2xl font-black text-foreground mb-2">Acceso Restringido</h3>
+                <p className="text-muted-foreground font-medium">No tienes permisos para ver datos financieros.</p>
               </div>
             </TabsContent>
           )}
@@ -915,7 +915,7 @@ function Dashboard() {
       <Dialog open={drillDownOpen} onOpenChange={setDrillDownOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black text-gray-900">Detalle — {drillDownLabel}</DialogTitle>
+            <DialogTitle className="text-xl font-black text-foreground">Detalle — {drillDownLabel}</DialogTitle>
             <DialogDescription>Transacciones registradas en este periodo.</DialogDescription>
           </DialogHeader>
           <div className="overflow-y-auto flex-1 -mx-2 px-2 space-y-6">
@@ -926,27 +926,27 @@ function Dashboard() {
                   <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
                   Ingresos ({drillDownIngresos.length})
                 </h4>
-                <div className="rounded-xl border border-gray-100 overflow-hidden">
+                <div className="rounded-xl border border-border/50 overflow-hidden">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-gray-50/80">
-                        <th className="text-left py-2.5 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Fecha</th>
-                        <th className="text-right py-2.5 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Monto</th>
-                        <th className="text-left py-2.5 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nombre</th>
+                      <tr className="bg-muted/50/80">
+                        <th className="text-left py-2.5 px-4 text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Fecha</th>
+                        <th className="text-right py-2.5 px-4 text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Monto</th>
+                        <th className="text-left py-2.5 px-4 text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Nombre</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {drillDownIngresos.slice(0, 50).map((item) => (
                         <tr key={item.id} className="hover:bg-emerald-50/30 transition-colors">
-                          <td className="py-2.5 px-4 text-gray-600 font-medium whitespace-nowrap">{isValid(parseISO(item.date)) ? format(parseISO(item.date), 'dd/MM/yyyy') : item.date}</td>
+                          <td className="py-2.5 px-4 text-muted-foreground font-medium whitespace-nowrap">{isValid(parseISO(item.date)) ? format(parseISO(item.date), 'dd/MM/yyyy') : item.date}</td>
                           <td className="py-2.5 px-4 text-right font-black text-emerald-700 whitespace-nowrap">{formatCurrency(item.amount)}</td>
-                          <td className="py-2.5 px-4 text-gray-500 font-medium truncate max-w-[200px]">{(item as any).full_name || item.dni || '—'}</td>
+                          <td className="py-2.5 px-4 text-muted-foreground font-medium truncate max-w-[200px]">{(item as any).full_name || item.dni || '—'}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                   {drillDownIngresos.length > 50 && (
-                    <p className="text-center text-xs text-gray-400 py-2">Mostrando 50 de {drillDownIngresos.length} registros.</p>
+                    <p className="text-center text-xs text-muted-foreground/70 py-2">Mostrando 50 de {drillDownIngresos.length} registros.</p>
                   )}
                 </div>
               </div>
@@ -958,34 +958,34 @@ function Dashboard() {
                   <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
                   Gastos ({drillDownGastos.length})
                 </h4>
-                <div className="rounded-xl border border-gray-100 overflow-hidden">
+                <div className="rounded-xl border border-border/50 overflow-hidden">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-gray-50/80">
-                        <th className="text-left py-2.5 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Fecha</th>
-                        <th className="text-right py-2.5 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Monto</th>
-                        <th className="text-left py-2.5 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Descripción</th>
+                      <tr className="bg-muted/50/80">
+                        <th className="text-left py-2.5 px-4 text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Fecha</th>
+                        <th className="text-right py-2.5 px-4 text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Monto</th>
+                        <th className="text-left py-2.5 px-4 text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Descripción</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {drillDownGastos.slice(0, 50).map((item) => (
                         <tr key={item.id} className="hover:bg-red-50/30 transition-colors">
-                          <td className="py-2.5 px-4 text-gray-600 font-medium whitespace-nowrap">{isValid(parseISO(item.date)) ? format(parseISO(item.date), 'dd/MM/yyyy') : item.date}</td>
+                          <td className="py-2.5 px-4 text-muted-foreground font-medium whitespace-nowrap">{isValid(parseISO(item.date)) ? format(parseISO(item.date), 'dd/MM/yyyy') : item.date}</td>
                           <td className="py-2.5 px-4 text-right font-black text-red-700 whitespace-nowrap">{formatCurrency(Math.abs(item.amount))}</td>
-                          <td className="py-2.5 px-4 text-gray-500 font-medium truncate max-w-[200px]">{(item as any).description || '—'}</td>
+                          <td className="py-2.5 px-4 text-muted-foreground font-medium truncate max-w-[200px]">{(item as any).description || '—'}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                   {drillDownGastos.length > 50 && (
-                    <p className="text-center text-xs text-gray-400 py-2">Mostrando 50 de {drillDownGastos.length} registros.</p>
+                    <p className="text-center text-xs text-muted-foreground/70 py-2">Mostrando 50 de {drillDownGastos.length} registros.</p>
                   )}
                 </div>
               </div>
             )}
             {drillDownIngresos.length === 0 && drillDownGastos.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-gray-400 font-bold">No hay transacciones para este periodo.</p>
+                <p className="text-muted-foreground/70 font-bold">No hay transacciones para este periodo.</p>
               </div>
             )}
           </div>

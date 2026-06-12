@@ -72,8 +72,8 @@ export default function DistritoCombobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "justify-between bg-gray-50 border-none rounded-2xl font-bold text-gray-700 hover:bg-gray-100",
-            !value || value === 'all' ? "text-gray-500" : "text-gray-700",
+            "justify-between bg-muted/50 border-none rounded-2xl font-bold text-foreground/80 hover:bg-muted",
+            !value || value === 'all' ? "text-muted-foreground" : "text-foreground/80",
             triggerClassName,
             className
           )}
@@ -90,7 +90,7 @@ export default function DistritoCombobox({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-white border-gray-100 rounded-xl shadow-lg">
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-card dark:bg-slate-900 border-border/50 rounded-xl shadow-lg">
         <Command>
           <CommandInput
             placeholder="Buscar distrito..."

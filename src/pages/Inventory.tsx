@@ -365,18 +365,18 @@ export default function InventoryPage() {
       {/* ── Header ──────────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-3">
+          <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3">
             <Package className="w-8 h-8 text-[#4892CC]" />
             Inventario de Campo
           </h1>
-          <p className="text-slate-500 mt-1 font-medium">
+          <p className="text-muted-foreground mt-1 font-medium">
             Registro de entrada y salida de equipos para ingenieros en salidas a campo.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="rounded-xl border-slate-200 shadow-sm gap-2">
+              <Button variant="outline" className="rounded-xl border-border shadow-sm gap-2">
                 <Download className="w-4 h-4" /> Exportar
               </Button>
             </DropdownMenuTrigger>
@@ -419,10 +419,10 @@ export default function InventoryPage() {
           </DropdownMenu>
           {canEdit && (
             <>
-              <Button onClick={() => setIsAddItemOpen(true)} variant="outline" className="rounded-xl border-slate-200 shadow-sm">
+              <Button onClick={() => setIsAddItemOpen(true)} variant="outline" className="rounded-xl border-border shadow-sm">
                 <Plus className="w-4 h-4 mr-2" /> Nuevo Equipo
               </Button>
-              <Button onClick={() => setIsReturnAllOpen(true)} variant="outline" className="rounded-xl border-slate-200 shadow-sm">
+              <Button onClick={() => setIsReturnAllOpen(true)} variant="outline" className="rounded-xl border-border shadow-sm">
                 <ArrowDownToLine className="w-4 h-4 mr-2" /> Recepción Total
               </Button>
               <Button onClick={() => setIsCheckoutOpen(true)} className="bg-[#4892CC] hover:bg-[#8b6ae5] text-white rounded-xl shadow-glass">
@@ -435,42 +435,42 @@ export default function InventoryPage() {
 
       {/* ── Stats rápidos ───────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <Card className="rounded-2xl border-gray-100 shadow-glass">
+        <Card className="rounded-2xl border-border/50 shadow-glass">
           <CardContent className="p-5 text-center">
-            <p className="text-3xl font-black text-slate-800">{items.length}</p>
-            <p className="text-xs font-bold text-slate-400 uppercase mt-1">Tipos de Equipo</p>
+            <p className="text-3xl font-black text-foreground/90">{items.length}</p>
+            <p className="text-xs font-bold text-muted-foreground/70 uppercase mt-1">Tipos de Equipo</p>
           </CardContent>
         </Card>
-        <Card className="rounded-2xl border-gray-100 shadow-glass">
+        <Card className="rounded-2xl border-border/50 shadow-glass">
           <CardContent className="p-5 text-center">
             <p className="text-3xl font-black text-green-500">{items.reduce((s, i) => s + i.available_quantity, 0)}</p>
-            <p className="text-xs font-bold text-slate-400 uppercase mt-1">Disponibles</p>
+            <p className="text-xs font-bold text-muted-foreground/70 uppercase mt-1">Disponibles</p>
           </CardContent>
         </Card>
-        <Card className="rounded-2xl border-gray-100 shadow-glass">
+        <Card className="rounded-2xl border-border/50 shadow-glass">
           <CardContent className="p-5 text-center">
             <p className="text-3xl font-black text-amber-500">{totalEnUso}</p>
-            <p className="text-xs font-bold text-slate-400 uppercase mt-1">En Uso</p>
+            <p className="text-xs font-bold text-muted-foreground/70 uppercase mt-1">En Uso</p>
           </CardContent>
         </Card>
-        <Card className="rounded-2xl border-gray-100 shadow-glass">
+        <Card className="rounded-2xl border-border/50 shadow-glass">
           <CardContent className="p-5 text-center">
             <p className="text-3xl font-black text-[#4892CC]">{ingenierosEnCampo}</p>
-            <p className="text-xs font-bold text-slate-400 uppercase mt-1">Ingenieros en Campo</p>
+            <p className="text-xs font-bold text-muted-foreground/70 uppercase mt-1">Ingenieros en Campo</p>
           </CardContent>
         </Card>
       </div>
 
       {/* ── Tabs ────────────────────────────────────── */}
       <Tabs defaultValue="active" className="w-full">
-        <TabsList className="bg-white/80 backdrop-blur-md border border-gray-200 p-1.5 rounded-2xl h-14 shadow-sm mb-6 flex overflow-x-auto max-w-full scrollbar-none shrink-0 justify-start sm:justify-center">
-          <TabsTrigger value="active" className="rounded-xl px-6 data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-bold text-slate-500 transition-all">
+        <TabsList className="bg-card dark:bg-slate-900/80 backdrop-blur-md border border-border p-1.5 rounded-2xl h-14 shadow-sm mb-6 flex overflow-x-auto max-w-full scrollbar-none shrink-0 justify-start sm:justify-center">
+          <TabsTrigger value="active" className="rounded-xl px-6 data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-bold text-muted-foreground transition-all">
             <UserCheck className="w-4 h-4 mr-2" /> Equipos en Campo
           </TabsTrigger>
-          <TabsTrigger value="catalog" className="rounded-xl px-6 data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-bold text-slate-500 transition-all">
+          <TabsTrigger value="catalog" className="rounded-xl px-6 data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-bold text-muted-foreground transition-all">
             <Box className="w-4 h-4 mr-2" /> Catálogo
           </TabsTrigger>
-          <TabsTrigger value="history" className="rounded-xl px-6 data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-bold text-slate-500 transition-all">
+          <TabsTrigger value="history" className="rounded-xl px-6 data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-bold text-muted-foreground transition-all">
             <History className="w-4 h-4 mr-2" /> Historial
           </TabsTrigger>
         </TabsList>
@@ -478,20 +478,20 @@ export default function InventoryPage() {
         {/* ── TAB: Equipos en Campo (por ingeniero) ── */}
         <TabsContent value="active" className="mt-4">
           {Object.keys(activeByColab).length === 0 ? (
-            <div className="py-20 text-center bg-white rounded-2xl border border-dashed border-slate-200">
+            <div className="py-20 text-center bg-card dark:bg-slate-900 rounded-2xl border border-dashed border-border">
               <ClipboardList className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-slate-700">Sin equipos en campo</h3>
-              <p className="text-slate-500 max-w-sm mx-auto mt-2">
+              <h3 className="text-lg font-bold text-foreground/80">Sin equipos en campo</h3>
+              <p className="text-muted-foreground max-w-sm mx-auto mt-2">
                 Todos los equipos están en almacén. Usa "Registrar Salida" cuando un ingeniero vaya a campo.
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {Object.entries(activeByColab).map(([colabId, { name, items: colabItems }]) => (
-                <Card key={colabId} className="rounded-2xl border border-gray-100 shadow-glass overflow-hidden">
-                  <CardHeader className="pb-3 bg-gradient-to-r from-slate-50 to-sky-50/30 border-b border-gray-100">
+                <Card key={colabId} className="rounded-2xl border border-border/50 shadow-glass overflow-hidden">
+                  <CardHeader className="pb-3 bg-gradient-to-r from-slate-50 to-sky-50/30 border-b border-border/50">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-base font-black text-slate-800 flex items-center gap-2">
+                      <CardTitle className="text-base font-black text-foreground/90 flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-[#4892CC]/10 flex items-center justify-center">
                           <UserCheck className="w-4 h-4 text-[#4892CC]" />
                         </div>
@@ -505,10 +505,10 @@ export default function InventoryPage() {
                   <CardContent className="p-0">
                     <div className="divide-y divide-gray-50">
                       {colabItems.map(a => (
-                        <div key={a.id} className="flex items-center justify-between px-5 py-3 hover:bg-slate-50/50 transition-colors">
+                        <div key={a.id} className="flex items-center justify-between px-5 py-3 hover:bg-muted/50/50 transition-colors">
                           <div>
-                            <p className="font-bold text-sm text-slate-700">{a.inventory_items?.name || 'Equipo'}</p>
-                            <p className="text-xs text-slate-400">
+                            <p className="font-bold text-sm text-foreground/80">{a.inventory_items?.name || 'Equipo'}</p>
+                            <p className="text-xs text-muted-foreground/70">
                               Cant: {a.quantity} · Salida: {format(new Date(a.assigned_at), "d MMM", { locale: es })}
                             </p>
                           </div>
@@ -538,7 +538,7 @@ export default function InventoryPage() {
               const inUse = item.total_quantity - item.available_quantity;
               const pct = item.total_quantity > 0 ? (item.available_quantity / item.total_quantity) * 100 : 0;
               return (
-                <Card key={item.id} className="rounded-2xl border border-gray-100 shadow-glass overflow-hidden group relative">
+                <Card key={item.id} className="rounded-2xl border border-border/50 shadow-glass overflow-hidden group relative">
                   {canEdit && (
                     <button
                       onClick={() => handleDeleteItem(item)}
@@ -547,31 +547,31 @@ export default function InventoryPage() {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}
-                  <CardHeader className="pb-3 border-b border-gray-50 bg-slate-50/50">
-                    <CardTitle className="text-base font-bold text-slate-800">{item.name}</CardTitle>
+                  <CardHeader className="pb-3 border-b border-gray-50 bg-muted/50/50">
+                    <CardTitle className="text-base font-bold text-foreground/90">{item.name}</CardTitle>
                     {item.description && <CardDescription className="line-clamp-1 text-xs">{item.description}</CardDescription>}
                   </CardHeader>
                   <CardContent className="pt-4 space-y-3">
                     <div className="flex justify-between text-center">
                       <div>
-                        <p className="text-2xl font-black text-slate-800">{item.total_quantity}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Total</p>
+                        <p className="text-2xl font-black text-foreground/90">{item.total_quantity}</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/70 uppercase">Total</p>
                       </div>
-                      <div className="h-10 w-px bg-slate-100" />
+                      <div className="h-10 w-px bg-muted" />
                       <div>
                         <p className={`text-2xl font-black ${item.available_quantity > 0 ? 'text-green-500' : 'text-red-500'}`}>
                           {item.available_quantity}
                         </p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Disponible</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/70 uppercase">Disponible</p>
                       </div>
-                      <div className="h-10 w-px bg-slate-100" />
+                      <div className="h-10 w-px bg-muted" />
                       <div>
                         <p className="text-2xl font-black text-amber-500">{inUse}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">En Uso</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/70 uppercase">En Uso</p>
                       </div>
                     </div>
                     {/* Barra de progreso */}
-                    <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div className="w-full bg-muted rounded-full h-2">
                        <div className="h-2 rounded-full bg-gradient-to-r from-[#4892CC] to-[#3C9384] transition-all" style={{ width: `${pct}%` }} />
                     </div>
                   </CardContent>
@@ -579,10 +579,10 @@ export default function InventoryPage() {
               );
             })}
             {items.length === 0 && (
-              <div className="col-span-full py-20 text-center bg-white rounded-2xl border border-dashed border-slate-200">
+              <div className="col-span-full py-20 text-center bg-card dark:bg-slate-900 rounded-2xl border border-dashed border-border">
                 <Package className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-slate-700">Catálogo Vacío</h3>
-                <p className="text-slate-500 max-w-sm mx-auto mt-2">
+                <h3 className="text-lg font-bold text-foreground/80">Catálogo Vacío</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto mt-2">
                   Agrega los equipos de campo (cascos, chalecos, GPS, etc.) para empezar a controlar entradas y salidas.
                 </p>
               </div>
@@ -593,7 +593,7 @@ export default function InventoryPage() {
         {/* ── TAB: Historial ───────────────────────── */}
         <TabsContent value="history" className="mt-4">
           {/* Vista Desktop: AG Grid */}
-          <Card className="hidden md:block rounded-2xl border border-gray-100 shadow-glass overflow-hidden h-[500px]">
+          <Card className="hidden md:block rounded-2xl border border-border/50 shadow-glass overflow-hidden h-[500px]">
              <div className="ag-theme-alpine w-full h-full">
               <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-[#4892CC]" /></div>}>
                 <AgGridReact
@@ -615,10 +615,10 @@ export default function InventoryPage() {
           {/* Vista Móvil: Tarjetas optimizadas */}
           <div className="md:hidden space-y-4">
             {allAssignments.length === 0 ? (
-              <div className="py-20 text-center bg-white rounded-2xl border border-dashed border-slate-200">
+              <div className="py-20 text-center bg-card dark:bg-slate-900 rounded-2xl border border-dashed border-border">
                 <ClipboardList className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-slate-700">Historial vacío</h3>
-                <p className="text-slate-500 max-w-sm mx-auto mt-2">Aún no hay movimientos de inventario registrados.</p>
+                <h3 className="text-lg font-bold text-foreground/80">Historial vacío</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto mt-2">Aún no hay movimientos de inventario registrados.</p>
               </div>
             ) : (
               allAssignments.map(a => {
@@ -627,11 +627,11 @@ export default function InventoryPage() {
                 const formattedSalida = a.assigned_at ? format(new Date(a.assigned_at), "d MMM yyyy, HH:mm", { locale: es }) : '—';
                 const formattedRetorno = (a.status === 'Devuelto' && a.returned_at) ? format(new Date(a.returned_at), "d MMM yyyy, HH:mm", { locale: es }) : '—';
                 return (
-                  <Card key={a.id} className="rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3 bg-white">
+                  <Card key={a.id} className="rounded-2xl border border-border/50 shadow-sm p-4 space-y-3 bg-card dark:bg-slate-900">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-bold text-slate-800 text-sm">{a.inventory_items?.name || 'Equipo'}</h4>
-                        <p className="text-xs text-slate-500 mt-0.5">Asignado a: {colabName}</p>
+                        <h4 className="font-bold text-foreground/90 text-sm">{a.inventory_items?.name || 'Equipo'}</h4>
+                        <p className="text-xs text-muted-foreground mt-0.5">Asignado a: {colabName}</p>
                       </div>
                       <Badge className={cn(
                         "font-bold text-[10px] px-2 py-0.5 border-none",
@@ -642,18 +642,18 @@ export default function InventoryPage() {
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-xs border-t border-slate-50 pt-2.5">
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Cantidad</p>
-                        <p className="font-bold text-slate-700 mt-0.5">{a.quantity}</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/70 uppercase">Cantidad</p>
+                        <p className="font-bold text-foreground/80 mt-0.5">{a.quantity}</p>
                       </div>
                       <div className="col-span-2">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Fecha Salida</p>
-                        <p className="text-slate-700 font-medium mt-0.5">{formattedSalida}</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/70 uppercase">Fecha Salida</p>
+                        <p className="text-foreground/80 font-medium mt-0.5">{formattedSalida}</p>
                       </div>
                     </div>
                     {a.status === 'Devuelto' && (
                       <div className="text-xs border-t border-slate-50 pt-2.5">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Fecha Retorno</p>
-                        <p className="text-slate-700 font-medium mt-0.5">{formattedRetorno}</p>
+                        <p className="text-[10px] font-bold text-muted-foreground/70 uppercase">Fecha Retorno</p>
+                        <p className="text-foreground/80 font-medium mt-0.5">{formattedRetorno}</p>
                       </div>
                     )}
                   </Card>
@@ -677,19 +677,19 @@ export default function InventoryPage() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Nombre</label>
+              <label className="text-sm font-bold text-foreground/80">Nombre</label>
               <Input placeholder="Ej. Casco de Seguridad" value={newName} onChange={e => setNewName(e.target.value)}
-                className="rounded-xl bg-slate-50 border-slate-200 focus-visible:ring-[#4892CC]" />
+                className="rounded-xl bg-muted/50 border-border focus-visible:ring-[#4892CC]" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Descripción (Opcional)</label>
+              <label className="text-sm font-bold text-foreground/80">Descripción (Opcional)</label>
               <Input placeholder="Color, talla, marca..." value={newDesc} onChange={e => setNewDesc(e.target.value)}
-                className="rounded-xl bg-slate-50 border-slate-200 focus-visible:ring-[#4892CC]" />
+                className="rounded-xl bg-muted/50 border-border focus-visible:ring-[#4892CC]" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Stock Inicial</label>
+              <label className="text-sm font-bold text-foreground/80">Stock Inicial</label>
               <Input type="number" min="1" value={newQty} onChange={e => setNewQty(e.target.value)}
-                className="rounded-xl bg-slate-50 border-slate-200 focus-visible:ring-[#4892CC]" />
+                className="rounded-xl bg-muted/50 border-border focus-visible:ring-[#4892CC]" />
             </div>
           </div>
           <DialogFooter>
@@ -711,9 +711,9 @@ export default function InventoryPage() {
           <div className="grid gap-5 py-4">
             {/* Selección de Ingeniero */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Ingeniero / Colaborador</label>
+              <label className="text-sm font-bold text-foreground/80">Ingeniero / Colaborador</label>
               <Select onValueChange={setCheckoutColabId} value={checkoutColabId}>
-                <SelectTrigger className="rounded-xl bg-slate-50 border-slate-200 focus:ring-[#4892CC]">
+                <SelectTrigger className="rounded-xl bg-muted/50 border-border focus:ring-[#4892CC]">
                   <SelectValue placeholder="¿Quién sale a campo?" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl max-h-60">
@@ -726,11 +726,11 @@ export default function InventoryPage() {
 
             {/* Lista de Equipos */}
             <div className="space-y-3">
-              <label className="text-sm font-bold text-slate-700">Equipos que se lleva</label>
+              <label className="text-sm font-bold text-foreground/80">Equipos que se lleva</label>
               {checkoutRows.map((row, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <Select onValueChange={v => updateCheckoutRow(index, 'item_id', v)} value={row.item_id}>
-                    <SelectTrigger className="rounded-xl bg-slate-50 border-slate-200 focus:ring-[#4892CC] flex-1">
+                    <SelectTrigger className="rounded-xl bg-muted/50 border-border focus:ring-[#4892CC] flex-1">
                       <SelectValue placeholder="Seleccionar equipo" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -744,26 +744,26 @@ export default function InventoryPage() {
                   <Input
                     type="number" min="1" value={row.quantity}
                     onChange={e => updateCheckoutRow(index, 'quantity', parseInt(e.target.value) || 1)}
-                    className="w-20 rounded-xl bg-slate-50 border-slate-200 focus-visible:ring-[#4892CC] text-center"
+                    className="w-20 rounded-xl bg-muted/50 border-border focus-visible:ring-[#4892CC] text-center"
                   />
                   {checkoutRows.length > 1 && (
-                    <Button size="icon" variant="ghost" onClick={() => removeCheckoutRow(index)} className="h-9 w-9 text-slate-400 hover:text-red-500">
+                    <Button size="icon" variant="ghost" onClick={() => removeCheckoutRow(index)} className="h-9 w-9 text-muted-foreground/70 hover:text-red-500">
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
               ))}
-              <Button variant="outline" size="sm" onClick={addCheckoutRow} className="rounded-xl border-dashed w-full text-slate-500">
+              <Button variant="outline" size="sm" onClick={addCheckoutRow} className="rounded-xl border-dashed w-full text-muted-foreground">
                 <Plus className="w-4 h-4 mr-2" /> Agregar otro equipo
               </Button>
             </div>
 
             {/* Notas */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Observaciones (Opcional)</label>
+              <label className="text-sm font-bold text-foreground/80">Observaciones (Opcional)</label>
               <Input placeholder="Ej. Salida a Zona Norte, proyecto ABC..." value={checkoutNotes}
                 onChange={e => setCheckoutNotes(e.target.value)}
-                className="rounded-xl bg-slate-50 border-slate-200 focus-visible:ring-[#4892CC]" />
+                className="rounded-xl bg-muted/50 border-border focus-visible:ring-[#4892CC]" />
             </div>
           </div>
           <DialogFooter>
@@ -784,9 +784,9 @@ export default function InventoryPage() {
           </DialogHeader>
           <div className="py-4 space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Ingeniero que regresa</label>
+              <label className="text-sm font-bold text-foreground/80">Ingeniero que regresa</label>
               <Select onValueChange={setReturnAllColabId} value={returnAllColabId}>
-                <SelectTrigger className="rounded-xl bg-slate-50 border-slate-200 focus:ring-[#4892CC]">
+                <SelectTrigger className="rounded-xl bg-muted/50 border-border focus:ring-[#4892CC]">
                   <SelectValue placeholder="Seleccionar colaborador" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl max-h-60">
@@ -799,12 +799,12 @@ export default function InventoryPage() {
               </Select>
             </div>
             {returnAllColabId && activeByColab[returnAllColabId] && (
-              <div className="bg-slate-50 rounded-xl p-4 space-y-2">
-                <p className="text-xs font-bold text-slate-400 uppercase">Equipos a devolver:</p>
+              <div className="bg-muted/50 rounded-xl p-4 space-y-2">
+                <p className="text-xs font-bold text-muted-foreground/70 uppercase">Equipos a devolver:</p>
                 {activeByColab[returnAllColabId].items.map(a => (
                   <div key={a.id} className="flex justify-between text-sm">
-                    <span className="text-slate-700 font-medium">{a.inventory_items?.name}</span>
-                    <span className="text-slate-500">×{a.quantity}</span>
+                    <span className="text-foreground/80 font-medium">{a.inventory_items?.name}</span>
+                    <span className="text-muted-foreground">×{a.quantity}</span>
                   </div>
                 ))}
               </div>

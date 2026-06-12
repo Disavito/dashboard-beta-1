@@ -198,7 +198,7 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
                   variant="outline" 
                   className={cn(
                     "flex-1 border-border hover:bg-primary/10",
-                    isReceipt && "border-amber-300 bg-white hover:bg-amber-100 text-amber-700"
+                    isReceipt && "border-amber-300 bg-card dark:bg-slate-900 hover:bg-amber-100 text-amber-700"
                   )} 
                   asChild
                 >
@@ -242,24 +242,24 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
   return (
     <div className="space-y-6">
       {isAdmin && (
-        <Card className="bg-white border-gray-200 shadow-sm overflow-visible">
+        <Card className="bg-card dark:bg-slate-900 border-border shadow-sm overflow-visible">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-bold text-gray-900">Gestión de Expedientes Digitales</CardTitle>
+            <CardTitle className="text-lg font-bold text-foreground">Gestión de Expedientes Digitales</CardTitle>
             <CardDescription>Busca un socio por nombre, DNI o recibo para administrar su documentación.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
               <Input
                 placeholder="Ej: 'Juan 456' o 'Mz A Lote 2'..."
-                className="pl-10 bg-gray-50 border-gray-200 focus:ring-2 focus:ring-primary/20 transition-all h-12"
+                className="pl-10 bg-muted/50 border-border focus:ring-2 focus:ring-primary/20 transition-all h-12"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
               {searchInput && (
                 <button 
                   onClick={() => setSearchInput('')}
-                  className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-10 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-muted-foreground"
                 >
                   <FilterX className="h-4 w-4" />
                 </button>
@@ -267,7 +267,7 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
               {isSearching && <div className="absolute right-3 top-1/2 -translate-y-1/2"><Loader2 className="h-4 w-4 animate-spin text-primary" /></div>}
               
               {rawSearchResults.length > 0 && (
-                <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-premium max-h-80 overflow-auto p-2 animate-in fade-in zoom-in-95 duration-200">
+                <div className="absolute z-50 w-full mt-2 bg-card dark:bg-slate-900 border border-border rounded-xl shadow-premium max-h-80 overflow-auto p-2 animate-in fade-in zoom-in-95 duration-200">
                   {rawSearchResults.map((socio) => (
                     <div
                       key={socio.id}
@@ -275,12 +275,12 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
                       onClick={() => { setSelectedSocio(socio); setSearchInput(''); setRawSearchResults([]); }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
                           <UserCheck className="h-5 w-5" />
                         </div>
                         <div>
-                          <div className="font-bold text-gray-900 uppercase text-sm">{socio.nombres} {socio.apellidoPaterno}</div>
-                          <div className="text-xs text-gray-500 flex items-center gap-2">
+                          <div className="font-bold text-foreground uppercase text-sm">{socio.nombres} {socio.apellidoPaterno}</div>
+                          <div className="text-xs text-muted-foreground flex items-center gap-2">
                             <span>DNI: {socio.dni}</span>
                             {socio.localidad && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {socio.localidad}</span>}
                           </div>
@@ -302,13 +302,13 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
 
       {selectedSocio ? (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-100 pb-6 gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-border/50 pb-6 gap-4">
             <div className="space-y-1">
-              <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tight leading-none">
+              <h2 className="text-3xl font-black text-foreground uppercase tracking-tight leading-none">
                 {selectedSocio.nombres} {selectedSocio.apellidoPaterno}
               </h2>
               <div className="flex flex-wrap items-center gap-3 mt-3">
-                <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200 px-3 py-1">
+                <Badge variant="outline" className="bg-muted/50 text-muted-foreground border-border px-3 py-1">
                   DNI: {selectedSocio.dni}
                 </Badge>
                 {selectedSocio.ingresos?.[0]?.nro_recibo && (
@@ -319,7 +319,7 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
                 )}
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => setSelectedSocio(null)} className="text-gray-400 hover:text-gray-600">
+            <Button variant="ghost" size="sm" onClick={() => setSelectedSocio(null)} className="text-muted-foreground/70 hover:text-muted-foreground">
               Cambiar Socio <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           </div>
@@ -337,12 +337,12 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
           )}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50">
-          <div className="bg-white p-6 rounded-full shadow-sm mb-6 border border-gray-100">
+        <div className="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-border rounded-2xl bg-muted/50/50">
+          <div className="bg-card dark:bg-slate-900 p-6 rounded-full shadow-sm mb-6 border border-border/50">
             <Search className="h-10 w-10 text-gray-300" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900">Selecciona un socio para ver su expediente</h3>
-          <p className="text-gray-500 max-w-xs mt-2">Utiliza el buscador de arriba para encontrar al socio por nombre, DNI o número de recibo.</p>
+          <h3 className="text-xl font-bold text-foreground">Selecciona un socio para ver su expediente</h3>
+          <p className="text-muted-foreground max-w-xs mt-2">Utiliza el buscador de arriba para encontrar al socio por nombre, DNI o número de recibo.</p>
         </div>
       )}
 
@@ -358,15 +358,15 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
       )}
 
       <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
-        <AlertDialogContent className="bg-white border-gray-200">
+        <AlertDialogContent className="bg-card dark:bg-slate-900 border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-gray-900">¿Solicitar eliminación?</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-500">
-              Esta acción enviará una solicitud para eliminar el documento <span className="text-gray-900 font-bold">{docToDelete?.tipo_documento}</span>.
+            <AlertDialogTitle className="text-foreground">¿Solicitar eliminación?</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              Esta acción enviará una solicitud para eliminar el documento <span className="text-foreground font-bold">{docToDelete?.tipo_documento}</span>.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-gray-100 border-none text-gray-600">Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="bg-muted border-none text-muted-foreground">Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={async () => {
                 if (!docToDelete || !selectedSocio || !user) return;

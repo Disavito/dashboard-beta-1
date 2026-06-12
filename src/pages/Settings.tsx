@@ -44,10 +44,10 @@ const SettingsPage: React.FC = () => {
             <SettingsIcon className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">
+            <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">
               Configuración
             </h1>
-            <p className="text-slate-500 font-medium text-sm">
+            <p className="text-muted-foreground font-medium text-sm">
               Gestiona los parámetros del sistema
             </p>
           </div>
@@ -55,30 +55,30 @@ const SettingsPage: React.FC = () => {
       </header>
 
       <Tabs defaultValue={defaultTab} className="space-y-6">
-        <TabsList className="bg-slate-50 p-1 rounded-2xl border border-slate-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1 h-auto">
+        <TabsList className="bg-muted/50 p-1 rounded-2xl border border-border/50 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1 h-auto">
           {isAdminOrFinanzas && (
-            <TabsTrigger value="horarios" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm py-2">
+            <TabsTrigger value="horarios" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm py-2">
               <Clock className="w-3.5 h-3.5 mr-1.5" /> Horarios
             </TabsTrigger>
           )}
           {isAdminOrFinanzas && (
-            <TabsTrigger value="categorias" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm py-2">
+            <TabsTrigger value="categorias" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm py-2">
               <Tag className="w-3.5 h-3.5 mr-1.5" /> Categorías
             </TabsTrigger>
           )}
-          <TabsTrigger value="localidades" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm py-2">
+          <TabsTrigger value="localidades" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm py-2">
             <MapPin className="w-3.5 h-3.5 mr-1.5" /> Localidades
           </TabsTrigger>
-          <TabsTrigger value="perfil" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm py-2">
+          <TabsTrigger value="perfil" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm py-2">
             <Shield className="w-3.5 h-3.5 mr-1.5" /> Perfil
           </TabsTrigger>
           {isAdmin && (
-            <TabsTrigger value="equipo" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm py-2">
+            <TabsTrigger value="equipo" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm py-2">
               <Users className="w-3.5 h-3.5 mr-1.5" /> Equipo
             </TabsTrigger>
           )}
           {isAdmin && (
-            <TabsTrigger value="plantillas" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm py-2">
+            <TabsTrigger value="plantillas" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm py-2">
               <FileText className="w-3.5 h-3.5 mr-1.5" /> Plantillas
             </TabsTrigger>
           )}
@@ -206,7 +206,7 @@ const HorariosSection: React.FC<{ isAdmin?: boolean }> = ({ isAdmin }) => {
   };
 
   return (
-    <Card className="border border-gray-100 shadow-sm rounded-2xl">
+    <Card className="border border-border/50 shadow-sm rounded-2xl">
       <CardHeader>
         <CardTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
           <Clock className="w-5 h-5 text-[#4892CC]" /> Ventanas Horarias de Jornada
@@ -228,11 +228,11 @@ const HorariosSection: React.FC<{ isAdmin?: boolean }> = ({ isAdmin }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-bold uppercase text-emerald-600/60 tracking-widest">Desde</Label>
-                    <Input type="time" value={entryStart} onChange={e => setEntryStart(e.target.value)} className="bg-white border-emerald-200 rounded-xl h-12 font-mono font-bold text-lg" disabled={!isAdmin} />
+                    <Input type="time" value={entryStart} onChange={e => setEntryStart(e.target.value)} className="bg-card dark:bg-slate-900 border-emerald-200 rounded-xl h-12 font-mono font-bold text-lg" disabled={!isAdmin} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-bold uppercase text-emerald-600/60 tracking-widest">Hasta</Label>
-                    <Input type="time" value={entryEnd} onChange={e => setEntryEnd(e.target.value)} className="bg-white border-emerald-200 rounded-xl h-12 font-mono font-bold text-lg" disabled={!isAdmin} />
+                    <Input type="time" value={entryEnd} onChange={e => setEntryEnd(e.target.value)} className="bg-card dark:bg-slate-900 border-emerald-200 rounded-xl h-12 font-mono font-bold text-lg" disabled={!isAdmin} />
                   </div>
                 </div>
               </div>
@@ -242,11 +242,11 @@ const HorariosSection: React.FC<{ isAdmin?: boolean }> = ({ isAdmin }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-bold uppercase text-red-600/60 tracking-widest">Desde</Label>
-                    <Input type="time" value={exitStart} onChange={e => setExitStart(e.target.value)} className="bg-white border-red-200 rounded-xl h-12 font-mono font-bold text-lg" disabled={!isAdmin} />
+                    <Input type="time" value={exitStart} onChange={e => setExitStart(e.target.value)} className="bg-card dark:bg-slate-900 border-red-200 rounded-xl h-12 font-mono font-bold text-lg" disabled={!isAdmin} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-bold uppercase text-red-600/60 tracking-widest">Hasta</Label>
-                    <Input type="time" value={exitEnd} onChange={e => setExitEnd(e.target.value)} className="bg-white border-red-200 rounded-xl h-12 font-mono font-bold text-lg" disabled={!isAdmin} />
+                    <Input type="time" value={exitEnd} onChange={e => setExitEnd(e.target.value)} className="bg-card dark:bg-slate-900 border-red-200 rounded-xl h-12 font-mono font-bold text-lg" disabled={!isAdmin} />
                   </div>
                 </div>
               </div>
@@ -298,7 +298,7 @@ const CategoriasSection: React.FC = () => {
   }, [fetchCategories]);
 
   return (
-    <Card className="border border-gray-100 shadow-sm rounded-2xl">
+    <Card className="border border-border/50 shadow-sm rounded-2xl">
       <CardHeader>
         <CardTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
           <Tag className="w-5 h-5 text-[#4892CC]" /> Categorías de Gasto
@@ -316,17 +316,17 @@ const CategoriasSection: React.FC = () => {
           <div className="space-y-6">
             <div className="flex flex-wrap gap-2">
               {categories.map(cat => (
-                <Badge key={cat} className="bg-slate-100 text-slate-700 border-none rounded-xl px-4 py-2 font-bold text-sm hover:bg-slate-200 transition-colors">
+                <Badge key={cat} className="bg-muted text-foreground/80 border-none rounded-xl px-4 py-2 font-bold text-sm hover:bg-slate-200 transition-colors">
                   {cat}
                 </Badge>
               ))}
               {categories.length === 0 && (
-                <p className="text-slate-400 italic text-sm">No hay categorías registradas aún.</p>
+                <p className="text-muted-foreground/70 italic text-sm">No hay categorías registradas aún.</p>
               )}
             </div>
 
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-xs text-slate-500 font-medium">
+            <div className="p-4 bg-muted/50 rounded-xl border border-border/50">
+              <p className="text-xs text-muted-foreground font-medium">
                 <strong>{categories.length}</strong> categorías únicas detectadas en la base de datos.
               </p>
             </div>
@@ -374,7 +374,7 @@ const LocalidadesSection: React.FC = () => {
   }, []);
 
   return (
-    <Card className="border border-gray-100 shadow-sm rounded-2xl">
+    <Card className="border border-border/50 shadow-sm rounded-2xl">
       <CardHeader>
         <CardTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
           <MapPin className="w-5 h-5 text-[#4892CC]" /> Localidades Registradas
@@ -391,12 +391,12 @@ const LocalidadesSection: React.FC = () => {
         ) : (
           <div className="space-y-4">
             {localidades.map(loc => (
-              <div key={loc.name} className="flex items-center justify-between p-4 bg-slate-50/50 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors">
+              <div key={loc.name} className="flex items-center justify-between p-4 bg-muted/50/50 rounded-xl border border-border/50 hover:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-[#4892CC]/10 rounded-xl flex items-center justify-center">
                     <MapPin className="w-5 h-5 text-[#4892CC]" />
                   </div>
-                  <span className="font-bold text-slate-700">{loc.name}</span>
+                  <span className="font-bold text-foreground/80">{loc.name}</span>
                 </div>
                 <Badge className="bg-[#4892CC]/10 text-[#4892CC] border-none font-black text-sm px-3 py-1">
                   {loc.count} socios
@@ -404,7 +404,7 @@ const LocalidadesSection: React.FC = () => {
               </div>
             ))}
             {localidades.length === 0 && (
-              <p className="text-slate-400 italic text-sm text-center py-8">No hay localidades registradas.</p>
+              <p className="text-muted-foreground/70 italic text-sm text-center py-8">No hay localidades registradas.</p>
             )}
           </div>
         )}
@@ -445,7 +445,7 @@ const PerfilSection: React.FC<{ user: any; roles: string[] | null }> = ({ user, 
 
   return (
     <div className="space-y-6">
-      <Card className="border border-gray-100 shadow-sm rounded-2xl">
+      <Card className="border border-border/50 shadow-sm rounded-2xl">
         <CardHeader>
           <CardTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
             <Users className="w-5 h-5 text-[#4892CC]" /> Mi Perfil
@@ -454,18 +454,18 @@ const PerfilSection: React.FC<{ user: any; roles: string[] | null }> = ({ user, 
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Email</Label>
-              <Input value={user?.email || ''} disabled className="bg-slate-50 border-slate-100 rounded-xl h-12 font-medium" />
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground/70 tracking-widest">Email</Label>
+              <Input value={user?.email || ''} disabled className="bg-muted/50 border-border/50 rounded-xl h-12 font-medium" />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Roles</Label>
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground/70 tracking-widest">Roles</Label>
               <div className="flex flex-wrap gap-2 pt-2">
                 {roles?.map(role => (
                   <Badge key={role} className="bg-[#4892CC]/10 text-[#4892CC] border-none font-bold px-3 py-1 rounded-lg uppercase text-xs">
                     <Shield className="w-3 h-3 mr-1" /> {role}
                   </Badge>
                 )) || (
-                  <span className="text-slate-400 text-sm italic">Sin roles asignados</span>
+                  <span className="text-muted-foreground/70 text-sm italic">Sin roles asignados</span>
                 )}
               </div>
             </div>
@@ -473,18 +473,18 @@ const PerfilSection: React.FC<{ user: any; roles: string[] | null }> = ({ user, 
         </CardContent>
       </Card>
 
-      <Card className="border border-gray-100 shadow-sm rounded-2xl">
+      <Card className="border border-border/50 shadow-sm rounded-2xl">
         <CardHeader>
           <CardTitle className="text-lg font-black uppercase tracking-tight">Cambiar Contraseña</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Nueva Contraseña</Label>
-            <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" className="bg-white border-slate-200 rounded-xl h-12" />
+            <Label className="text-[10px] font-bold uppercase text-muted-foreground/70 tracking-widest">Nueva Contraseña</Label>
+            <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" className="bg-card dark:bg-slate-900 border-border rounded-xl h-12" />
           </div>
           <div className="space-y-2">
-            <Label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Confirmar Contraseña</Label>
-            <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Repetir contraseña" className="bg-white border-slate-200 rounded-xl h-12" />
+            <Label className="text-[10px] font-bold uppercase text-muted-foreground/70 tracking-widest">Confirmar Contraseña</Label>
+            <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Repetir contraseña" className="bg-card dark:bg-slate-900 border-border rounded-xl h-12" />
           </div>
           <Button 
             onClick={handleChangePassword}
@@ -555,7 +555,7 @@ const EquipoSection: React.FC = () => {
   };
 
   return (
-    <Card className="border border-gray-100 shadow-sm rounded-2xl">
+    <Card className="border border-border/50 shadow-sm rounded-2xl">
       <CardHeader>
         <CardTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
           <Users className="w-5 h-5 text-[#4892CC]" /> Equipo y Permisos Especiales
@@ -583,12 +583,12 @@ const EquipoSection: React.FC = () => {
               const canManageJornada = !!perms.can_manage_jornada;
 
               return (
-                <div key={colab.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-slate-50/50 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors gap-4">
+                <div key={colab.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-muted/50/50 rounded-xl border border-border/50 hover:bg-muted/50 transition-colors gap-4">
                   <div>
-                    <h3 className="font-bold text-slate-800 uppercase text-sm">
+                    <h3 className="font-bold text-foreground/90 uppercase text-sm">
                       {colab.name} {colab.apellidos}
                     </h3>
-                    <p className="text-xs text-slate-500 font-medium">{colab.cargo || 'Ingeniero / Colaborador'}</p>
+                    <p className="text-xs text-muted-foreground font-medium">{colab.cargo || 'Ingeniero / Colaborador'}</p>
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full lg:w-auto mt-3 md:mt-0">
@@ -606,7 +606,7 @@ const EquipoSection: React.FC = () => {
             })}
             
             {colaboradores.length === 0 && (
-              <p className="text-slate-400 italic text-sm text-center py-8">No hay colaboradores vinculados a usuarios del sistema.</p>
+              <p className="text-muted-foreground/70 italic text-sm text-center py-8">No hay colaboradores vinculados a usuarios del sistema.</p>
             )}
           </div>
         )}
@@ -616,8 +616,8 @@ const EquipoSection: React.FC = () => {
 };
 
 const SwitchItem: React.FC<{ id: string, colabId: string, checked: boolean, onChange: () => void, label: string }> = ({ id, colabId, checked, onChange, label }) => (
-  <div className="flex items-center justify-between bg-white border border-slate-100 p-2 rounded-xl gap-3 min-w-[170px] shadow-sm">
-    <Label htmlFor={`${id}-${colabId}`} className="text-[10px] font-bold text-slate-600 uppercase tracking-tight cursor-pointer">
+  <div className="flex items-center justify-between bg-card dark:bg-slate-900 border border-border/50 p-2 rounded-xl gap-3 min-w-[170px] shadow-sm">
+    <Label htmlFor={`${id}-${colabId}`} className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight cursor-pointer">
       {label}
     </Label>
     <Switch 
@@ -709,7 +709,7 @@ const PlantillasSection: React.FC = () => {
   };
 
   return (
-    <Card className="border border-gray-100 shadow-sm rounded-2xl">
+    <Card className="border border-border/50 shadow-sm rounded-2xl">
       <CardHeader>
         <CardTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
           <FileText className="w-5 h-5 text-[#4892CC]" /> Plantillas para Carbone.io
@@ -726,23 +726,23 @@ const PlantillasSection: React.FC = () => {
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
             {/* Plantilla Ficha */}
-            <div className="border border-slate-100 rounded-2xl p-6 bg-slate-50/50 space-y-4 flex flex-col justify-between">
+            <div className="border border-border/50 rounded-2xl p-6 bg-muted/50/50 space-y-4 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-black text-slate-800 uppercase text-sm tracking-tight flex items-center gap-2">
+                  <h3 className="font-black text-foreground/90 uppercase text-sm tracking-tight flex items-center gap-2">
                     <FileText className="w-4 h-4 text-[#4892CC]" /> Ficha Técnica
                   </h3>
-                  <Badge variant={fichaTemplateId ? 'default' : 'outline'} className={fichaTemplateId ? 'bg-emerald-500 text-white' : 'text-slate-400 border-slate-200'}>
+                  <Badge variant={fichaTemplateId ? 'default' : 'outline'} className={fichaTemplateId ? 'bg-emerald-500 text-white' : 'text-muted-foreground/70 border-border'}>
                     {fichaTemplateId ? 'ACTIVO' : 'PENDIENTE'}
                   </Badge>
                 </div>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-xs text-muted-foreground font-medium">
                   Se genera automáticamente al registrar un nuevo socio en el padrón.
                 </p>
                 {fichaTemplateId && (
-                  <div className="p-3 bg-white border border-slate-100 rounded-xl space-y-1">
-                    <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Template ID</span>
-                    <p className="font-mono text-xs text-slate-600 break-all select-all font-bold">{fichaTemplateId}</p>
+                  <div className="p-3 bg-card dark:bg-slate-900 border border-border/50 rounded-xl space-y-1">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground/70 tracking-wider">Template ID</span>
+                    <p className="font-mono text-xs text-muted-foreground break-all select-all font-bold">{fichaTemplateId}</p>
                   </div>
                 )}
               </div>
@@ -768,7 +768,7 @@ const PlantillasSection: React.FC = () => {
                         toast.error('Error al descargar plantilla: ' + err.message);
                       }
                     }}
-                    className="w-full text-slate-700 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 rounded-xl h-11 font-bold flex items-center justify-center gap-2"
+                    className="w-full text-foreground/80 hover:text-foreground border border-border hover:bg-muted/50 rounded-xl h-11 font-bold flex items-center justify-center gap-2"
                   >
                     <Download className="w-4 h-4 text-[#4892CC]" />
                     Descargar Plantilla Actual
@@ -785,32 +785,32 @@ const PlantillasSection: React.FC = () => {
                 <Button
                   onClick={() => document.getElementById('upload-ficha-input')?.click()}
                   disabled={uploadingFicha}
-                  className="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl h-11 font-bold flex items-center justify-center gap-2"
+                  className="w-full bg-card dark:bg-slate-900 hover:bg-muted/50 text-foreground/80 border border-border rounded-xl h-11 font-bold flex items-center justify-center gap-2"
                 >
-                  {uploadingFicha ? <Loader2 className="w-4 h-4 animate-spin text-[#4892CC]" /> : <Upload className="w-4 h-4 text-slate-400" />}
+                  {uploadingFicha ? <Loader2 className="w-4 h-4 animate-spin text-[#4892CC]" /> : <Upload className="w-4 h-4 text-muted-foreground/70" />}
                   {fichaTemplateId ? 'Reemplazar Plantilla' : 'Cargar Ficha (.docx)'}
                 </Button>
               </div>
             </div>
 
             {/* Plantilla Contrato */}
-            <div className="border border-slate-100 rounded-2xl p-6 bg-slate-50/50 space-y-4 flex flex-col justify-between">
+            <div className="border border-border/50 rounded-2xl p-6 bg-muted/50/50 space-y-4 flex flex-col justify-between">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-black text-slate-800 uppercase text-sm tracking-tight flex items-center gap-2">
+                  <h3 className="font-black text-foreground/90 uppercase text-sm tracking-tight flex items-center gap-2">
                     <FileText className="w-4 h-4 text-[#4892CC]" /> Contrato de Socio
                   </h3>
-                  <Badge variant={contratoTemplateId ? 'default' : 'outline'} className={contratoTemplateId ? 'bg-emerald-500 text-white' : 'text-slate-400 border-slate-200'}>
+                  <Badge variant={contratoTemplateId ? 'default' : 'outline'} className={contratoTemplateId ? 'bg-emerald-500 text-white' : 'text-muted-foreground/70 border-border'}>
                     {contratoTemplateId ? 'ACTIVO' : 'PENDIENTE'}
                   </Badge>
                 </div>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-xs text-muted-foreground font-medium">
                   Se genera automáticamente cuando se registra un pago asociado al DNI de un socio.
                 </p>
                 {contratoTemplateId && (
-                  <div className="p-3 bg-white border border-slate-100 rounded-xl space-y-1">
-                    <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Template ID</span>
-                    <p className="font-mono text-xs text-slate-600 break-all select-all font-bold">{contratoTemplateId}</p>
+                  <div className="p-3 bg-card dark:bg-slate-900 border border-border/50 rounded-xl space-y-1">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground/70 tracking-wider">Template ID</span>
+                    <p className="font-mono text-xs text-muted-foreground break-all select-all font-bold">{contratoTemplateId}</p>
                   </div>
                 )}
               </div>
@@ -836,7 +836,7 @@ const PlantillasSection: React.FC = () => {
                         toast.error('Error al descargar plantilla: ' + err.message);
                       }
                     }}
-                    className="w-full text-slate-700 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 rounded-xl h-11 font-bold flex items-center justify-center gap-2"
+                    className="w-full text-foreground/80 hover:text-foreground border border-border hover:bg-muted/50 rounded-xl h-11 font-bold flex items-center justify-center gap-2"
                   >
                     <Download className="w-4 h-4 text-[#4892CC]" />
                     Descargar Plantilla Actual
@@ -853,9 +853,9 @@ const PlantillasSection: React.FC = () => {
                 <Button
                   onClick={() => document.getElementById('upload-contrato-input')?.click()}
                   disabled={uploadingContrato}
-                  className="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl h-11 font-bold flex items-center justify-center gap-2"
+                  className="w-full bg-card dark:bg-slate-900 hover:bg-muted/50 text-foreground/80 border border-border rounded-xl h-11 font-bold flex items-center justify-center gap-2"
                 >
-                  {uploadingContrato ? <Loader2 className="w-4 h-4 animate-spin text-[#4892CC]" /> : <Upload className="w-4 h-4 text-slate-400" />}
+                  {uploadingContrato ? <Loader2 className="w-4 h-4 animate-spin text-[#4892CC]" /> : <Upload className="w-4 h-4 text-muted-foreground/70" />}
                   {contratoTemplateId ? 'Reemplazar Plantilla' : 'Cargar Contrato (.docx)'}
                 </Button>
               </div>

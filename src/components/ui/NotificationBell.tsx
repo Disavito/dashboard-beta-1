@@ -39,7 +39,7 @@ const NotificationBell: React.FC = () => {
             case 'warning': return <AlertTriangle size={16} className="text-amber-500" />;
             case 'error': return <ShieldAlert size={16} className="text-red-500" />;
             case 'system': return <Info size={16} className="text-[#4892CC]" />;
-            default: return <Bell size={16} className="text-gray-400" />;
+            default: return <Bell size={16} className="text-muted-foreground/70" />;
         }
     };
 
@@ -49,7 +49,7 @@ const NotificationBell: React.FC = () => {
                 <button 
                     className={cn(
                         "relative p-2.5 rounded-full transition-all duration-300 outline-none group",
-                        "bg-white/5 hover:bg-primary/10 border border-white/10 shadow-lg",
+                        "bg-card dark:bg-slate-900/5 hover:bg-primary/10 border border-white/10 shadow-lg",
                         "focus:ring-2 focus:ring-primary/50 active:scale-95"
                     )}
                 >
@@ -57,7 +57,7 @@ const NotificationBell: React.FC = () => {
                         "w-5 h-5 transition-all duration-300", 
                         hasPending 
                             ? 'text-primary fill-primary/20 animate-ring' 
-                            : 'text-gray-400 group-hover:text-primary'
+                            : 'text-muted-foreground/70 group-hover:text-primary'
                     )} />
                     
                     {hasPending && (
@@ -71,27 +71,27 @@ const NotificationBell: React.FC = () => {
                 </button>
             </PopoverTrigger>
             
-            <PopoverContent className="w-96 p-0 bg-white border-gray-200 shadow-premium z-[100]" align="end">
+            <PopoverContent className="w-96 p-0 bg-card dark:bg-slate-900 border-border shadow-premium z-[100]" align="end">
                 <Tabs defaultValue="notifications" className="w-full">
-                    <div className="p-4 flex items-center justify-between bg-white/5">
+                    <div className="p-4 flex items-center justify-between bg-card dark:bg-slate-900/5">
                         <TabsList className="bg-black/20">
                             <TabsTrigger value="notifications" className="text-xs">Notificaciones {unreadCount > 0 && `(${unreadCount})`}</TabsTrigger>
                             <TabsTrigger value="requests" className="text-xs">Solicitudes {pendingCount > 0 && `(${pendingCount})`}</TabsTrigger>
                         </TabsList>
                         
-                        <Button variant="ghost" size="sm" onClick={() => markAllAsRead()} className="text-[10px] text-gray-400 hover:text-white px-2 h-6">
+                        <Button variant="ghost" size="sm" onClick={() => markAllAsRead()} className="text-[10px] text-muted-foreground/70 hover:text-white px-2 h-6">
                             Marcar leídas
                         </Button>
                     </div>
                     
-                    <Separator className="bg-white/5" />
+                    <Separator className="bg-card dark:bg-slate-900/5" />
                     
                     <TabsContent value="notifications" className="m-0 border-none outline-none">
-                        <div className="flex gap-2 p-2 px-4 bg-white/5">
+                        <div className="flex gap-2 p-2 px-4 bg-card dark:bg-slate-900/5">
                             <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className={cn("text-[10px] h-6 rounded-full px-3", filter === 'all' ? "bg-primary text-white" : "text-gray-400")}
+                                className={cn("text-[10px] h-6 rounded-full px-3", filter === 'all' ? "bg-primary text-white" : "text-muted-foreground/70")}
                                 onClick={() => setFilter('all')}
                             >
                                 Todas
@@ -99,7 +99,7 @@ const NotificationBell: React.FC = () => {
                             <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className={cn("text-[10px] h-6 rounded-full px-3", filter === 'unread' ? "bg-primary text-white" : "text-gray-400")}
+                                className={cn("text-[10px] h-6 rounded-full px-3", filter === 'unread' ? "bg-primary text-white" : "text-muted-foreground/70")}
                                 onClick={() => setFilter('unread')}
                             >
                                 No leídas
@@ -112,27 +112,27 @@ const NotificationBell: React.FC = () => {
                                         <div 
                                             key={notif.id} 
                                             className={cn(
-                                                "p-4 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 group cursor-pointer",
-                                                !notif.is_read ? "bg-white/[0.02]" : ""
+                                                "p-4 hover:bg-card dark:bg-slate-900/5 transition-colors border-b border-white/5 last:border-0 group cursor-pointer",
+                                                !notif.is_read ? "bg-card dark:bg-slate-900/[0.02]" : ""
                                             )}
                                             onClick={() => !notif.is_read && markAsRead(notif.id)}
                                         >
                                             <div className="flex gap-3">
-                                                <div className="mt-1 p-2 rounded-lg bg-white/5">
+                                                <div className="mt-1 p-2 rounded-lg bg-card dark:bg-slate-900/5">
                                                     {getIconForType(notif.type)}
                                                 </div>
                                                 <div className="flex-1 space-y-1">
                                                     <div className="flex justify-between items-start">
-                                                        <p className={cn("text-[13px] leading-tight", !notif.is_read ? "font-black text-black" : "font-bold text-gray-700")}>
+                                                        <p className={cn("text-[13px] leading-tight", !notif.is_read ? "font-black text-black" : "font-bold text-foreground/80")}>
                                                             {notif.title}
                                                         </p>
                                                         {!notif.is_read && <span className="w-2 h-2 rounded-full bg-primary mt-1" />}
                                                     </div>
-                                                    <p className="text-[11px] text-gray-400 font-medium leading-snug">
+                                                    <p className="text-[11px] text-muted-foreground/70 font-medium leading-snug">
                                                         {notif.message}
                                                     </p>
                                                     <div className="flex items-center justify-between pt-1">
-                                                        <span className="text-[10px] text-gray-500 flex items-center font-mono">
+                                                        <span className="text-[10px] text-muted-foreground flex items-center font-mono">
                                                             <Clock size={10} className="mr-1" />
                                                             {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: es })}
                                                         </span>
@@ -149,11 +149,11 @@ const NotificationBell: React.FC = () => {
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-[300px] text-center p-6">
-                                    <div className="p-4 rounded-full bg-white/5 mb-4">
+                                    <div className="p-4 rounded-full bg-card dark:bg-slate-900/5 mb-4">
                                         <Check className="w-8 h-8 text-emerald-500" />
                                     </div>
-                                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Todo al día</p>
-                                    <p className="text-xs text-gray-500 mt-1">No hay notificaciones {filter === 'unread' ? 'nuevas' : ''}</p>
+                                    <p className="text-sm font-bold text-muted-foreground/70 uppercase tracking-widest">Todo al día</p>
+                                    <p className="text-xs text-muted-foreground mt-1">No hay notificaciones {filter === 'unread' ? 'nuevas' : ''}</p>
                                 </div>
                             )}
                         </ScrollArea>
@@ -166,7 +166,7 @@ const NotificationBell: React.FC = () => {
                                     {pendingRequests.map((req) => (
                                         <div 
                                             key={req.id} 
-                                            className="p-4 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 group"
+                                            className="p-4 hover:bg-card dark:bg-slate-900/5 transition-colors border-b border-white/5 last:border-0 group"
                                         >
                                             <div className="flex gap-3">
                                                 <div className="mt-1 p-2 rounded-lg bg-red-500/10 text-red-500 group-hover:bg-red-500 group-hover:text-white transition-all duration-300">
@@ -176,7 +176,7 @@ const NotificationBell: React.FC = () => {
                                                     <p className="text-[13px] font-bold text-white leading-tight">
                                                         Eliminación de Documento
                                                     </p>
-                                                    <p className="text-[11px] text-gray-400 line-clamp-1 font-medium">
+                                                    <p className="text-[11px] text-muted-foreground/70 line-clamp-1 font-medium">
                                                         {req.document_type} • {req.socio_details?.nombres}
                                                     </p>
                                                     <div className="flex items-center gap-2 pt-2">
@@ -190,7 +190,7 @@ const NotificationBell: React.FC = () => {
                                                                 <ExternalLink size={12} className="mr-1" /> REVISAR DOC
                                                             </a>
                                                         </Button>
-                                                        <span className="text-[10px] text-gray-500 flex items-center ml-auto font-mono">
+                                                        <span className="text-[10px] text-muted-foreground flex items-center ml-auto font-mono">
                                                             <Clock size={10} className="mr-1" />
                                                             {formatDistanceToNow(new Date(req.created_at), { addSuffix: true, locale: es })}
                                                         </span>
@@ -213,11 +213,11 @@ const NotificationBell: React.FC = () => {
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-[300px] text-center p-6">
-                                    <div className="p-4 rounded-full bg-white/5 mb-4">
-                                        <ShieldAlert className="w-8 h-8 text-gray-600" />
+                                    <div className="p-4 rounded-full bg-card dark:bg-slate-900/5 mb-4">
+                                        <ShieldAlert className="w-8 h-8 text-muted-foreground" />
                                     </div>
-                                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Sin Solicitudes</p>
-                                    <p className="text-xs text-gray-500 mt-1">No hay solicitudes pendientes de aprobación.</p>
+                                    <p className="text-sm font-bold text-muted-foreground/70 uppercase tracking-widest">Sin Solicitudes</p>
+                                    <p className="text-xs text-muted-foreground mt-1">No hay solicitudes pendientes de aprobación.</p>
                                 </div>
                             )}
                         </ScrollArea>
@@ -225,7 +225,7 @@ const NotificationBell: React.FC = () => {
                 </Tabs>
 
                 {isSupported && !isSubscribed && permission !== 'denied' && (
-                    <div className="p-3 bg-white/5 border-t border-white/10 text-center">
+                    <div className="p-3 bg-card dark:bg-slate-900/5 border-t border-white/10 text-center">
                         <Button 
                             variant="default" 
                             size="sm" 
@@ -241,7 +241,7 @@ const NotificationBell: React.FC = () => {
                     <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="text-[10px] text-gray-500 hover:text-white underline"
+                        className="text-[10px] text-muted-foreground hover:text-white underline"
                         onClick={async () => {
                             import('sonner').then(async ({ toast }) => {
                                 const { supabase } = await import('@/lib/supabaseClient');

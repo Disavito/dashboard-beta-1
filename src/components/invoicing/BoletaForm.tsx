@@ -178,7 +178,7 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
   };
 
   return (
-    <Card className="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm">
+    <Card className="bg-card dark:bg-slate-900 border border-border/50 rounded-2xl p-8 shadow-sm">
       <CardContent className="p-0">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -189,9 +189,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                 name="serie"
                 render={({ field }) => (
                   <FormItem>
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Serie</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Serie</label>
                     <FormControl>
-                      <Input {...field} readOnly className="h-14 bg-gray-100 border-none rounded-2xl font-bold text-gray-700" />
+                      <Input {...field} readOnly className="h-14 bg-muted border-none rounded-2xl font-bold text-foreground/80" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -202,9 +202,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                 name="fecha_emision"
                 render={({ field }) => (
                   <FormItem>
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Fecha Emisión</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Fecha Emisión</label>
                     <FormControl>
-                      <DateMaskInput {...field} className="h-14 bg-gray-50 border-none rounded-2xl font-bold" />
+                      <DateMaskInput {...field} className="h-14 bg-muted/50 border-none rounded-2xl font-bold" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -215,10 +215,10 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                 name="moneda"
                 render={({ field }) => (
                   <FormItem>
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Moneda</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Moneda</label>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="h-14 bg-gray-50 border-none rounded-2xl font-bold">
+                        <SelectTrigger className="h-14 bg-muted/50 border-none rounded-2xl font-bold">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
@@ -234,18 +234,18 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
             </div>
 
             {/* Sección de Datos del Cliente */}
-            <div className="space-y-4 border-t border-gray-100 pt-8 mt-8">
-              <h3 className="text-lg font-bold text-gray-800">Datos del Cliente</h3>
+            <div className="space-y-4 border-t border-border/50 pt-8 mt-8">
+              <h3 className="text-lg font-bold text-foreground/90">Datos del Cliente</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <FormField
                   control={form.control}
                   name="client.tipo_documento"
                   render={({ field }) => (
                     <FormItem>
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Tipo Doc.</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Tipo Doc.</label>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="h-14 bg-gray-50 border-none rounded-2xl font-bold">
+                          <SelectTrigger className="h-14 bg-muted/50 border-none rounded-2xl font-bold">
                             <SelectValue />
                           </SelectTrigger>
                         </FormControl>
@@ -265,13 +265,13 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                     name="client.numero_documento"
                     render={({ field }) => (
                       <FormItem className="flex-grow">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">N° Documento</label>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">N° Documento</label>
                         <FormControl>
                           <Input
                             placeholder={clientTipoDocumento === '1' ? "8 dígitos" : "N° Documento"}
                             {...field}
                             maxLength={clientTipoDocumento === '1' ? 8 : undefined}
-                            className="h-14 bg-gray-50 border-none rounded-2xl text-lg font-bold"
+                            className="h-14 bg-muted/50 border-none rounded-2xl text-lg font-bold"
                           />
                         </FormControl>
                         <FormMessage />
@@ -295,9 +295,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                 name="client.razon_social"
                 render={({ field }) => (
                   <FormItem>
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Razón Social / Nombres</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Razón Social / Nombres</label>
                     <FormControl>
-                      <Input {...field} className="h-14 bg-gray-50 border-none rounded-2xl font-black text-gray-700 uppercase" />
+                      <Input {...field} className="h-14 bg-muted/50 border-none rounded-2xl font-black text-foreground/80 uppercase" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -308,9 +308,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                 name="client.direccion"
                 render={({ field }) => (
                   <FormItem>
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Dirección</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Dirección</label>
                     <FormControl>
-                      <Input {...field} className="h-14 bg-gray-50 border-none rounded-2xl font-medium" />
+                      <Input {...field} className="h-14 bg-muted/50 border-none rounded-2xl font-medium" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -321,9 +321,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                 name="client.email"
                 render={({ field }) => (
                   <FormItem>
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Email</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Email</label>
                     <FormControl>
-                      <Input type="email" {...field} className="h-14 bg-gray-50 border-none rounded-2xl font-medium" />
+                      <Input type="email" {...field} className="h-14 bg-muted/50 border-none rounded-2xl font-medium" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -332,13 +332,13 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
             </div>
 
             {/* Sección de Detalles de la Venta */}
-            <div className="space-y-4 border-t border-gray-100 pt-8 mt-8">
-              <h3 className="text-lg font-bold text-gray-800">Detalles de la Venta</h3>
+            <div className="space-y-4 border-t border-border/50 pt-8 mt-8">
+              <h3 className="text-lg font-bold text-foreground/90">Detalles de la Venta</h3>
               {fields.map((item, index) => (
-                <Card key={item.id} className="p-6 rounded-2xl border-gray-100 shadow-sm">
+                <Card key={item.id} className="p-6 rounded-2xl border-border/50 shadow-sm">
                   <CardContent className="p-0 space-y-4">
                     <div className="flex justify-between items-center">
-                      <h4 className="text-md font-semibold text-gray-700">Item {index + 1}</h4>
+                      <h4 className="text-md font-semibold text-foreground/80">Item {index + 1}</h4>
                       <Button
                         type="button"
                         variant="ghost"
@@ -354,9 +354,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                       name={`detalles.${index}.descripcion`}
                       render={({ field }) => (
                         <FormItem>
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Descripción</label>
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Descripción</label>
                           <FormControl>
-                            <Input {...field} className="h-12 bg-gray-50 border-none rounded-xl font-medium" />
+                            <Input {...field} className="h-12 bg-muted/50 border-none rounded-xl font-medium" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -368,9 +368,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                         name={`detalles.${index}.cantidad`}
                         render={({ field }) => (
                           <FormItem>
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Cantidad</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Cantidad</label>
                             <FormControl>
-                              <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="h-12 bg-gray-50 border-none rounded-xl font-bold" />
+                              <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="h-12 bg-muted/50 border-none rounded-xl font-bold" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -381,9 +381,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                         name={`detalles.${index}.unidad`}
                         render={({ field }) => (
                           <FormItem>
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Unidad</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Unidad</label>
                             <FormControl>
-                              <Input {...field} className="h-12 bg-gray-50 border-none rounded-xl font-bold" />
+                              <Input {...field} className="h-12 bg-muted/50 border-none rounded-xl font-bold" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -394,9 +394,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                         name={`detalles.${index}.mto_valor_unitario`}
                         render={({ field }) => (
                           <FormItem>
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Valor Unitario (S/.)</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Valor Unitario (S/.)</label>
                             <FormControl>
-                              <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="h-12 bg-gray-50 border-none rounded-xl font-bold" />
+                              <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="h-12 bg-muted/50 border-none rounded-xl font-bold" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -409,9 +409,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                         name={`detalles.${index}.porcentaje_igv`}
                         render={({ field }) => (
                           <FormItem>
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">% IGV</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">% IGV</label>
                             <FormControl>
-                              <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="h-12 bg-gray-50 border-none rounded-xl font-bold" />
+                              <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="h-12 bg-muted/50 border-none rounded-xl font-bold" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -422,10 +422,10 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                         name={`detalles.${index}.tip_afe_igv`}
                         render={({ field }) => (
                           <FormItem>
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Tipo Afectación IGV</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Tipo Afectación IGV</label>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="h-12 bg-gray-50 border-none rounded-xl font-bold">
+                                <SelectTrigger className="h-12 bg-muted/50 border-none rounded-xl font-bold">
                                   <SelectValue />
                                 </SelectTrigger>
                               </FormControl>
@@ -447,20 +447,20 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                 type="button"
                 variant="outline"
                 onClick={() => append({ descripcion: '', unidad: 'NIU', cantidad: 1, mto_valor_unitario: 0, porcentaje_igv: 18, tip_afe_igv: '10' })}
-                className="w-full h-12 rounded-2xl border-dashed border-gray-300 text-gray-600 hover:bg-gray-50"
+                className="w-full h-12 rounded-2xl border-dashed border-border text-muted-foreground hover:bg-muted/50"
               >
                 <PlusCircle className="h-5 w-5 mr-2" /> Añadir Item
               </Button>
             </div>
 
             {/* Sección de Registro de Ingreso */}
-            <div className="space-y-4 border-t border-gray-100 pt-8 mt-8">
+            <div className="space-y-4 border-t border-border/50 pt-8 mt-8">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="create_income_record"
                   checked={createIncomeRecord}
                   onCheckedChange={(checked) => form.setValue('create_income_record', !!checked)}
-                  className="h-5 w-5 rounded-md border-gray-300 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                  className="h-5 w-5 rounded-md border-border data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                 />
                 <label
                   htmlFor="create_income_record"
@@ -477,9 +477,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                     name="income_date"
                     render={({ field }) => (
                       <FormItem>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Fecha de Ingreso</label>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Fecha de Ingreso</label>
                         <FormControl>
-                          <DateMaskInput {...field} className="h-14 bg-gray-50 border-none rounded-2xl font-bold" />
+                          <DateMaskInput {...field} className="h-14 bg-muted/50 border-none rounded-2xl font-bold" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -490,10 +490,10 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                     name="income_account"
                     render={({ field }) => (
                       <FormItem>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Cuenta de Ingreso</label>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Cuenta de Ingreso</label>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="h-14 bg-gray-50 border-none rounded-2xl font-bold">
+                            <SelectTrigger className="h-14 bg-muted/50 border-none rounded-2xl font-bold">
                               <SelectValue />
                             </SelectTrigger>
                           </FormControl>
@@ -510,9 +510,9 @@ export default function BoletaForm({ /* nextBoletaNumber */ }: BoletaFormProps) 
                     name="income_numero_operacion"
                     render={({ field }) => (
                       <FormItem>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">N° Operación (Opcional)</label>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">N° Operación (Opcional)</label>
                         <FormControl>
-                          <Input {...field} className="h-14 bg-gray-50 border-none rounded-2xl font-medium" />
+                          <Input {...field} className="h-14 bg-muted/50 border-none rounded-2xl font-medium" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

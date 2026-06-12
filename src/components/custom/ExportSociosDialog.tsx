@@ -204,11 +204,11 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
             <Settings2 className="h-5 w-5 md:h-6 md:w-6 text-[#4892CC]" />
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="md:hidden rounded-full">
-            <X className="h-5 w-5 text-gray-400" />
+            <X className="h-5 w-5 text-muted-foreground/70" />
           </Button>
         </div>
-        <DialogTitle className="text-xl md:text-2xl font-black text-gray-900">Configurar Exportación</DialogTitle>
-        <DialogDescription className="text-gray-500 font-medium text-sm">
+        <DialogTitle className="text-xl md:text-2xl font-black text-foreground">Configurar Exportación</DialogTitle>
+        <DialogDescription className="text-muted-foreground font-medium text-sm">
           Selecciona los campos y el formato para tu reporte.
         </DialogDescription>
       </div>
@@ -216,7 +216,7 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
       {loading ? (
         <div className="flex flex-col items-center justify-center p-12">
           <Loader2 className="w-8 h-8 animate-spin text-[#4892CC] mb-4" />
-          <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Cargando registros...</p>
+          <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Cargando registros...</p>
         </div>
       ) : (
         <ScrollArea className="flex-1 px-6 md:px-8 py-6">
@@ -235,13 +235,13 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
                   "flex flex-col items-center justify-center p-3 md:p-4 rounded-2xl border-2 transition-all gap-2 relative",
                   format === f.id 
                     ? "border-[#4892CC] bg-[#4892CC]/5 shadow-sm" 
-                    : "border-gray-100 hover:border-gray-200 bg-white"
+                    : "border-border/50 hover:border-border bg-card dark:bg-slate-900"
                 )}
               >
                 <div className={cn("p-2 rounded-xl", f.bg)}>
                   <f.icon className={cn("h-5 w-5 md:h-6 md:w-6", f.color)} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black uppercase tracking-wider text-gray-700">{f.label}</span>
+                <span className="text-[10px] md:text-xs font-black uppercase tracking-wider text-foreground/80">{f.label}</span>
                 {format === f.id && <CheckCircle2 className="h-3 w-3 md:h-4 md:w-4 text-[#4892CC] absolute top-2 right-2" />}
               </button>
             ))}
@@ -249,14 +249,14 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
 
           {/* Filtro de Lote Medido */}
           <div className="space-y-3">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-              <div className="h-px flex-1 bg-gray-100"></div>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70 flex items-center gap-2">
+              <div className="h-px flex-1 bg-muted"></div>
               Filtro de Medición
-              <div className="h-px flex-1 bg-gray-100"></div>
+              <div className="h-px flex-1 bg-muted"></div>
             </h4>
             <div className="flex items-center gap-3">
               <Select value={loteMedidoFilter} onValueChange={(v) => setLoteMedidoFilter(v as any)}>
-                <SelectTrigger className="w-full h-12 bg-gray-50 border-none rounded-xl font-bold text-gray-700">
+                <SelectTrigger className="w-full h-12 bg-muted/50 border-none rounded-xl font-bold text-foreground/80">
                   <SelectValue placeholder="Filtrar por medición" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -265,7 +265,7 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
                   <SelectItem value="no_medido">Solo Lotes No Medidos</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-xs font-bold text-gray-400 whitespace-nowrap">
+              <span className="text-xs font-bold text-muted-foreground/70 whitespace-nowrap">
                 {filteredCount} registros
               </span>
             </div>
@@ -273,14 +273,14 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
 
           {/* Filtro por Localidad */}
           <div className="space-y-3">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-              <div className="h-px flex-1 bg-gray-100"></div>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70 flex items-center gap-2">
+              <div className="h-px flex-1 bg-muted"></div>
               Filtro por Localidad
-              <div className="h-px flex-1 bg-gray-100"></div>
+              <div className="h-px flex-1 bg-muted"></div>
             </h4>
             <div className="flex items-center gap-3">
               <Select value={localidadFilter} onValueChange={setLocalidadFilter}>
-                <SelectTrigger className="w-full h-12 bg-gray-50 border-none rounded-xl font-bold text-gray-700">
+                <SelectTrigger className="w-full h-12 bg-muted/50 border-none rounded-xl font-bold text-foreground/80">
                   <SelectValue placeholder="Filtrar por localidad" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl max-h-60">
@@ -295,14 +295,14 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
 
           {/* Filtro por Distrito */}
           <div className="space-y-3">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-              <div className="h-px flex-1 bg-gray-100"></div>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70 flex items-center gap-2">
+              <div className="h-px flex-1 bg-muted"></div>
               Filtro por Distrito
-              <div className="h-px flex-1 bg-gray-100"></div>
+              <div className="h-px flex-1 bg-muted"></div>
             </h4>
             <div className="flex items-center gap-3">
               <Select value={distritoFilter} onValueChange={setDistritoFilter}>
-                <SelectTrigger className="w-full h-12 bg-gray-50 border-none rounded-xl font-bold text-gray-700">
+                <SelectTrigger className="w-full h-12 bg-muted/50 border-none rounded-xl font-bold text-foreground/80">
                   <SelectValue placeholder="Filtrar por distrito" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl max-h-60">
@@ -319,10 +319,10 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
           <div className="space-y-6">
             {['Básico', 'Financiero', 'Documentos'].map((category) => (
               <div key={category} className="space-y-3">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-                  <div className="h-px flex-1 bg-gray-100"></div>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70 flex items-center gap-2">
+                  <div className="h-px flex-1 bg-muted"></div>
                   {category}
-                  <div className="h-px flex-1 bg-gray-100"></div>
+                  <div className="h-px flex-1 bg-muted"></div>
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
                   {EXPORT_FIELDS.filter(f => f.category === category).map((field) => (
@@ -330,7 +330,7 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
                       key={field.id} 
                       className={cn(
                         "flex items-center space-x-3 p-3 rounded-xl border transition-colors cursor-pointer",
-                        selectedFields.includes(field.id) ? "border-[#4892CC]/30 bg-[#4892CC]/5" : "border-gray-100 hover:bg-gray-50"
+                        selectedFields.includes(field.id) ? "border-[#4892CC]/30 bg-[#4892CC]/5" : "border-border/50 hover:bg-muted/50"
                       )}
                       onClick={() => toggleField(field.id)}
                     >
@@ -340,7 +340,7 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
                         onCheckedChange={() => toggleField(field.id)}
                         className="data-[state=checked]:bg-[#4892CC] data-[state=checked]:border-[#4892CC]"
                       />
-                      <Label htmlFor={field.id} className="text-xs md:text-sm font-bold text-gray-700 cursor-pointer flex-1">
+                      <Label htmlFor={field.id} className="text-xs md:text-sm font-bold text-foreground/80 cursor-pointer flex-1">
                         {field.label}
                       </Label>
                     </div>
@@ -354,11 +354,11 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
       )}
 
       {/* Footer Fijo */}
-      <DialogFooter className="p-6 md:p-8 pt-4 border-t border-gray-50 bg-gray-50/30 flex-col sm:flex-row gap-3">
+      <DialogFooter className="p-6 md:p-8 pt-4 border-t border-gray-50 bg-muted/50/30 flex-col sm:flex-row gap-3">
         <Button 
           variant="ghost" 
           onClick={onClose} 
-          className="rounded-xl font-bold text-gray-500 order-2 sm:order-1"
+          className="rounded-xl font-bold text-muted-foreground order-2 sm:order-1"
         >
           Cancelar
         </Button>

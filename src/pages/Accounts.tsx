@@ -254,13 +254,13 @@ const Accounts: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#FAFBFC] page-enter flex flex-col items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-[#4892CC]" />
-        <p className="text-slate-500 mt-4 font-medium">Sincronizando estados financieros...</p>
+        <p className="text-muted-foreground mt-4 font-medium">Sincronizando estados financieros...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC] page-enter text-slate-900 p-4 md:p-8 space-y-8">
+    <div className="min-h-screen bg-[#FAFBFC] page-enter text-foreground p-4 md:p-8 space-y-8">
       {/* Header Profesional */}
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 max-w-7xl mx-auto">
         <div className="space-y-1">
@@ -269,20 +269,20 @@ const Accounts: React.FC = () => {
               <Wallet className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">Cuentas & <span className="text-[#4892CC]">Tesorería</span></h1>
-              <p className="text-slate-500 font-medium">Control centralizado de activos y flujos de caja</p>
+              <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">Cuentas & <span className="text-[#4892CC]">Tesorería</span></h1>
+              <p className="text-muted-foreground font-medium">Control centralizado de activos y flujos de caja</p>
             </div>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
-            <Filter className="w-4 h-4 text-slate-400 ml-2" />
+          <div className="flex items-center gap-2 bg-card dark:bg-slate-900 p-1.5 rounded-xl border border-border shadow-sm">
+            <Filter className="w-4 h-4 text-muted-foreground/70 ml-2" />
             <Select value={selectedTipo} onValueChange={setSelectedTipo}>
-              <SelectTrigger className="w-[140px] border-none focus:ring-0 font-bold text-slate-700">
+              <SelectTrigger className="w-[140px] border-none focus:ring-0 font-bold text-foreground/80">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-slate-100">
+              <SelectContent className="rounded-xl border-border/50">
                 <SelectItem value="all">Todos los tipos</SelectItem>
                 {accountTypes.map(tipo => (
                   <SelectItem key={tipo} value={tipo}>{tipo}</SelectItem>
@@ -291,13 +291,13 @@ const Accounts: React.FC = () => {
             </Select>
           </div>
 
-          <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
-            <Filter className="w-4 h-4 text-slate-400 ml-2" />
+          <div className="flex items-center gap-2 bg-card dark:bg-slate-900 p-1.5 rounded-xl border border-border shadow-sm">
+            <Filter className="w-4 h-4 text-muted-foreground/70 ml-2" />
             <Select value={selectedAccount} onValueChange={setSelectedAccount}>
-              <SelectTrigger className="w-[180px] border-none focus:ring-0 font-bold text-slate-700">
+              <SelectTrigger className="w-[180px] border-none focus:ring-0 font-bold text-foreground/80">
                 <SelectValue placeholder="Todas las cuentas" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-slate-100">
+              <SelectContent className="rounded-xl border-border/50">
                 <SelectItem value="all">Todas las cuentas</SelectItem>
                 {filteredAccounts.map(acc => (
                   <SelectItem key={acc.id} value={acc.name}>{acc.name}</SelectItem>
@@ -313,9 +313,9 @@ const Accounts: React.FC = () => {
                   <PlusCircle className="w-5 h-5 mr-2" /> Nuevo Movimiento
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-white border-none text-slate-900 max-w-2xl rounded-3xl shadow-premium">
+              <DialogContent className="bg-card dark:bg-slate-900 border-none text-foreground max-w-2xl rounded-3xl shadow-premium">
                 <DialogHeader>
-                  <DialogTitle className="text-2xl font-black text-slate-900 uppercase tracking-tight">Registrar Transacción</DialogTitle>
+                  <DialogTitle className="text-2xl font-black text-foreground uppercase tracking-tight">Registrar Transacción</DialogTitle>
                 </DialogHeader>
                 <TransactionForm 
                   onClose={() => setIsTransactionDialogOpen(false)} 
@@ -330,13 +330,13 @@ const Accounts: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Stats Grid - Estilo Apple/Stripe */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden relative group">
+          <Card className="bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl overflow-hidden relative group">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
               <TrendingUp className="w-20 h-20 text-emerald-500" />
             </div>
             <CardHeader className="pb-2">
-              <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Saldo Neto Disponible</CardDescription>
-              <CardTitle className="text-4xl font-black text-slate-900">
+              <CardDescription className="text-muted-foreground/70 font-bold uppercase tracking-widest text-[10px]">Saldo Neto Disponible</CardDescription>
+              <CardTitle className="text-4xl font-black text-foreground">
                 {formatCurrency(stats.balance)}
               </CardTitle>
             </CardHeader>
@@ -348,30 +348,30 @@ const Accounts: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl">
+          <Card className="bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl">
             <CardHeader className="pb-2">
-              <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Ingresos Totales</CardDescription>
+              <CardDescription className="text-muted-foreground/70 font-bold uppercase tracking-widest text-[10px]">Ingresos Totales</CardDescription>
               <CardTitle className="text-4xl font-black text-[#4892CC]">
                 {formatCurrency(stats.income)}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
+              <div className="flex items-center gap-2 text-muted-foreground/70 text-sm font-medium">
                 <ArrowUpCircle className="w-4 h-4 text-[#4892CC]" />
                 <span>Flujo de entrada acumulado</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl">
+          <Card className="bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl">
             <CardHeader className="pb-2">
-              <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Gastos & Egresos</CardDescription>
+              <CardDescription className="text-muted-foreground/70 font-bold uppercase tracking-widest text-[10px]">Gastos & Egresos</CardDescription>
               <CardTitle className="text-4xl font-black text-corp-teal">
                 {formatCurrency(stats.expenses)}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
+              <div className="flex items-center gap-2 text-muted-foreground/70 text-sm font-medium">
                 <ArrowDownCircle className="w-4 h-4 text-corp-teal" />
                 <span>Salidas de caja registradas</span>
               </div>
@@ -382,19 +382,19 @@ const Accounts: React.FC = () => {
         {/* Main Content: Charts & Accounts */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Chart Section */}
-          <Card className="xl:col-span-2 bg-white border border-gray-100 shadow-sm rounded-2xl p-8">
+          <Card className="xl:col-span-2 bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl p-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
               <div>
-                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Análisis de Flujo</h3>
-                <p className="text-slate-400 text-sm font-medium">Comparativa de Ingresos vs Gastos</p>
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Análisis de Flujo</h3>
+                <p className="text-muted-foreground/70 text-sm font-medium">Comparativa de Ingresos vs Gastos</p>
               </div>
               
-              <Tabs value={timeFrame} onValueChange={(v) => setTimeFrame(v as TimeFrame)} className="bg-slate-50 p-1 rounded-xl border border-slate-100">
+              <Tabs value={timeFrame} onValueChange={(v) => setTimeFrame(v as TimeFrame)} className="bg-muted/50 p-1 rounded-xl border border-border/50">
                 <TabsList className="bg-transparent border-none">
-                  <TabsTrigger value="daily" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs font-bold">Día</TabsTrigger>
-                  <TabsTrigger value="monthly" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs font-bold">Mes</TabsTrigger>
-                  <TabsTrigger value="quarterly" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs font-bold">Trim.</TabsTrigger>
-                  <TabsTrigger value="yearly" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs font-bold">Año</TabsTrigger>
+                  <TabsTrigger value="daily" className="rounded-lg data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm text-xs font-bold">Día</TabsTrigger>
+                  <TabsTrigger value="monthly" className="rounded-lg data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm text-xs font-bold">Mes</TabsTrigger>
+                  <TabsTrigger value="quarterly" className="rounded-lg data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm text-xs font-bold">Trim.</TabsTrigger>
+                  <TabsTrigger value="yearly" className="rounded-lg data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm text-xs font-bold">Año</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
@@ -457,7 +457,7 @@ const Accounts: React.FC = () => {
 
           {/* Accounts List & Distribution */}
           <div className="space-y-6">
-            <h3 className="text-xl font-black px-2 flex items-center gap-2 text-slate-900 uppercase tracking-tight">
+            <h3 className="text-xl font-black px-2 flex items-center gap-2 text-foreground uppercase tracking-tight">
               <BarChart3 className="w-5 h-5 text-[#4892CC]" />
               Estado de Cuentas
             </h3>
@@ -475,27 +475,27 @@ const Accounts: React.FC = () => {
                 const percentage = stats.balance > 0 ? (balance / stats.balance) * 100 : 0;
 
                 return (
-                  <Card key={account.id} className="bg-white border border-gray-100 shadow-sm rounded-2xl hover:ring-2 hover:ring-[#4892CC]/20 transition-all cursor-pointer overflow-hidden group">
+                  <Card key={account.id} className="bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl hover:ring-2 hover:ring-[#4892CC]/20 transition-all cursor-pointer overflow-hidden group">
                     <div className="p-5">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h4 className="font-bold text-slate-900 group-hover:text-[#4892CC] transition-colors">{account.name}</h4>
-                          <Badge variant="secondary" className="text-[10px] bg-slate-100 text-slate-500 border-none uppercase font-bold">{account.tipo}</Badge>
+                          <h4 className="font-bold text-foreground group-hover:text-[#4892CC] transition-colors">{account.name}</h4>
+                          <Badge variant="secondary" className="text-[10px] bg-muted text-muted-foreground border-none uppercase font-bold">{account.tipo}</Badge>
                         </div>
                         <div className="text-right">
                           <p className={cn("text-lg font-black", balance >= 0 ? "text-emerald-600" : "text-corp-teal")}>
                             {formatCurrency(balance)}
                           </p>
-                          <p className="text-[10px] text-slate-400 font-bold uppercase">Saldo Actual</p>
+                          <p className="text-[10px] text-muted-foreground/70 font-bold uppercase">Saldo Actual</p>
                         </div>
                       </div>
                       
                       <div className="space-y-2">
                         <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
-                          <span className="text-slate-400">Distribución</span>
-                          <span className="text-slate-600">{percentage.toFixed(1)}%</span>
+                          <span className="text-muted-foreground/70">Distribución</span>
+                          <span className="text-muted-foreground">{percentage.toFixed(1)}%</span>
                         </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
                           <div 
                             className="bg-[#4892CC] h-full rounded-full transition-all duration-1000" 
                             style={{ width: `${Math.max(0, Math.min(percentage, 100))}%` }}
@@ -513,18 +513,18 @@ const Accounts: React.FC = () => {
         </div>
 
         {/* Unified Transaction History */}
-        <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
+        <Card className="bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl overflow-hidden">
           <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Historial Unificado</h3>
-              <p className="text-slate-400 text-sm font-medium">Todos los movimientos de tesorería</p>
+              <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Historial Unificado</h3>
+              <p className="text-muted-foreground/70 text-sm font-medium">Todos los movimientos de tesorería</p>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
               <div className="relative flex-1 w-full md:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
                 <Input 
                   placeholder="Buscar por socio o recibo..." 
-                  className="pl-10 bg-slate-50 border-none rounded-xl h-11 text-sm"
+                  className="pl-10 bg-muted/50 border-none rounded-xl h-11 text-sm"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -543,7 +543,7 @@ const Accounts: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                <tr className="bg-muted/50/50 text-muted-foreground/70 text-[10px] font-black uppercase tracking-widest">
                   <th className="px-8 py-4">Fecha</th>
                   <th className="px-8 py-4">Concepto / Referencia</th>
                   <th className="px-8 py-4">Cuenta</th>
@@ -553,11 +553,11 @@ const Accounts: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {allTransactions.slice(0, 15).map((t) => (
-                  <tr key={t.id} className="hover:bg-slate-50/50 transition-colors group">
+                  <tr key={t.id} className="hover:bg-muted/50/50 transition-colors group">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <Calendar className="w-4 h-4 text-slate-300" />
-                        <span className="text-sm font-semibold text-slate-600">
+                        <span className="text-sm font-semibold text-muted-foreground">
                           {t.date && !isNaN(parseISO(t.date).getTime()) 
                             ? format(parseISO(t.date), 'dd MMM, yyyy', { locale: es }) 
                             : '—'}
@@ -566,14 +566,14 @@ const Accounts: React.FC = () => {
                     </td>
                     <td className="px-8 py-5">
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-900 group-hover:text-[#4892CC] transition-colors uppercase">
+                        <span className="text-sm font-bold text-foreground group-hover:text-[#4892CC] transition-colors uppercase">
                           {t.description}
                         </span>
-                        <span className="text-[10px] font-mono text-slate-400 font-bold">{t.ref || 'S/N'}</span>
+                        <span className="text-[10px] font-mono text-muted-foreground/70 font-bold">{t.ref || 'S/N'}</span>
                       </div>
                     </td>
                     <td className="px-8 py-5">
-                      <Badge variant="outline" className="bg-white text-slate-500 border-slate-200 font-bold text-[10px]">
+                      <Badge variant="outline" className="bg-card dark:bg-slate-900 text-muted-foreground border-border font-bold text-[10px]">
                         {t.account}
                       </Badge>
                     </td>
@@ -599,7 +599,7 @@ const Accounts: React.FC = () => {
             </table>
             {allTransactions.length === 0 && (
               <div className="p-20 text-center">
-                <p className="text-slate-400 font-bold">No se encontraron movimientos con los filtros aplicados</p>
+                <p className="text-muted-foreground/70 font-bold">No se encontraron movimientos con los filtros aplicados</p>
               </div>
             )}
           </div>

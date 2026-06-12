@@ -117,7 +117,7 @@ function TimelineEntry({ log, index }: { log: AuditLog; index: number }) {
   const [expanded, setExpanded] = useState(false);
   const actionUpper = log.action.toUpperCase();
   const dotColor = ACTION_DOT_COLORS[actionUpper] ?? 'bg-gray-400';
-  const iconBg = ACTION_ICON_BG[actionUpper] ?? 'bg-gray-50 text-gray-600';
+  const iconBg = ACTION_ICON_BG[actionUpper] ?? 'bg-muted/50 text-muted-foreground';
   const ActionIcon = ACTION_ICONS[actionUpper] ?? FileText;
   const diffs = actionUpper === 'UPDATE' ? computeDiff(log.old_data, log.new_data) : [];
   const dataToShow = actionUpper === 'INSERT' ? log.new_data : actionUpper === 'DELETE' ? log.old_data : null;
@@ -140,7 +140,7 @@ function TimelineEntry({ log, index }: { log: AuditLog; index: number }) {
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div
-          className="bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-4 md:p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 cursor-pointer group/card"
+          className="bg-card dark:bg-slate-900 dark:bg-slate-800/60 border border-border/50 dark:border-slate-700/50 rounded-2xl p-4 md:p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 cursor-pointer group/card"
           onClick={() => setExpanded(!expanded)}
         >
           {/* Top row */}
@@ -152,19 +152,19 @@ function TimelineEntry({ log, index }: { log: AuditLog; index: number }) {
               </div>
 
               <div className="min-w-0">
-                <p className="font-bold text-sm md:text-[15px] text-slate-800 dark:text-slate-100 leading-snug">
+                <p className="font-bold text-sm md:text-[15px] text-foreground/90 dark:text-slate-100 leading-snug">
                   {getActionLabel(log.action, log.table_name)}
                 </p>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   {/* User avatar */}
-                  <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-600 text-[10px] font-black text-slate-600 dark:text-slate-300 flex items-center justify-center flex-shrink-0">
+                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground dark:text-muted-foreground/70 font-medium">
+                    <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-600 text-[10px] font-black text-muted-foreground dark:text-slate-300 flex items-center justify-center flex-shrink-0">
                       {userInitial}
                     </span>
                     <span className="truncate max-w-[180px]" title={log.user_id || 'Sistema'}>{(log.user_id || 'Sistema').substring(0, 8)}…</span>
                   </span>
-                  <span className="text-slate-300 dark:text-slate-600">·</span>
-                  <span className="text-xs text-slate-400 dark:text-slate-500 font-medium flex items-center gap-1">
+                  <span className="text-slate-300 dark:text-muted-foreground">·</span>
+                  <span className="text-xs text-muted-foreground/70 dark:text-muted-foreground font-medium flex items-center gap-1">
                     <Clock size={11} className="flex-shrink-0" />
                     {formatDistanceToNow(parseISO(log.created_at), { addSuffix: true, locale: es })}
                   </span>
@@ -178,37 +178,37 @@ function TimelineEntry({ log, index }: { log: AuditLog; index: number }) {
                 actionUpper === 'INSERT' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400' :
                 actionUpper === 'UPDATE' ? 'bg-blue-100 text-corp-blue dark:bg-blue-500/15 dark:text-blue-400' :
                 actionUpper === 'DELETE' ? 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400' :
-                'bg-gray-100 text-gray-700'
+                'bg-muted text-foreground/80'
               }`}>
                 {log.table_name}
               </Badge>
               {expanded
-                ? <ChevronDown size={16} className="text-slate-400 transition-transform" />
-                : <ChevronRight size={16} className="text-slate-400 transition-transform" />
+                ? <ChevronDown size={16} className="text-muted-foreground/70 transition-transform" />
+                : <ChevronRight size={16} className="text-muted-foreground/70 transition-transform" />
               }
             </div>
           </div>
 
           {/* Expanded detail */}
           {expanded && (
-            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700/50 animate-slide-up-fade">
+            <div className="mt-4 pt-4 border-t border-border/50 dark:border-slate-700/50 animate-slide-up-fade">
               {/* UPDATE: show diff */}
               {actionUpper === 'UPDATE' && diffs.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Campos modificados</p>
-                  <div className="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700/50">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-3">Campos modificados</p>
+                  <div className="rounded-xl overflow-hidden border border-border/50 dark:border-slate-700/50">
                     <table className="w-full text-xs">
                       <thead>
-                        <tr className="bg-slate-50 dark:bg-slate-800">
-                          <th className="text-left px-3 py-2 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">Campo</th>
+                        <tr className="bg-muted/50 dark:bg-slate-800">
+                          <th className="text-left px-3 py-2 font-bold text-muted-foreground dark:text-muted-foreground/70 uppercase tracking-wider text-[10px]">Campo</th>
                           <th className="text-left px-3 py-2 font-bold text-red-400 uppercase tracking-wider text-[10px]">Antes</th>
                           <th className="text-left px-3 py-2 font-bold text-emerald-500 uppercase tracking-wider text-[10px]">Después</th>
                         </tr>
                       </thead>
                       <tbody>
                         {diffs.map(diff => (
-                          <tr key={diff.key} className="border-t border-slate-100 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
-                            <td className="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">{prettyKey(diff.key)}</td>
+                          <tr key={diff.key} className="border-t border-border/50 dark:border-slate-700/50 hover:bg-muted/50/50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-3 py-2.5 font-bold text-foreground/80 dark:text-slate-300 whitespace-nowrap">{prettyKey(diff.key)}</td>
                             <td className="px-3 py-2.5 font-mono text-[11px] text-red-500 dark:text-red-400 bg-red-50/40 dark:bg-red-500/5 break-all">
                               <span className="line-through opacity-70">{formatValue(diff.oldVal)}</span>
                             </td>
@@ -221,7 +221,7 @@ function TimelineEntry({ log, index }: { log: AuditLog; index: number }) {
                     </table>
                   </div>
                   {diffs.length === 0 && (
-                    <p className="text-xs text-slate-400 italic">No se detectaron cambios entre los datos.</p>
+                    <p className="text-xs text-muted-foreground/70 italic">No se detectaron cambios entre los datos.</p>
                   )}
                 </div>
               )}
@@ -229,15 +229,15 @@ function TimelineEntry({ log, index }: { log: AuditLog; index: number }) {
               {/* INSERT or DELETE: show record fields */}
               {(actionUpper === 'INSERT' || actionUpper === 'DELETE') && dataToShow && (
                 <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-3">
                     {actionUpper === 'INSERT' ? 'Datos del nuevo registro' : 'Datos del registro eliminado'}
                   </p>
-                  <div className="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700/50">
+                  <div className="rounded-xl overflow-hidden border border-border/50 dark:border-slate-700/50">
                     <table className="w-full text-xs">
                       <tbody>
                         {Object.entries(dataToShow as Record<string, unknown>).map(([key, val]) => (
-                          <tr key={key} className="border-t first:border-t-0 border-slate-100 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
-                            <td className="px-3 py-2.5 font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap w-1/3">{prettyKey(key)}</td>
+                          <tr key={key} className="border-t first:border-t-0 border-border/50 dark:border-slate-700/50 hover:bg-muted/50/50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="px-3 py-2.5 font-bold text-foreground/80 dark:text-slate-300 whitespace-nowrap w-1/3">{prettyKey(key)}</td>
                             <td className={`px-3 py-2.5 font-mono text-[11px] break-all ${
                               actionUpper === 'INSERT'
                                 ? 'text-emerald-600 dark:text-emerald-400'
@@ -255,11 +255,11 @@ function TimelineEntry({ log, index }: { log: AuditLog; index: number }) {
 
               {/* Fallback: no data */}
               {!dataToShow && actionUpper !== 'UPDATE' && (
-                <p className="text-xs text-slate-400 italic">Sin datos disponibles para esta acción.</p>
+                <p className="text-xs text-muted-foreground/70 italic">Sin datos disponibles para esta acción.</p>
               )}
 
               {/* Metadata */}
-              <div className="mt-4 flex items-center gap-3 text-[10px] text-slate-400 dark:text-slate-500">
+              <div className="mt-4 flex items-center gap-3 text-[10px] text-muted-foreground/70 dark:text-muted-foreground">
                 <span className="font-mono">{log.record_id}</span>
                 <span>·</span>
                 <span>{format(parseISO(log.created_at), "dd MMM yyyy, HH:mm:ss", { locale: es })}</span>
@@ -320,7 +320,7 @@ export default function AuditPage() {
       case 'INSERT': return <Badge className="bg-emerald-100 text-emerald-700 border-none px-3 font-black">INSERTAR</Badge>;
       case 'UPDATE': return <Badge className="bg-amber-100 text-amber-700 border-none px-3 font-black">ACTUALIZAR</Badge>;
       case 'DELETE': return <Badge className="bg-red-100 text-red-700 border-none px-3 font-black">ELIMINAR</Badge>;
-      default: return <Badge className="bg-gray-100 text-gray-700 border-none px-3 font-black">{action}</Badge>;
+      default: return <Badge className="bg-muted text-foreground/80 border-none px-3 font-black">{action}</Badge>;
     }
   };
 
@@ -333,19 +333,19 @@ export default function AuditPage() {
     {
       accessorKey: 'table_name',
       header: 'Tabla Afectada',
-      cell: ({ row }: any) => <span className="font-mono text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-md">{row.original.table_name}</span>
+      cell: ({ row }: any) => <span className="font-mono text-xs font-bold text-muted-foreground bg-muted px-2 py-1 rounded-md">{row.original.table_name}</span>
     },
     {
       accessorKey: 'record_id',
       header: 'ID del Registro',
-      cell: ({ row }: any) => <span className="text-[11px] text-slate-400 font-mono" title={row.original.record_id}>{(row.original.record_id || '').substring(0, 8)}...</span>
+      cell: ({ row }: any) => <span className="text-[11px] text-muted-foreground/70 font-mono" title={row.original.record_id}>{(row.original.record_id || '').substring(0, 8)}...</span>
     },
     {
       accessorKey: 'created_at',
       header: 'Fecha y Hora',
       cell: ({ row }: any) => (
-        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
-          <Calendar size={12} className="text-slate-400" />
+        <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+          <Calendar size={12} className="text-muted-foreground/70" />
           {format(parseISO(row.original.created_at), "dd MMM yyyy, HH:mm", { locale: es })}
         </span>
       )
@@ -357,7 +357,7 @@ export default function AuditPage() {
         <Button
           variant="outline"
           size="sm"
-          className="h-8 rounded-lg font-bold border-slate-200 text-[#4892CC] hover:bg-[#E8F1F8] hover:text-[#4892CC] hover:border-transparent"
+          className="h-8 rounded-lg font-bold border-border text-[#4892CC] hover:bg-[#E8F1F8] hover:text-[#4892CC] hover:border-transparent"
           onClick={() => setSelectedLog(row.original)}
         >
           <Eye size={14} className="mr-1.5" /> Inspeccionar
@@ -369,18 +369,18 @@ export default function AuditPage() {
   return (
     <div className="pb-20 bg-[#FAFBFC] dark:bg-background min-h-screen page-enter">
       {/* HEADER */}
-      <header className="relative h-auto py-8 md:h-64 flex items-center overflow-hidden bg-white dark:bg-card border-b border-slate-100/60 dark:border-border">
+      <header className="relative h-auto py-8 md:h-64 flex items-center overflow-hidden bg-card dark:bg-slate-900 dark:bg-card border-b border-border/50/60 dark:border-border">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/[0.03] via-transparent to-slate-900/[0.02] z-0"></div>
         <div className="container mx-auto px-4 md:px-8 relative z-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <Badge className="mb-3 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-none font-bold px-4 py-1 rounded-full text-[10px] md:text-xs tracking-widest uppercase flex items-center w-fit gap-1.5">
+              <Badge className="mb-3 bg-muted text-muted-foreground dark:bg-slate-800 dark:text-muted-foreground/70 border-none font-bold px-4 py-1 rounded-full text-[10px] md:text-xs tracking-widest uppercase flex items-center w-fit gap-1.5">
                 <ShieldAlert size={12} /> Seguridad y Auditoría
               </Badge>
-              <h1 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-foreground tracking-tight">
-                Historial de <span className="text-slate-500 dark:text-slate-400">Cambios</span>
+              <h1 className="text-3xl md:text-5xl font-black text-foreground dark:text-foreground tracking-tight">
+                Historial de <span className="text-muted-foreground dark:text-muted-foreground/70">Cambios</span>
               </h1>
-              <p className="text-gray-500 dark:text-muted-foreground font-medium mt-2 max-w-xl">
+              <p className="text-muted-foreground dark:text-muted-foreground font-medium mt-2 max-w-xl">
                 Monitorea cada registro insertado, actualizado o eliminado en el sistema. Los cambios son inmutables y quedan registrados de por vida.
               </p>
             </div>
@@ -390,25 +390,25 @@ export default function AuditPage() {
 
       {/* FILTERS & STATS */}
       <div className="container mx-auto px-4 md:px-8 -mt-6 md:-mt-8 relative z-20">
-        <div className="bg-white/80 dark:bg-card/80 backdrop-blur-xl border border-slate-200/60 dark:border-border p-4 rounded-2xl shadow-premium flex flex-col md:flex-row items-center gap-4">
+        <div className="bg-card dark:bg-slate-900/80 dark:bg-card/80 backdrop-blur-xl border border-border/60 dark:border-border p-4 rounded-2xl shadow-premium flex flex-col md:flex-row items-center gap-4">
           <div className="relative flex-1 w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 w-5 h-5" />
             <Input
               placeholder="Buscar por tabla, acción o ID de registro..."
-              className="pl-12 h-14 bg-white/50 dark:bg-background/50 border-slate-200 dark:border-border focus:bg-white dark:focus:bg-background rounded-xl font-medium w-full text-base transition-all focus:ring-4 focus:ring-slate-100 dark:focus:ring-slate-800"
+              className="pl-12 h-14 bg-card dark:bg-slate-900/50 dark:bg-background/50 border-border dark:border-border focus:bg-card dark:bg-slate-900 dark:focus:bg-background rounded-xl font-medium w-full text-base transition-all focus:ring-4 focus:ring-slate-100 dark:focus:ring-slate-800"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <div className="flex gap-3 w-full md:w-auto">
             {/* View toggle */}
-            <div className="flex rounded-xl border border-slate-200 dark:border-border overflow-hidden h-14">
+            <div className="flex rounded-xl border border-border dark:border-border overflow-hidden h-14">
               <button
                 onClick={() => setViewMode('tabla')}
                 className={`px-4 flex items-center gap-2 text-sm font-bold transition-all ${
                   viewMode === 'tabla'
-                    ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
-                    : 'bg-white text-slate-500 hover:bg-slate-50 dark:bg-card dark:text-slate-400 dark:hover:bg-slate-800'
+                    ? 'bg-slate-900 text-white dark:bg-muted dark:text-foreground'
+                    : 'bg-card dark:bg-slate-900 text-muted-foreground hover:bg-muted/50 dark:bg-card dark:text-muted-foreground/70 dark:hover:bg-slate-800'
                 }`}
               >
                 <Table2 size={16} />
@@ -418,8 +418,8 @@ export default function AuditPage() {
                 onClick={() => setViewMode('timeline')}
                 className={`px-4 flex items-center gap-2 text-sm font-bold transition-all ${
                   viewMode === 'timeline'
-                    ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
-                    : 'bg-white text-slate-500 hover:bg-slate-50 dark:bg-card dark:text-slate-400 dark:hover:bg-slate-800'
+                    ? 'bg-slate-900 text-white dark:bg-muted dark:text-foreground'
+                    : 'bg-card dark:bg-slate-900 text-muted-foreground hover:bg-muted/50 dark:bg-card dark:text-muted-foreground/70 dark:hover:bg-slate-800'
                 }`}
               >
                 <Clock size={16} />
@@ -427,7 +427,7 @@ export default function AuditPage() {
               </button>
             </div>
 
-            <Button variant="outline" className="h-14 rounded-xl px-6 border-slate-200 dark:border-border font-bold text-slate-600 dark:text-slate-400 flex-1 md:flex-none">
+            <Button variant="outline" className="h-14 rounded-xl px-6 border-border dark:border-border font-bold text-muted-foreground dark:text-muted-foreground/70 flex-1 md:flex-none">
               <Filter className="w-4 h-4 mr-2" /> Filtros
             </Button>
             <Button
@@ -444,7 +444,7 @@ export default function AuditPage() {
       <div className="container mx-auto px-4 md:px-8 mt-8">
         {viewMode === 'tabla' ? (
           /* ─── TABLE VIEW ─── */
-          <Card className="rounded-3xl border-none shadow-premium bg-white dark:bg-card overflow-hidden animate-fade-in-up">
+          <Card className="rounded-3xl border-none shadow-premium bg-card dark:bg-slate-900 dark:bg-card overflow-hidden animate-fade-in-up">
             <div className="p-1">
               <DataTable
                 columns={columns}
@@ -461,20 +461,20 @@ export default function AuditPage() {
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="flex gap-6">
                     <div className="w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse mt-1.5" />
-                    <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700/50 space-y-3 animate-pulse">
-                      <div className="h-4 w-2/3 bg-slate-100 dark:bg-slate-700 rounded-lg" />
-                      <div className="h-3 w-1/3 bg-slate-100 dark:bg-slate-700 rounded-lg" />
+                    <div className="flex-1 bg-card dark:bg-slate-900 dark:bg-slate-800 rounded-2xl p-5 border border-border/50 dark:border-slate-700/50 space-y-3 animate-pulse">
+                      <div className="h-4 w-2/3 bg-muted dark:bg-slate-700 rounded-lg" />
+                      <div className="h-3 w-1/3 bg-muted dark:bg-slate-700 rounded-lg" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : filteredLogs.length === 0 ? (
               <div className="text-center py-20">
-                <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
-                  <Clock size={28} className="text-slate-400" />
+                <div className="w-16 h-16 rounded-2xl bg-muted dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                  <Clock size={28} className="text-muted-foreground/70" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">Sin registros</h3>
-                <p className="text-sm text-slate-400 mt-1">No se encontraron logs con los filtros actuales.</p>
+                <h3 className="text-lg font-bold text-foreground/80 dark:text-slate-300">Sin registros</h3>
+                <p className="text-sm text-muted-foreground/70 mt-1">No se encontraron logs con los filtros actuales.</p>
               </div>
             ) : (
               <div className="pl-2">
@@ -489,10 +489,10 @@ export default function AuditPage() {
 
       {/* MODAL DETAIL */}
       <Dialog open={!!selectedLog} onOpenChange={(open) => !open && setSelectedLog(null)}>
-        <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden bg-[#FAFBFC] dark:bg-card border-slate-200 dark:border-border rounded-3xl">
-          <div className="p-6 bg-white dark:bg-card border-b border-slate-100 dark:border-border flex items-center justify-between">
+        <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden bg-[#FAFBFC] dark:bg-card border-border dark:border-border rounded-3xl">
+          <div className="p-6 bg-card dark:bg-slate-900 dark:bg-card border-b border-border/50 dark:border-border flex items-center justify-between">
             <div>
-              <DialogTitle className="text-xl font-black text-slate-900 dark:text-foreground flex items-center gap-2">
+              <DialogTitle className="text-xl font-black text-foreground dark:text-foreground flex items-center gap-2">
                 <FileText className="text-[#4892CC] w-6 h-6" /> Detalle de la Transacción
               </DialogTitle>
               <DialogDescription className="font-medium mt-1">
@@ -506,16 +506,16 @@ export default function AuditPage() {
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tabla</p>
-                  <p className="font-mono text-sm font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 w-fit px-2 py-0.5 rounded-md">{selectedLog.table_name}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-widest">Tabla</p>
+                  <p className="font-mono text-sm font-bold text-foreground/90 dark:text-slate-200 bg-muted dark:bg-slate-800 w-fit px-2 py-0.5 rounded-md">{selectedLog.table_name}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Usuario ID</p>
-                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate" title={selectedLog.user_id || 'Sistema'}>{selectedLog.user_id || 'Sistema'}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-widest">Usuario ID</p>
+                  <p className="text-xs font-medium text-foreground/80 dark:text-slate-300 truncate" title={selectedLog.user_id || 'Sistema'}>{selectedLog.user_id || 'Sistema'}</p>
                 </div>
                 <div className="space-y-1 md:col-span-2">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Registro Afectado (UUID)</p>
-                  <p className="text-xs font-mono font-medium text-slate-700 dark:text-slate-300">{selectedLog.record_id}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-widest">Registro Afectado (UUID)</p>
+                  <p className="text-xs font-mono font-medium text-foreground/80 dark:text-slate-300">{selectedLog.record_id}</p>
                 </div>
               </div>
 
@@ -524,7 +524,7 @@ export default function AuditPage() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                    <h4 className="font-black text-sm text-slate-800 dark:text-slate-200 uppercase tracking-wide">Datos Anteriores</h4>
+                    <h4 className="font-black text-sm text-foreground/90 dark:text-slate-200 uppercase tracking-wide">Datos Anteriores</h4>
                   </div>
                   <div className="bg-slate-900 rounded-2xl p-4 overflow-auto max-h-[300px] border border-slate-800 shadow-inner">
                     {selectedLog.old_data ? (
@@ -532,7 +532,7 @@ export default function AuditPage() {
                         {JSON.stringify(selectedLog.old_data, null, 2)}
                       </pre>
                     ) : (
-                      <div className="h-full flex items-center justify-center text-slate-600 text-[11px] font-mono italic p-4">
+                      <div className="h-full flex items-center justify-center text-muted-foreground text-[11px] font-mono italic p-4">
                         (Null) Registro nuevo
                       </div>
                     )}
@@ -543,7 +543,7 @@ export default function AuditPage() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <h4 className="font-black text-sm text-slate-800 dark:text-slate-200 uppercase tracking-wide">Datos Nuevos</h4>
+                    <h4 className="font-black text-sm text-foreground/90 dark:text-slate-200 uppercase tracking-wide">Datos Nuevos</h4>
                   </div>
                   <div className="bg-slate-900 rounded-2xl p-4 overflow-auto max-h-[300px] border border-slate-800 shadow-inner">
                     {selectedLog.new_data ? (
@@ -551,7 +551,7 @@ export default function AuditPage() {
                         {JSON.stringify(selectedLog.new_data, null, 2)}
                       </pre>
                     ) : (
-                      <div className="h-full flex items-center justify-center text-slate-600 text-[11px] font-mono italic p-4">
+                      <div className="h-full flex items-center justify-center text-muted-foreground text-[11px] font-mono italic p-4">
                         (Null) Registro eliminado
                       </div>
                     )}

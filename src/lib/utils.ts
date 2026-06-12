@@ -25,7 +25,7 @@ export function getSocioStatus(lastTransactionType: string | null, amount: numbe
   }
   
   if (type.includes('anulación') || type.includes('anulado')) {
-    return { label: 'Inactivo', color: 'bg-slate-100 text-slate-600 border-slate-200' };
+    return { label: 'Inactivo', color: 'bg-muted text-muted-foreground border-border' };
   }
 
   if (amount > 0) {

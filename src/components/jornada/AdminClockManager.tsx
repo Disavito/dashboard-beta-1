@@ -27,7 +27,7 @@ const AdminClockManager: React.FC = () => {
 
   return (
     <div className="space-y-6 w-full max-w-4xl mx-auto">
-      <Card className="border border-gray-100 shadow-premium bg-white rounded-2xl">
+      <Card className="border border-border/50 shadow-premium bg-card dark:bg-slate-900 rounded-2xl">
         <CardHeader className="pb-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -39,7 +39,7 @@ const AdminClockManager: React.FC = () => {
               onClick={() => setIsManualMode(!isManualMode)}
               className={cn(
                 "rounded-xl border-2 font-bold transition-all",
-                isManualMode ? "border-[#4892CC] text-[#4892CC] bg-[#4892CC]/5" : "border-gray-100"
+                isManualMode ? "border-[#4892CC] text-[#4892CC] bg-[#4892CC]/5" : "border-border/50"
               )}
             >
               {isManualMode ? <ToggleRight className="mr-2 h-5 w-5" /> : <ToggleLeft className="mr-2 h-5 w-5" />}
@@ -50,12 +50,12 @@ const AdminClockManager: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Colaborador</label>
+              <label className="text-[10px] font-black uppercase text-muted-foreground/70 tracking-widest ml-1">Colaborador</label>
               <Select
                 onValueChange={setSelectedColaboradorId}
                 disabled={isLoadingColaboradores}
               >
-                <SelectTrigger className="h-12 rounded-xl border-gray-100 bg-gray-50 font-bold">
+                <SelectTrigger className="h-12 rounded-xl border-border/50 bg-muted/50 font-bold">
                   <Users className="mr-2 h-4 w-4 text-[#4892CC]" />
                   <SelectValue placeholder={isLoadingColaboradores ? "Cargando..." : "Seleccionar colaborador"} />
                 </SelectTrigger>
@@ -70,13 +70,13 @@ const AdminClockManager: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Fecha del Registro</label>
+              <label className="text-[10px] font-black uppercase text-muted-foreground/70 tracking-widest ml-1">Fecha del Registro</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-full h-12 justify-start text-left font-bold rounded-xl border-gray-100 bg-gray-50",
+                      "w-full h-12 justify-start text-left font-bold rounded-xl border-border/50 bg-muted/50",
                       !selectedDate && "text-muted-foreground"
                     )}
                   >
@@ -84,7 +84,7 @@ const AdminClockManager: React.FC = () => {
                     {selectedDate ? format(selectedDate, "PPP", { locale: es }) : <span>Seleccionar fecha</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 rounded-2xl overflow-hidden border border-gray-100 shadow-premium" align="start">
+                <PopoverContent className="w-auto p-0 rounded-2xl overflow-hidden border border-border/50 shadow-premium" align="start">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
@@ -112,12 +112,12 @@ const AdminClockManager: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center text-center p-20 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50">
-            <div className="w-20 h-20 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6">
+        <div className="flex flex-col items-center justify-center text-center p-20 border-2 border-dashed border-border rounded-2xl bg-muted/50/50">
+            <div className="w-20 h-20 bg-card dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center mb-6">
               <UserSearch className="h-10 w-10 text-gray-300" />
             </div>
-            <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">Esperando Selección</h3>
-            <p className="text-gray-400 font-medium max-w-xs">Elige un colaborador y una fecha para comenzar la gestión de asistencia.</p>
+            <h3 className="text-xl font-black text-foreground uppercase tracking-tight mb-2">Esperando Selección</h3>
+            <p className="text-muted-foreground/70 font-medium max-w-xs">Elige un colaborador y una fecha para comenzar la gestión de asistencia.</p>
         </div>
       )}
     </div>

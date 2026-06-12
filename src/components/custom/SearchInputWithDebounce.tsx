@@ -39,13 +39,13 @@ const SearchInputWithDebounce = React.memo(
 
     return (
       <div className={cn("relative flex-1 w-full", className)}>
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
         <Input
           placeholder={placeholder}
           value={inputValue}
           onChange={handleChange}
           className={cn(
-            "pl-12 h-14 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-gray-700 font-medium",
+            "pl-12 h-14 bg-muted/50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-foreground/80 font-medium",
             inputClassName
           )}
         />

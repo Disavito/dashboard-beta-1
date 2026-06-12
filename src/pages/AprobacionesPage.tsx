@@ -166,7 +166,7 @@ export default function AprobacionesPage() {
       }
 
       return (
-        <div className="mt-4 p-4 bg-gray-50 rounded-xl space-y-2 border border-gray-100">
+        <div className="mt-4 p-4 bg-muted/50 rounded-xl space-y-2 border border-border/50">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2 text-rose-600 font-bold">
               <ArrowRight className="w-4 h-4" /> {title}
@@ -180,13 +180,13 @@ export default function AprobacionesPage() {
             ) : null}
           </div>
           <div className="grid grid-cols-2 gap-4 text-sm">
-            <div><span className="text-gray-500 block text-xs uppercase font-bold">Monto</span><span className="font-bold text-lg">{formatCurrency(Math.abs(payload.amount))}</span></div>
-            <div><span className="text-gray-500 block text-xs uppercase font-bold">Categoría</span><span className="font-medium">{payload.category} - {payload.sub_category}</span></div>
-            <div className="col-span-2"><span className="text-gray-500 block text-xs uppercase font-bold">Descripción</span><span className="text-gray-700">{desc}</span></div>
+            <div><span className="text-muted-foreground block text-xs uppercase font-bold">Monto</span><span className="font-bold text-lg">{formatCurrency(Math.abs(payload.amount))}</span></div>
+            <div><span className="text-muted-foreground block text-xs uppercase font-bold">Categoría</span><span className="font-medium">{payload.category} - {payload.sub_category}</span></div>
+            <div className="col-span-2"><span className="text-muted-foreground block text-xs uppercase font-bold">Descripción</span><span className="text-foreground/80">{desc}</span></div>
             {payload.presupuesto_id && (
               <div className="col-span-2 bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 text-xs">
                 <span className="font-bold text-[#4892CC] block">Vinculado a Presupuesto Operativo:</span>
-                <span className="font-semibold text-slate-700">{getBudgetMotivo(payload.presupuesto_id)}</span>
+                <span className="font-semibold text-foreground/80">{getBudgetMotivo(payload.presupuesto_id)}</span>
               </div>
             )}
           </div>
@@ -200,8 +200,8 @@ export default function AprobacionesPage() {
           <div className="flex items-center gap-2 text-red-600 font-bold mb-2">
             <Trash2 className="w-4 h-4" /> Eliminación de Registro
           </div>
-          <p className="text-sm text-gray-700">Se solicita eliminar el registro ID: <span className="font-bold">{request.reference_id}</span></p>
-          <p className="text-sm text-gray-500"><span className="font-bold">Motivo:</span> {request.payload?.reason || 'No especificado'}</p>
+          <p className="text-sm text-foreground/80">Se solicita eliminar el registro ID: <span className="font-bold">{request.reference_id}</span></p>
+          <p className="text-sm text-muted-foreground"><span className="font-bold">Motivo:</span> {request.payload?.reason || 'No especificado'}</p>
         </div>
       );
     }
@@ -209,16 +209,16 @@ export default function AprobacionesPage() {
     return null;
   };
 
-  if (loading) return <div className="p-8 text-center text-gray-500">Cargando solicitudes...</div>;
+  if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando solicitudes...</div>;
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-gray-900">
+          <h1 className="text-3xl font-black tracking-tight text-foreground">
             {isAdminOrFinanzas ? 'Aprobaciones Pendientes' : 'Estado de mis Solicitudes'}
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-muted-foreground mt-1">
             {isAdminOrFinanzas 
               ? 'Gestiona solicitudes de eliminación y gastos elevados del equipo.' 
               : 'Consulta el estado de tus solicitudes de gastos y eliminaciones de archivos.'}
@@ -236,26 +236,26 @@ export default function AprobacionesPage() {
       )}
 
       {pendingRequests.length === 0 ? (
-        <Card className="rounded-2xl border-dashed bg-gray-50/50 p-12 text-center shadow-none">
+        <Card className="rounded-2xl border-dashed bg-muted/50/50 p-12 text-center shadow-none">
           <Check className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-gray-700">Todo al día</h3>
-          <p className="text-gray-500">No hay solicitudes pendientes de aprobación.</p>
+          <h3 className="text-xl font-bold text-foreground/80">Todo al día</h3>
+          <p className="text-muted-foreground">No hay solicitudes pendientes de aprobación.</p>
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {pendingRequests.map(request => (
-            <Card key={request.id} className="rounded-2xl border border-gray-100 shadow-premium overflow-hidden">
+            <Card key={request.id} className="rounded-2xl border border-border/50 shadow-premium overflow-hidden">
               <div className="flex items-start justify-between p-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-[#4892CC]/10 flex items-center justify-center flex-shrink-0">
                     <FileText className="w-6 h-6 text-[#4892CC]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">
+                    <h3 className="text-lg font-bold text-foreground">
                       {request.request_type === 'high_expense' ? 'Aprobación de Gasto Elevado' : request.request_type === 'engineer_expense' ? 'Aprobación de Gasto (Ingeniero)' : request.request_type === 'expense_approval' ? 'Aprobación de Gasto' : 'Aprobación de Eliminación'}
                     </h3>
-                    <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
-                      <span className="font-medium text-gray-700">Solicitado por: {getColaboradorName(request.requested_by)}</span>
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
+                      <span className="font-medium text-foreground/80">Solicitado por: {getColaboradorName(request.requested_by)}</span>
                       <span>•</span>
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {format(parseISO(request.created_at), 'dd/MM/yyyy HH:mm', { locale: es })}</span>
                     </div>
@@ -276,7 +276,7 @@ export default function AprobacionesPage() {
                       onClick={() => handleAction(request, 'reject')} 
                       disabled={isProcessing === request.id}
                       variant="outline"
-                      className="border-gray-200 text-gray-600 hover:bg-gray-50 font-bold"
+                      className="border-border text-muted-foreground hover:bg-muted/50 font-bold"
                     >
                       Rechazar
                     </Button>
@@ -290,11 +290,11 @@ export default function AprobacionesPage() {
 
       {historyRequests.length > 0 && (
         <div className="mt-12">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Historial Reciente</h2>
-          <Card className="rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+          <h2 className="text-xl font-bold text-foreground mb-6">Historial Reciente</h2>
+          <Card className="rounded-2xl border border-border/50 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 text-gray-500 uppercase text-xs font-bold border-b border-gray-100">
+                <thead className="bg-muted/50 text-muted-foreground uppercase text-xs font-bold border-b border-border/50">
                   <tr>
                     <th className="px-6 py-4">Tipo</th>
                     <th className="px-6 py-4">Solicitante</th>
@@ -303,14 +303,14 @@ export default function AprobacionesPage() {
                     <th className="px-6 py-4">Revisado por</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 bg-white">
+                <tbody className="divide-y divide-gray-100 bg-card dark:bg-slate-900">
                   {historyRequests.map(h => (
-                    <tr key={h.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-gray-900">
+                    <tr key={h.id} className="hover:bg-muted/50/50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-foreground">
                         {h.request_type === 'engineer_expense' ? 'Gasto Ingeniero' : h.request_type === 'expense_approval' ? 'Nuevo Gasto' : h.request_type}
                       </td>
-                      <td className="px-6 py-4 text-gray-600">{getColaboradorName(h.requested_by)}</td>
-                      <td className="px-6 py-4 text-gray-500">{format(parseISO(h.created_at), 'dd MMM yyyy', { locale: es })}</td>
+                      <td className="px-6 py-4 text-muted-foreground">{getColaboradorName(h.requested_by)}</td>
+                      <td className="px-6 py-4 text-muted-foreground">{format(parseISO(h.created_at), 'dd MMM yyyy', { locale: es })}</td>
                       <td className="px-6 py-4">
                         {h.status === 'approved' ? (
                           <Badge className="bg-emerald-50 text-emerald-600 border-none">Aprobado</Badge>
@@ -318,7 +318,7 @@ export default function AprobacionesPage() {
                           <Badge className="bg-red-50 text-red-600 border-none">Rechazado</Badge>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-gray-500">{h.reviewed_by ? getColaboradorName(h.reviewed_by) : '-'}</td>
+                      <td className="px-6 py-4 text-muted-foreground">{h.reviewed_by ? getColaboradorName(h.reviewed_by) : '-'}</td>
                     </tr>
                   ))}
                 </tbody>

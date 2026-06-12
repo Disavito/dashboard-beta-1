@@ -104,15 +104,15 @@ const ManualClockForm: React.FC<ManualClockFormProps> = ({ colaborador, date }) 
   });
 
   return (
-    <Card className="border border-gray-100 shadow-premium bg-white rounded-2xl overflow-hidden">
-      <CardHeader className="bg-gradient-to-br from-gray-50 to-white border-b border-gray-100 pb-8">
+    <Card className="border border-border/50 shadow-premium bg-card dark:bg-slate-900 rounded-2xl overflow-hidden">
+      <CardHeader className="bg-gradient-to-br from-gray-50 to-white border-b border-border/50 pb-8">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-[#4892CC]/10 rounded-2xl flex items-center justify-center">
             <Clock className="text-[#4892CC] h-6 w-6" />
           </div>
           <div>
             <CardTitle className="text-xl font-black uppercase tracking-tight">Entrada Manual</CardTitle>
-            <p className="text-sm text-gray-400 font-medium">
+            <p className="text-sm text-muted-foreground/70 font-medium">
               {colaborador.name} - {format(date, 'dd/MM/yyyy')}
             </p>
           </div>
@@ -121,50 +121,50 @@ const ManualClockForm: React.FC<ManualClockFormProps> = ({ colaborador, date }) 
       <CardContent className="pt-8 space-y-6">
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Inicio Jornada</Label>
+            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Inicio Jornada</Label>
             <Input 
               type="time" 
               value={times.inicio} 
               onChange={(e) => setTimes({...times, inicio: e.target.value})}
-              className="h-12 rounded-xl border-gray-100 bg-gray-50 font-bold focus:ring-[#4892CC]"
+              className="h-12 rounded-xl border-border/50 bg-muted/50 font-bold focus:ring-[#4892CC]"
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Fin Jornada</Label>
+            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Fin Jornada</Label>
             <Input 
               type="time" 
               value={times.fin} 
               onChange={(e) => setTimes({...times, fin: e.target.value})}
-              className="h-12 rounded-xl border-gray-100 bg-gray-50 font-bold focus:ring-[#4892CC]"
+              className="h-12 rounded-xl border-border/50 bg-muted/50 font-bold focus:ring-[#4892CC]"
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Inicio Almuerzo</Label>
+            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Inicio Almuerzo</Label>
             <Input 
               type="time" 
               value={times.inicioAlmuerzo} 
               onChange={(e) => setTimes({...times, inicioAlmuerzo: e.target.value})}
-              className="h-12 rounded-xl border-gray-100 bg-gray-50 font-bold focus:ring-[#4892CC]"
+              className="h-12 rounded-xl border-border/50 bg-muted/50 font-bold focus:ring-[#4892CC]"
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Fin Almuerzo</Label>
+            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Fin Almuerzo</Label>
             <Input 
               type="time" 
               value={times.finAlmuerzo} 
               onChange={(e) => setTimes({...times, finAlmuerzo: e.target.value})}
-              className="h-12 rounded-xl border-gray-100 bg-gray-50 font-bold focus:ring-[#4892CC]"
+              className="h-12 rounded-xl border-border/50 bg-muted/50 font-bold focus:ring-[#4892CC]"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Notas / Observaciones</Label>
+          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Notas / Observaciones</Label>
           <Textarea 
             placeholder="Motivo del registro manual..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="min-h-[100px] rounded-2xl border-gray-100 bg-gray-50 font-medium resize-none focus:ring-[#4892CC]"
+            className="min-h-[100px] rounded-2xl border-border/50 bg-muted/50 font-medium resize-none focus:ring-[#4892CC]"
           />
         </div>
 

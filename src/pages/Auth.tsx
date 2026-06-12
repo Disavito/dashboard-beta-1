@@ -62,26 +62,26 @@ const AuthPage: React.FC = () => {
       <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-corp-teal/5 rounded-full blur-3xl" />
       
-      <Card className="w-full max-w-md border-white/60 shadow-premium-lg rounded-2xl overflow-hidden animate-scale-in backdrop-blur-sm bg-white/90">
+      <Card className="w-full max-w-md border-white/60 shadow-premium-lg rounded-2xl overflow-hidden animate-scale-in backdrop-blur-sm bg-card dark:bg-slate-900/90">
         <CardHeader className="text-center p-8 pb-6">
           {/* Logo */}
           <div className="flex flex-col items-center justify-center mb-6 gap-3">
             <img src="/logo.png" alt="Fimagadi Logo" className="w-20 h-20 object-contain drop-shadow-xl" />
-            <span className="text-2xl font-black tracking-widest text-slate-900 uppercase">
+            <span className="text-2xl font-black tracking-widest text-foreground uppercase">
               FIMAGADI
             </span>
           </div>
-          <CardTitle className="text-2xl font-black text-slate-900 tracking-tight">
+          <CardTitle className="text-2xl font-black text-foreground tracking-tight">
             {isSignIn ? 'Bienvenido de nuevo' : 'Únete a FIMAGADI'}
           </CardTitle>
-          <CardDescription className="text-slate-500 font-medium mt-1">
+          <CardDescription className="text-muted-foreground font-medium mt-1">
             {isSignIn ? 'Inicia sesión para acceder a tu dashboard.' : 'Crea una cuenta para empezar a gestionar tus finanzas.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="px-8 pb-8 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-slate-700 font-bold text-xs uppercase tracking-wider">Correo Electrónico</Label>
+              <Label htmlFor="email" className="text-foreground/80 font-bold text-xs uppercase tracking-wider">Correo Electrónico</Label>
               <Input
                 id="email"
                 type="email"
@@ -89,11 +89,11 @@ const AuthPage: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-12 bg-slate-50/80 border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-slate-700 font-medium placeholder:text-slate-400 transition-all duration-200"
+                className="h-12 bg-muted/50/80 border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-foreground/80 font-medium placeholder:text-muted-foreground/70 transition-all duration-200"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-700 font-bold text-xs uppercase tracking-wider">Contraseña</Label>
+              <Label htmlFor="password" className="text-foreground/80 font-bold text-xs uppercase tracking-wider">Contraseña</Label>
               <Input
                 id="password"
                 type="password"
@@ -101,7 +101,7 @@ const AuthPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="h-12 bg-slate-50/80 border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-slate-700 font-medium placeholder:text-slate-400 transition-all duration-200"
+                className="h-12 bg-muted/50/80 border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-foreground/80 font-medium placeholder:text-muted-foreground/70 transition-all duration-200"
               />
             </div>
             {error && (
@@ -135,7 +135,7 @@ const AuthPage: React.FC = () => {
           <Button
             variant="link"
             onClick={() => setIsSignIn(!isSignIn)}
-            className="text-slate-500 hover:text-primary transition-colors duration-200 font-medium"
+            className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium"
           >
             {isSignIn ? '¿No tienes una cuenta? Regístrate' : '¿Ya tienes una cuenta? Inicia Sesión'}
           </Button>

@@ -144,23 +144,23 @@ function SocioStatusAndDocuments({ socioId }: SocioStatusAndDocumentsProps) {
   };
 
   if (isLoading) return (
-    <div className="p-24 flex flex-col items-center justify-center bg-white rounded-3xl border border-gray-100 shadow-sm">
+    <div className="p-24 flex flex-col items-center justify-center bg-card dark:bg-slate-900 rounded-3xl border border-border/50 shadow-sm">
       <Loader2 className="h-12 w-12 animate-spin text-[#4892CC]" />
-      <p className="mt-6 text-gray-400 font-medium">Sincronizando expediente técnico...</p>
+      <p className="mt-6 text-muted-foreground/70 font-medium">Sincronizando expediente técnico...</p>
     </div>
   );
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-      <div className="relative overflow-hidden bg-white p-8 rounded-2xl border border-gray-100 shadow-sm group">
+      <div className="relative overflow-hidden bg-card dark:bg-slate-900 p-8 rounded-2xl border border-border/50 shadow-sm group">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-5">
             <div className="p-4 bg-[#E8F1F8] rounded-2xl shadow-inner">
               <Layers className="w-7 h-7 text-[#4892CC]" />
             </div>
             <div>
-              <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">Expediente de Ingeniería</h2>
-              <p className="text-sm text-gray-500 font-medium">Control de medición y planimetría basado en el último estado financiero.</p>
+              <h2 className="text-2xl font-extrabold text-foreground tracking-tight">Expediente de Ingeniería</h2>
+              <p className="text-sm text-muted-foreground font-medium">Control de medición y planimetría basado en el último estado financiero.</p>
             </div>
           </div>
           <Button onClick={handleBulkUpdate} disabled={isSubmitting} className="bg-[#4892CC] hover:bg-[#3C8B93] text-white shadow-glass px-8 py-6 rounded-2xl font-bold">
@@ -170,15 +170,15 @@ function SocioStatusAndDocuments({ socioId }: SocioStatusAndDocumentsProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-card dark:bg-slate-900 rounded-2xl border border-border/50 shadow-sm overflow-hidden">
         <Table>
-          <TableHeader className="bg-gray-50/40">
-            <TableRow className="hover:bg-transparent border-b border-gray-100/50">
-              <TableHead className="w-[180px] py-6 pl-8 font-bold text-gray-400 text-[11px] uppercase tracking-widest">Estado Medición</TableHead>
-              <TableHead className="font-bold text-gray-400 text-[11px] uppercase tracking-widest">Ubicación Técnica</TableHead>
-              <TableHead className="font-bold text-gray-400 text-[11px] uppercase tracking-widest">Finanzas (Último Mov.)</TableHead>
-              <TableHead className="font-bold text-gray-400 text-[11px] uppercase tracking-widest">Documentación Activa</TableHead>
-              <TableHead className="text-right pr-8 font-bold text-gray-400 text-[11px] uppercase tracking-widest">Gestión</TableHead>
+          <TableHeader className="bg-muted/50/40">
+            <TableRow className="hover:bg-transparent border-b border-border/50/50">
+              <TableHead className="w-[180px] py-6 pl-8 font-bold text-muted-foreground/70 text-[11px] uppercase tracking-widest">Estado Medición</TableHead>
+              <TableHead className="font-bold text-muted-foreground/70 text-[11px] uppercase tracking-widest">Ubicación Técnica</TableHead>
+              <TableHead className="font-bold text-muted-foreground/70 text-[11px] uppercase tracking-widest">Finanzas (Último Mov.)</TableHead>
+              <TableHead className="font-bold text-muted-foreground/70 text-[11px] uppercase tracking-widest">Documentación Activa</TableHead>
+              <TableHead className="text-right pr-8 font-bold text-muted-foreground/70 text-[11px] uppercase tracking-widest">Gestión</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -192,7 +192,7 @@ function SocioStatusAndDocuments({ socioId }: SocioStatusAndDocumentsProps) {
                         if (checked) setSelectedLotIds([...selectedLotIds, lot.id]);
                         else setSelectedLotIds(selectedLotIds.filter(id => id !== lot.id));
                       }}
-                      className="w-5 h-5 rounded-md border-gray-300 data-[state=checked]:bg-[#4892CC] data-[state=checked]:border-[#4892CC]"
+                      className="w-5 h-5 rounded-md border-border data-[state=checked]:bg-[#4892CC] data-[state=checked]:border-[#4892CC]"
                     />
                     <span className={cn(
                       "text-[10px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-md w-fit",
@@ -205,11 +205,11 @@ function SocioStatusAndDocuments({ socioId }: SocioStatusAndDocumentsProps) {
 
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center">
-                      <MapIcon className="w-5 h-5 text-gray-400" />
+                    <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center">
+                      <MapIcon className="w-5 h-5 text-muted-foreground/70" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-bold text-gray-900 text-base">Mz. {lot.mz} — Lote {lot.lote}</span>
+                      <span className="font-bold text-foreground text-base">Mz. {lot.mz} — Lote {lot.lote}</span>
                       <span className="text-[11px] font-bold text-[#4892CC] uppercase">{lot.isPrimary ? 'Predio Principal' : 'Predio Adicional'}</span>
                     </div>
                   </div>
@@ -229,8 +229,8 @@ function SocioStatusAndDocuments({ socioId }: SocioStatusAndDocumentsProps) {
                       {lot.paymentStatus}
                     </div>
                     <span className={cn(
-                      "text-[10px] font-mono bg-gray-50 px-2 py-0.5 rounded w-fit",
-                      lot.paymentStatus === 'Anulado' ? "text-red-400 line-through" : "text-gray-400"
+                      "text-[10px] font-mono bg-muted/50 px-2 py-0.5 rounded w-fit",
+                      lot.paymentStatus === 'Anulado' ? "text-red-400 line-through" : "text-muted-foreground/70"
                     )}>
                       {lot.receiptNumber}
                     </span>
@@ -253,10 +253,10 @@ function SocioStatusAndDocuments({ socioId }: SocioStatusAndDocumentsProps) {
 
                 <TableCell className="text-right pr-8">
                   <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Button variant="outline" size="sm" className="h-9 rounded-xl border-gray-200 font-bold text-[11px]" onClick={() => setUploadModal({ isOpen: true, socioId: lot.id, socioName: lot.fullName, type: 'Planos de ubicación' })}>
+                    <Button variant="outline" size="sm" className="h-9 rounded-xl border-border font-bold text-[11px]" onClick={() => setUploadModal({ isOpen: true, socioId: lot.id, socioName: lot.fullName, type: 'Planos de ubicación' })}>
                       <UploadCloud className="w-3.5 h-3.5 mr-1.5" /> Planos
                     </Button>
-                    <Button variant="outline" size="sm" className="h-9 rounded-xl border-gray-200 font-bold text-[11px]" onClick={() => setUploadModal({ isOpen: true, socioId: lot.id, socioName: lot.fullName, type: 'Memoria descriptiva' })}>
+                    <Button variant="outline" size="sm" className="h-9 rounded-xl border-border font-bold text-[11px]" onClick={() => setUploadModal({ isOpen: true, socioId: lot.id, socioName: lot.fullName, type: 'Memoria descriptiva' })}>
                       <UploadCloud className="w-3.5 h-3.5 mr-1.5" /> Memoria
                     </Button>
                   </div>

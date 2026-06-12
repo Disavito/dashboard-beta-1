@@ -73,7 +73,7 @@ const DocumentLinkPill: React.FC<DocumentLinkPillProps> = ({
     return (
       <Badge
         variant="outline"
-        className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border-gray-200 bg-gray-50 text-gray-400 italic"
+        className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border-border bg-muted/50 text-muted-foreground/70 italic"
       >
         <FileText className="h-3.5 w-3.5 text-gray-300" />
         {type.split(' ')[0]} (N/A)
@@ -86,11 +86,11 @@ const DocumentLinkPill: React.FC<DocumentLinkPillProps> = ({
       <Badge
         variant="outline"
         className={cn(
-          "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border-gray-200 bg-gray-50 text-gray-700",
+          "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border-border bg-muted/50 text-foreground/80",
           (isAdmin || showEngineerRequestButton) && "pr-1" // Adjust padding if delete/request button is present
         )}
       >
-        <FileText className="h-3.5 w-3.5 text-gray-400" />
+        <FileText className="h-3.5 w-3.5 text-muted-foreground/70" />
         <a href={link} target="_blank" rel="noopener noreferrer" className="hover:underline">
           {type.split(' ')[0]}
         </a>
@@ -98,7 +98,7 @@ const DocumentLinkPill: React.FC<DocumentLinkPillProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 text-gray-400 hover:bg-gray-100 hover:text-red-500"
+            className="h-6 w-6 text-muted-foreground/70 hover:bg-muted hover:text-red-500"
             onClick={onDelete}
             aria-label={`Eliminar ${type}`}
           >
@@ -109,7 +109,7 @@ const DocumentLinkPill: React.FC<DocumentLinkPillProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 text-gray-400 hover:bg-gray-100 hover:text-amber-500"
+            className="h-6 w-6 text-muted-foreground/70 hover:bg-muted hover:text-amber-500"
             onClick={() => setShowRequestConfirm(true)}
             disabled={isRequestingDeletion}
             aria-label={`Solicitar eliminación de ${type}`}

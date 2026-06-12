@@ -345,25 +345,25 @@ const ReportesPage: React.FC = () => {
             <BarChart3 className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">Reportes</h1>
-            <p className="text-slate-500 font-medium text-sm">Analiza el rendimiento de tu organización</p>
+            <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">Reportes</h1>
+            <p className="text-muted-foreground font-medium text-sm">Analiza el rendimiento de tu organización</p>
           </div>
         </div>
       </header>
 
       {/* ── Barra de navegación de periodo ── */}
-      <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-end p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+      <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-end p-5 bg-card dark:bg-slate-900 border border-border/50 rounded-2xl shadow-sm">
         {/* Vista selector */}
         <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Vista</label>
-          <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
+          <label className="text-[10px] font-black uppercase text-muted-foreground/70 tracking-widest">Vista</label>
+          <div className="flex bg-muted/50 p-1 rounded-xl border border-border/50">
             {(Object.entries(VIEW_LABELS) as [ViewMode, string][]).map(([key, lbl]) => (
               <button
                 key={key}
                 onClick={() => setViewMode(key)}
                 className={cn(
                   "px-3 py-2 rounded-lg text-xs font-bold transition-all",
-                  viewMode === key ? "bg-white shadow-sm text-[#4892CC]" : "text-slate-400 hover:text-slate-600"
+                  viewMode === key ? "bg-card dark:bg-slate-900 shadow-sm text-[#4892CC]" : "text-muted-foreground/70 hover:text-muted-foreground"
                 )}
               >
                 {lbl}
@@ -378,8 +378,8 @@ const ReportesPage: React.FC = () => {
             <ChevronLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1 text-center">
-            <p className="text-lg font-black text-slate-900 capitalize">{label}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <p className="text-lg font-black text-foreground capitalize">{label}</p>
+            <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-widest">
               {format(parseISO(startDate), 'dd/MM')} → {format(parseISO(endDate), 'dd/MM/yyyy')}
             </p>
           </div>
@@ -395,32 +395,32 @@ const ReportesPage: React.FC = () => {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20">
           <Loader2 className="w-10 h-10 animate-spin text-[#4892CC] mb-4" />
-          <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">Generando reportes...</p>
+          <p className="text-muted-foreground/70 font-bold uppercase text-xs tracking-widest">Generando reportes...</p>
         </div>
       ) : hasError ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-red-100 shadow-sm">
+        <div className="flex flex-col items-center justify-center py-20 bg-card dark:bg-slate-900 rounded-3xl border border-red-100 shadow-sm">
           <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Error al generar reportes</h2>
-          <p className="text-gray-500 font-medium text-center max-w-md">{(firstError as Error)?.message || 'Ha ocurrido un problema al descargar las estadísticas.'}</p>
+          <h2 className="text-xl font-bold text-foreground mb-2">Error al generar reportes</h2>
+          <p className="text-muted-foreground font-medium text-center max-w-md">{(firstError as Error)?.message || 'Ha ocurrido un problema al descargar las estadísticas.'}</p>
           <Button onClick={() => window.location.reload()} className="mt-6 bg-[#4892CC]">Reintentar</Button>
         </div>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className={cn("bg-slate-50 p-1 rounded-2xl border border-slate-100 grid gap-1", isFinanceUser ? "grid-cols-4" : "grid-cols-2")}>
+          <TabsList className={cn("bg-muted/50 p-1 rounded-2xl border border-border/50 grid gap-1", isFinanceUser ? "grid-cols-4" : "grid-cols-2")}>
             {isFinanceUser && (
-              <TabsTrigger value="financiero" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="financiero" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm">
                 <DollarSign className="w-3.5 h-3.5 mr-1.5" /> Financiero
               </TabsTrigger>
             )}
             {isFinanceUser && (
-              <TabsTrigger value="gerencial" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm text-[#4892CC]">
+              <TabsTrigger value="gerencial" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm text-[#4892CC]">
                 <LineChart className="w-3.5 h-3.5 mr-1.5" /> Gerencial
               </TabsTrigger>
             )}
-            <TabsTrigger value="asistencia" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger value="asistencia" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm">
               <Clock className="w-3.5 h-3.5 mr-1.5" /> Asistencia
             </TabsTrigger>
-            <TabsTrigger value="socios" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger value="socios" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm">
               <Users className="w-3.5 h-3.5 mr-1.5" /> Socios
             </TabsTrigger>
           </TabsList>
@@ -430,10 +430,10 @@ const ReportesPage: React.FC = () => {
             <TabsContent value="financiero" className="space-y-6">
               {/* Filtros financieros */}
               <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
-                <Filter className="w-4 h-4 text-slate-400 ml-2" />
+              <div className="flex items-center gap-2 bg-card dark:bg-slate-900 p-1.5 rounded-xl border border-border shadow-sm">
+                <Filter className="w-4 h-4 text-muted-foreground/70 ml-2" />
                 <Select value={accountFilter} onValueChange={setAccountFilter}>
-                  <SelectTrigger className="w-[160px] border-none focus:ring-0 font-bold text-slate-700 text-xs">
+                  <SelectTrigger className="w-[160px] border-none focus:ring-0 font-bold text-foreground/80 text-xs">
                     <SelectValue placeholder="Cuenta" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -442,10 +442,10 @@ const ReportesPage: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
-                <Filter className="w-4 h-4 text-slate-400 ml-2" />
+              <div className="flex items-center gap-2 bg-card dark:bg-slate-900 p-1.5 rounded-xl border border-border shadow-sm">
+                <Filter className="w-4 h-4 text-muted-foreground/70 ml-2" />
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-[160px] border-none focus:ring-0 font-bold text-slate-700 text-xs">
+                  <SelectTrigger className="w-[160px] border-none focus:ring-0 font-bold text-foreground/80 text-xs">
                     <SelectValue placeholder="Categoría gasto" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -476,24 +476,24 @@ const ReportesPage: React.FC = () => {
               )}
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="h-9 rounded-xl shadow-sm text-xs px-4 font-bold border-slate-200">
+                  <Button variant="outline" className="h-9 rounded-xl shadow-sm text-xs px-4 font-bold border-border">
                     <CalendarDays className="w-4 h-4 mr-2 text-[#4892CC]" /> Programar
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6">
+                <DialogContent className="sm:max-w-md bg-card dark:bg-slate-900 rounded-3xl p-6">
                   <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2 text-xl font-black text-slate-900">
+                    <DialogTitle className="flex items-center gap-2 text-xl font-black text-foreground">
                       <Mail className="w-5 h-5 text-[#4892CC]" /> Envío Programado
                     </DialogTitle>
-                    <DialogDescription className="font-medium text-slate-500">
+                    <DialogDescription className="font-medium text-muted-foreground">
                       Configura el envío automático de este reporte por correo electrónico. (Requiere Supabase Edge Functions y un proveedor de correo).
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 mt-4">
                     <div className="space-y-1">
-                      <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Frecuencia</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70">Frecuencia</label>
                       <Select defaultValue="weekly">
-                        <SelectTrigger className="bg-slate-50 border-slate-200 h-12 rounded-xl focus:ring-0"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="bg-muted/50 border-border h-12 rounded-xl focus:ring-0"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="daily">Diario (Cierre de caja)</SelectItem>
                           <SelectItem value="weekly">Semanal (Cada lunes)</SelectItem>
@@ -502,8 +502,8 @@ const ReportesPage: React.FC = () => {
                       </Select>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Correos Destinatarios</label>
-                      <Input placeholder="admin@fimagadi.com, finanzas@fimagadi.com" className="bg-slate-50 border-slate-200 h-12 rounded-xl focus:ring-0" />
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70">Correos Destinatarios</label>
+                      <Input placeholder="admin@fimagadi.com, finanzas@fimagadi.com" className="bg-muted/50 border-border h-12 rounded-xl focus:ring-0" />
                     </div>
                     <Button 
                       className="w-full bg-[#4892CC] hover:bg-[#4892CC]/90 text-white font-bold h-12 rounded-xl mt-4"
@@ -520,39 +520,39 @@ const ReportesPage: React.FC = () => {
               <>
                 {/* KPIs */}
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
                     <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Ingresos</p>
                     <p className="text-xl font-black text-emerald-600 mt-1">{formatCurrency(financialStats.totalIngresos)}</p>
-                    <p className="text-[10px] text-slate-400 mt-1">{financialStats.numIngresos} operaciones</p>
+                    <p className="text-[10px] text-muted-foreground/70 mt-1">{financialStats.numIngresos} operaciones</p>
                   </Card>
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
                     <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Gastos</p>
                     <p className="text-xl font-black text-red-600 mt-1">{formatCurrency(financialStats.totalGastos)}</p>
-                    <p className="text-[10px] text-slate-400 mt-1">{financialStats.numGastos} operaciones</p>
+                    <p className="text-[10px] text-muted-foreground/70 mt-1">{financialStats.numGastos} operaciones</p>
                   </Card>
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
                     <p className="text-[10px] font-black text-[#4892CC] uppercase tracking-widest">Balance</p>
                     <p className={cn("text-xl font-black mt-1", financialStats.balance >= 0 ? "text-emerald-600" : "text-red-600")}>
                       {formatCurrency(financialStats.balance)}
                     </p>
                   </Card>
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Promedio Diario</p>
-                    <p className="text-xl font-black text-slate-900 mt-1">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
+                    <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Promedio Diario</p>
+                    <p className="text-xl font-black text-foreground mt-1">
                       {financialStats.porDia.length > 0 ? formatCurrency(financialStats.totalIngresos / financialStats.porDia.length) : 'S/ 0'}
                     </p>
-                    <p className="text-[10px] text-slate-400 mt-1">de ingresos</p>
+                    <p className="text-[10px] text-muted-foreground/70 mt-1">de ingresos</p>
                   </Card>
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Ops</p>
-                    <p className="text-xl font-black text-slate-900 mt-1">{financialStats.numIngresos + financialStats.numGastos}</p>
-                    <p className="text-[10px] text-slate-400 mt-1">transacciones</p>
+                  <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
+                    <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Total Ops</p>
+                    <p className="text-xl font-black text-foreground mt-1">{financialStats.numIngresos + financialStats.numGastos}</p>
+                    <p className="text-[10px] text-muted-foreground/70 mt-1">transacciones</p>
                   </Card>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Gastos por Categoría */}
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                     <CardHeader className="p-5 border-b border-slate-50">
                       <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
                         <PieChart className="w-4 h-4 text-[#4892CC]" /> Gastos por Categoría
@@ -563,27 +563,27 @@ const ReportesPage: React.FC = () => {
                         {financialStats.porCategoria.map(([cat, amount]) => {
                           const pct = financialStats.totalGastos > 0 ? (amount / financialStats.totalGastos * 100) : 0;
                           return (
-                            <div key={cat} className="px-5 py-3 flex items-center gap-3 hover:bg-slate-50/50 transition-colors">
+                            <div key={cat} className="px-5 py-3 flex items-center gap-3 hover:bg-muted/50/50 transition-colors">
                               <div className="flex-1">
-                                <p className="font-bold text-slate-700 text-xs">{cat}</p>
-                                <div className="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                <p className="font-bold text-foreground/80 text-xs">{cat}</p>
+                                <div className="mt-1.5 h-1.5 bg-muted rounded-full overflow-hidden">
                                   <div className="h-full bg-red-400 rounded-full transition-all" style={{ width: `${pct}%` }} />
                                 </div>
                               </div>
                               <div className="text-right shrink-0">
                                 <p className="font-black text-red-600 text-sm">{formatCurrency(amount)}</p>
-                                <p className="text-[10px] font-bold text-slate-400">{pct.toFixed(1)}%</p>
+                                <p className="text-[10px] font-bold text-muted-foreground/70">{pct.toFixed(1)}%</p>
                               </div>
                             </div>
                           );
                         })}
-                        {financialStats.porCategoria.length === 0 && <div className="p-6 text-center text-slate-400 italic text-sm">Sin gastos</div>}
+                        {financialStats.porCategoria.length === 0 && <div className="p-6 text-center text-muted-foreground/70 italic text-sm">Sin gastos</div>}
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Balance por Cuenta */}
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                     <CardHeader className="p-5 border-b border-slate-50">
                       <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
                         <BarChart3 className="w-4 h-4 text-[#4892CC]" /> Balance por Cuenta
@@ -592,14 +592,14 @@ const ReportesPage: React.FC = () => {
                     <CardContent className="p-0 max-h-[320px] overflow-y-auto">
                       <div className="divide-y divide-slate-50">
                         {financialStats.porCuenta.map(([acc, vals]) => (
-                          <div key={acc} className="px-5 py-3 hover:bg-slate-50/50 transition-colors">
+                          <div key={acc} className="px-5 py-3 hover:bg-muted/50/50 transition-colors">
                             <div className="flex justify-between items-center mb-1">
-                              <span className="font-bold text-slate-700 text-xs">{acc}</span>
+                              <span className="font-bold text-foreground/80 text-xs">{acc}</span>
                               <span className={cn("font-black text-sm", vals.ingresos - vals.gastos >= 0 ? "text-emerald-600" : "text-red-600")}>
                                 {formatCurrency(vals.ingresos - vals.gastos)}
                               </span>
                             </div>
-                            <div className="flex gap-4 text-[10px] font-bold text-slate-400">
+                            <div className="flex gap-4 text-[10px] font-bold text-muted-foreground/70">
                               <span className="text-emerald-500">↑ {formatCurrency(vals.ingresos)}</span>
                               <span className="text-red-400">↓ {formatCurrency(vals.gastos)}</span>
                             </div>
@@ -611,7 +611,7 @@ const ReportesPage: React.FC = () => {
                 </div>
 
                 {/* Movimiento Diario */}
-                <Card className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <Card className="rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <CardHeader className="p-5 border-b border-slate-50">
                     <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
                       <CalendarIcon className="w-4 h-4 text-[#4892CC]" /> Movimiento por Día
@@ -621,8 +621,8 @@ const ReportesPage: React.FC = () => {
                   <CardContent className="p-0 max-h-[400px] overflow-y-auto">
                     <div className="divide-y divide-slate-50">
                       {financialStats.porDia.map(([dia, vals]) => (
-                        <div key={dia} className="px-5 py-3 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
-                          <span className="text-xs font-bold text-slate-500 w-24">{safeFormatDate(dia, "EEE dd/MM")}</span>
+                        <div key={dia} className="px-5 py-3 flex items-center justify-between hover:bg-muted/50/50 transition-colors">
+                          <span className="text-xs font-bold text-muted-foreground w-24">{safeFormatDate(dia, "EEE dd/MM")}</span>
                           <div className="flex gap-6 items-center">
                             <span className="text-xs font-black text-emerald-600 flex items-center gap-1">
                               <TrendingUp className="w-3 h-3" /> {formatCurrency(vals.ingresos)}
@@ -642,7 +642,7 @@ const ReportesPage: React.FC = () => {
 
                 {/* Top 5 */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                     <CardHeader className="p-5 border-b border-slate-50">
                       <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
                         <ArrowUpCircle className="w-4 h-4 text-emerald-500" /> Top 5 Ingresos
@@ -651,10 +651,10 @@ const ReportesPage: React.FC = () => {
                     <CardContent className="p-0">
                       <div className="divide-y divide-slate-50">
                         {financialStats.topIngresos.map((i, idx) => (
-                          <div key={idx} className="px-5 py-3 flex justify-between items-center hover:bg-slate-50/50">
+                          <div key={idx} className="px-5 py-3 flex justify-between items-center hover:bg-muted/50/50">
                             <div>
-                              <p className="font-bold text-slate-700 text-xs uppercase">{i.full_name || 'Sin nombre'}</p>
-                              <p className="text-[10px] text-slate-400">{safeFormatDate(i.date, 'dd/MM/yyyy')} · {i.receipt_number}</p>
+                              <p className="font-bold text-foreground/80 text-xs uppercase">{i.full_name || 'Sin nombre'}</p>
+                              <p className="text-[10px] text-muted-foreground/70">{safeFormatDate(i.date, 'dd/MM/yyyy')} · {i.receipt_number}</p>
                             </div>
                             <span className="font-black text-emerald-600 text-sm">{formatCurrency(i.amount)}</span>
                           </div>
@@ -662,7 +662,7 @@ const ReportesPage: React.FC = () => {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                     <CardHeader className="p-5 border-b border-slate-50">
                       <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
                         <ArrowDownCircle className="w-4 h-4 text-red-500" /> Top 5 Gastos
@@ -671,10 +671,10 @@ const ReportesPage: React.FC = () => {
                     <CardContent className="p-0">
                       <div className="divide-y divide-slate-50">
                         {financialStats.topGastos.map((g, idx) => (
-                          <div key={idx} className="px-5 py-3 flex justify-between items-center hover:bg-slate-50/50">
+                          <div key={idx} className="px-5 py-3 flex justify-between items-center hover:bg-muted/50/50">
                             <div>
-                              <p className="font-bold text-slate-700 text-xs">{g.description}</p>
-                              <p className="text-[10px] text-slate-400">{safeFormatDate(g.date, 'dd/MM/yyyy')} · {g.category}</p>
+                              <p className="font-bold text-foreground/80 text-xs">{g.description}</p>
+                              <p className="text-[10px] text-muted-foreground/70">{safeFormatDate(g.date, 'dd/MM/yyyy')} · {g.category}</p>
                             </div>
                             <span className="font-black text-red-600 text-sm">{formatCurrency(Math.abs(g.amount))}</span>
                           </div>
@@ -693,26 +693,26 @@ const ReportesPage: React.FC = () => {
             {attendanceStats && (
               <>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Registros</p>
-                    <p className="text-2xl font-black text-slate-900 mt-1">{attendanceStats.totalRegistros}</p>
+                  <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
+                    <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Registros</p>
+                    <p className="text-2xl font-black text-foreground mt-1">{attendanceStats.totalRegistros}</p>
                   </Card>
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
                     <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Completados</p>
                     <p className="text-2xl font-black text-emerald-600 mt-1">{attendanceStats.completados}</p>
                   </Card>
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
                     <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">En Curso</p>
                     <p className="text-2xl font-black text-amber-600 mt-1">{attendanceStats.enCurso}</p>
                   </Card>
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
                     <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Tardanzas</p>
                     <p className="text-2xl font-black text-red-600 mt-1">{attendanceStats.totalTardanzas}</p>
                   </Card>
                 </div>
 
                 {/* Horas por Colaborador */}
-                <Card className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <Card className="rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <CardHeader className="p-5 border-b border-slate-50">
                     <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
                       <Users className="w-4 h-4 text-[#4892CC]" /> Horas por Colaborador
@@ -725,15 +725,15 @@ const ReportesPage: React.FC = () => {
                         const hours = Math.floor(colab.minutos / 60);
                         const mins = Math.round(colab.minutos % 60);
                         return (
-                          <div key={idx} className="px-5 py-4 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+                          <div key={idx} className="px-5 py-4 flex items-center justify-between hover:bg-muted/50/50 transition-colors">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-[#4892CC]/10 flex items-center justify-center text-[#4892CC] font-black text-sm">
                                 {colab.nombre.split(' ').map(n => n[0]).slice(0, 2).join('')}
                               </div>
                               <div>
-                                <p className="font-bold text-slate-700 text-sm">{colab.nombre}</p>
+                                <p className="font-bold text-foreground/80 text-sm">{colab.nombre}</p>
                                 <div className="flex gap-3 text-[10px] font-bold mt-0.5">
-                                  <span className="text-slate-400">{colab.dias} días</span>
+                                  <span className="text-muted-foreground/70">{colab.dias} días</span>
                                   {colab.tardanzas > 0 && <span className="text-red-400">{colab.tardanzas} tardanzas</span>}
                                 </div>
                               </div>
@@ -745,14 +745,14 @@ const ReportesPage: React.FC = () => {
                         );
                       })}
                       {attendanceStats.porColaborador.length === 0 && (
-                        <div className="p-8 text-center text-slate-400 italic text-sm">Sin registros en este periodo</div>
+                        <div className="p-8 text-center text-muted-foreground/70 italic text-sm">Sin registros en este periodo</div>
                       )}
                     </div>
                   </CardContent>
                 </Card>
 
                 {/* Detalle de registros */}
-                <Card className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <Card className="rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <CardHeader className="p-5 border-b border-slate-50">
                     <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
                       <FileText className="w-4 h-4 text-[#4892CC]" /> Detalle de Registros
@@ -762,7 +762,7 @@ const ReportesPage: React.FC = () => {
                   <CardContent className="p-0 overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                        <tr className="bg-muted/50/50 text-muted-foreground/70 text-[10px] font-black uppercase tracking-widest">
                           <th className="px-5 py-3">Fecha</th>
                           <th className="px-5 py-3">Colaborador</th>
                           <th className="px-5 py-3">Entrada</th>
@@ -772,13 +772,13 @@ const ReportesPage: React.FC = () => {
                       </thead>
                       <tbody className="divide-y divide-slate-50">
                         {attendanceStats.registrosDetalle.map((r, i) => (
-                          <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                            <td className="px-5 py-3 text-xs font-bold text-slate-500">{safeFormatDate(r.fecha, 'EEE dd/MM')}</td>
-                            <td className="px-5 py-3 text-xs font-bold text-slate-700">{r.nombre}</td>
-                            <td className="px-5 py-3 text-xs font-mono text-slate-600">
+                          <tr key={i} className="hover:bg-muted/50/50 transition-colors">
+                            <td className="px-5 py-3 text-xs font-bold text-muted-foreground">{safeFormatDate(r.fecha, 'EEE dd/MM')}</td>
+                            <td className="px-5 py-3 text-xs font-bold text-foreground/80">{r.nombre}</td>
+                            <td className="px-5 py-3 text-xs font-mono text-muted-foreground">
                               {r.entrada ? format(new Date(r.entrada), 'HH:mm') : '--:--'}
                             </td>
-                            <td className="px-5 py-3 text-xs font-mono text-slate-600">
+                            <td className="px-5 py-3 text-xs font-mono text-muted-foreground">
                               {r.salida ? format(new Date(r.salida), 'HH:mm') : '--:--'}
                             </td>
                             <td className="px-5 py-3">
@@ -803,10 +803,10 @@ const ReportesPage: React.FC = () => {
           <TabsContent value="socios" className="space-y-6">
             {/* Filtro de localidad */}
             <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
-                <MapPin className="w-4 h-4 text-slate-400 ml-2" />
+              <div className="flex items-center gap-2 bg-card dark:bg-slate-900 p-1.5 rounded-xl border border-border shadow-sm">
+                <MapPin className="w-4 h-4 text-muted-foreground/70 ml-2" />
                 <Select value={localidadFilter} onValueChange={setLocalidadFilter}>
-                  <SelectTrigger className="w-[200px] border-none focus:ring-0 font-bold text-slate-700 text-xs">
+                  <SelectTrigger className="w-[200px] border-none focus:ring-0 font-bold text-foreground/80 text-xs">
                     <SelectValue placeholder="Localidad" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -826,19 +826,19 @@ const ReportesPage: React.FC = () => {
               return (
                 <>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Socios</p>
-                      <p className="text-2xl font-black text-slate-900 mt-1">{filteredTotal}</p>
+                    <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
+                      <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest">Total Socios</p>
+                      <p className="text-2xl font-black text-foreground mt-1">{filteredTotal}</p>
                     </Card>
-                    <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
                       <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Con Mz + Lote</p>
                       <p className="text-2xl font-black text-emerald-600 mt-1">{socioStats.conDatos}</p>
                     </Card>
-                    <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
                       <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Sin Datos</p>
                       <p className="text-2xl font-black text-amber-600 mt-1">{socioStats.sinDatos}</p>
                     </Card>
-                    <Card className="rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <Card className="rounded-2xl border border-border/50 shadow-sm p-5">
                       <p className="text-[10px] font-black text-[#4892CC] uppercase tracking-widest">Cobertura</p>
                       <p className="text-2xl font-black text-[#4892CC] mt-1">
                         {socioStats.total > 0 ? ((socioStats.conDatos / socioStats.total) * 100).toFixed(1) : 0}%
@@ -846,8 +846,8 @@ const ReportesPage: React.FC = () => {
                     </Card>
                   </div>
 
-                  <Card className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden col-span-2 md:col-span-4 mt-4">
-                    <CardHeader className="p-5 border-b border-slate-50 bg-slate-50/50">
+                  <Card className="rounded-2xl border border-border/50 shadow-sm overflow-hidden col-span-2 md:col-span-4 mt-4">
+                    <CardHeader className="p-5 border-b border-slate-50 bg-muted/50/50">
                       <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-[#4892CC]" /> Progreso Operativo por Localidad
                       </CardTitle>
@@ -856,7 +856,7 @@ const ReportesPage: React.FC = () => {
                     <CardContent className="p-0 overflow-x-auto">
                       <table className="w-full text-left">
                         <thead>
-                          <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-black uppercase tracking-widest border-y border-slate-100">
+                          <tr className="bg-muted/50/50 text-muted-foreground/70 text-[10px] font-black uppercase tracking-widest border-y border-border/50">
                             <th className="px-5 py-3">Localidad</th>
                             <th className="px-5 py-3 text-center">Total Socios</th>
                             <th className="px-5 py-3 text-center text-amber-500">Planos Faltantes</th>
@@ -870,20 +870,20 @@ const ReportesPage: React.FC = () => {
                              const pct = row.total_socios > 0 ? (completedDocs / row.total_socios * 100) : 0;
                              
                              return (
-                              <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                              <tr key={i} className="hover:bg-muted/50/50 transition-colors">
                                 <td className="px-5 py-3">
-                                  <p className="font-bold text-slate-700 text-sm">{row.localidad || 'Sin Localidad'}</p>
-                                  <p className="text-[10px] text-slate-400 font-bold uppercase">{row.zona_distrito || 'Sin Distrito'}</p>
+                                  <p className="font-bold text-foreground/80 text-sm">{row.localidad || 'Sin Localidad'}</p>
+                                  <p className="text-[10px] text-muted-foreground/70 font-bold uppercase">{row.zona_distrito || 'Sin Distrito'}</p>
                                 </td>
-                                <td className="px-5 py-3 text-center font-black text-slate-900">{row.total_socios}</td>
+                                <td className="px-5 py-3 text-center font-black text-foreground">{row.total_socios}</td>
                                 <td className="px-5 py-3 text-center font-bold text-amber-600">{row.planos_pendientes > 0 ? row.planos_pendientes : '✅'}</td>
                                 <td className="px-5 py-3 text-center font-bold text-rose-600">{row.fichas_pendientes > 0 ? row.fichas_pendientes : '✅'}</td>
                                 <td className="px-5 py-3">
                                   <div className="flex items-center gap-2">
-                                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden w-24">
+                                    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden w-24">
                                       <div className={cn("h-full rounded-full transition-all", pct === 100 ? "bg-emerald-500" : "bg-[#4892CC]")} style={{ width: `${pct}%` }} />
                                     </div>
-                                    <span className="text-[10px] font-black text-slate-500">{pct.toFixed(0)}%</span>
+                                    <span className="text-[10px] font-black text-muted-foreground">{pct.toFixed(0)}%</span>
                                   </div>
                                 </td>
                               </tr>
@@ -903,10 +903,10 @@ const ReportesPage: React.FC = () => {
             <TabsContent value="gerencial" className="space-y-6">
               {/* Filtro de localidad */}
               <div className="flex flex-wrap gap-3">
-                <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
-                  <MapPin className="w-4 h-4 text-slate-400 ml-2" />
+                <div className="flex items-center gap-2 bg-card dark:bg-slate-900 p-1.5 rounded-xl border border-border shadow-sm">
+                  <MapPin className="w-4 h-4 text-muted-foreground/70 ml-2" />
                   <Select value={localidadFilter} onValueChange={setLocalidadFilter}>
-                    <SelectTrigger className="w-[200px] border-none focus:ring-0 font-bold text-slate-700 text-xs">
+                    <SelectTrigger className="w-[200px] border-none focus:ring-0 font-bold text-foreground/80 text-xs">
                       <SelectValue placeholder="Localidad" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -922,20 +922,20 @@ const ReportesPage: React.FC = () => {
               ) : gerencialData && (
                  <>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                       <Card className="rounded-2xl border border-gray-100 shadow-sm p-5 bg-gradient-to-br from-white to-red-50/30">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-red-500"/> Riesgo Morosidad</p>
+                       <Card className="rounded-2xl border border-border/50 shadow-sm p-5 bg-gradient-to-br from-white to-red-50/30">
+                          <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-red-500"/> Riesgo Morosidad</p>
                           <p className="text-2xl font-black text-red-600 mt-1">{gerencialData.morosidad.filter((m:any) => (localidadFilter === 'all' || m.localidad === localidadFilter) && (!m.last_income_date || new Date(m.last_income_date) < subMonths(new Date(), 3))).length}</p>
-                          <p className="text-[10px] text-slate-400 mt-1">Socios &gt; 3 meses sin pago</p>
+                          <p className="text-[10px] text-muted-foreground/70 mt-1">Socios &gt; 3 meses sin pago</p>
                        </Card>
-                       <Card className="rounded-2xl border border-gray-100 shadow-sm p-5 bg-gradient-to-br from-white to-amber-50/30">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1"><FileText className="w-3 h-3 text-amber-500"/> Fichas Faltantes Global</p>
-                          <p className="text-2xl font-black text-slate-900 mt-1">{gerencialData.socioEstado.filter((s:any) => (localidadFilter === 'all' || s.localidad === localidadFilter) && s['FICHA OK'] === false).length}</p>
-                          <p className="text-[10px] text-slate-400 mt-1">Socios sin ficha entregada</p>
+                       <Card className="rounded-2xl border border-border/50 shadow-sm p-5 bg-gradient-to-br from-white to-amber-50/30">
+                          <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest flex items-center gap-1"><FileText className="w-3 h-3 text-amber-500"/> Fichas Faltantes Global</p>
+                          <p className="text-2xl font-black text-foreground mt-1">{gerencialData.socioEstado.filter((s:any) => (localidadFilter === 'all' || s.localidad === localidadFilter) && s['FICHA OK'] === false).length}</p>
+                          <p className="text-[10px] text-muted-foreground/70 mt-1">Socios sin ficha entregada</p>
                        </Card>
-                       <Card className="rounded-2xl border border-gray-100 shadow-sm p-5 bg-gradient-to-br from-white to-emerald-50/30">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-emerald-500"/> Contratos Completos</p>
+                       <Card className="rounded-2xl border border-border/50 shadow-sm p-5 bg-gradient-to-br from-white to-emerald-50/30">
+                          <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-emerald-500"/> Contratos Completos</p>
                           <p className="text-2xl font-black text-emerald-600 mt-1">{gerencialData.socioEstado.filter((s:any) => (localidadFilter === 'all' || s.localidad === localidadFilter) && s['CONTRATO OK'] === true).length}</p>
-                          <p className="text-[10px] text-slate-400 mt-1">Socios formalizados al 100%</p>
+                          <p className="text-[10px] text-muted-foreground/70 mt-1">Socios formalizados al 100%</p>
                        </Card>
                     </div>
 
@@ -951,14 +951,14 @@ const ReportesPage: React.FC = () => {
                          <CardContent className="p-0 max-h-[300px] overflow-y-auto">
                             <div className="divide-y divide-slate-50">
                                {gerencialData.morosidad.filter((m:any) => localidadFilter === 'all' || m.localidad === localidadFilter).slice(0,50).map((m:any, i:number) => (
-                                  <div key={i} className="px-5 py-3 flex justify-between items-center hover:bg-slate-50 transition-colors">
+                                  <div key={i} className="px-5 py-3 flex justify-between items-center hover:bg-muted/50 transition-colors">
                                      <div>
-                                        <p className="font-bold text-slate-700 text-xs uppercase">{m.nombres} {m.apellidoPaterno}</p>
-                                        <p className="text-[10px] text-slate-400">{m.localidad || 'Sin Localidad'}</p>
+                                        <p className="font-bold text-foreground/80 text-xs uppercase">{m.nombres} {m.apellidoPaterno}</p>
+                                        <p className="text-[10px] text-muted-foreground/70">{m.localidad || 'Sin Localidad'}</p>
                                      </div>
                                      <div className="text-right">
                                         <p className="font-black text-red-600 text-xs">{m.last_income_date ? safeFormatDate(m.last_income_date, 'dd/MM/yyyy') : 'NUNCA'}</p>
-                                        <p className="text-[9px] text-slate-400 font-bold uppercase">Último Pago</p>
+                                        <p className="text-[9px] text-muted-foreground/70 font-bold uppercase">Último Pago</p>
                                      </div>
                                   </div>
                                ))}
@@ -967,8 +967,8 @@ const ReportesPage: React.FC = () => {
                        </Card>
                        
                        {/* Ingresos x Zona */}
-                       <Card className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                         <CardHeader className="p-5 border-b border-slate-50 bg-slate-50/50">
+                       <Card className="rounded-2xl border border-border/50 shadow-sm overflow-hidden">
+                         <CardHeader className="p-5 border-b border-slate-50 bg-muted/50/50">
                            <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
                              <TrendingUp className="w-4 h-4 text-emerald-500" /> Ingresos por Zona
                            </CardTitle>
@@ -977,14 +977,14 @@ const ReportesPage: React.FC = () => {
                          <CardContent className="p-0 max-h-[300px] overflow-y-auto">
                             <div className="divide-y divide-slate-50">
                                {gerencialData.ingresosLocalidad.filter((ing:any) => localidadFilter === 'all' || ing.localidad === localidadFilter).slice(0,20).map((ing:any, i:number) => (
-                                  <div key={i} className="px-5 py-3 flex justify-between items-center hover:bg-slate-50 transition-colors">
+                                  <div key={i} className="px-5 py-3 flex justify-between items-center hover:bg-muted/50 transition-colors">
                                      <div>
-                                        <p className="font-bold text-slate-700 text-xs uppercase">{ing.localidad || 'General'}</p>
-                                        <p className="text-[10px] text-slate-400 font-bold">{ing.mes}</p>
+                                        <p className="font-bold text-foreground/80 text-xs uppercase">{ing.localidad || 'General'}</p>
+                                        <p className="text-[10px] text-muted-foreground/70 font-bold">{ing.mes}</p>
                                      </div>
                                      <div className="text-right">
                                         <p className="font-black text-emerald-600 text-sm">{formatCurrency(ing.total_amount)}</p>
-                                        <p className="text-[9px] text-slate-400 font-bold">{ing.total_transactions} transacciones</p>
+                                        <p className="text-[9px] text-muted-foreground/70 font-bold">{ing.total_transactions} transacciones</p>
                                      </div>
                                   </div>
                                ))}

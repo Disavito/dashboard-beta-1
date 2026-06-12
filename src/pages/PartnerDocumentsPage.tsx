@@ -28,15 +28,15 @@ const PartnerDocumentsPage = () => {
     return (
         <div className="space-y-8 pb-10">
             <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Gestión de Documentos</h1>
-                <p className="text-gray-500 text-lg">Administra los planos y memorias descriptivas de los socios.</p>
+                <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Gestión de Documentos</h1>
+                <p className="text-muted-foreground text-lg">Administra los planos y memorias descriptivas de los socios.</p>
             </div>
             
             <Tabs value={initialTab} onValueChange={handleTabChange} className="w-full space-y-6">
-                <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-gray-100/80 border border-gray-200 rounded-lg">
+                <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-muted/80 border border-border rounded-lg">
                     <TabsTrigger 
                         value="my-documents" 
-                        className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm font-medium transition-all"
+                        className="data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:text-primary data-[state=active]:shadow-sm font-medium transition-all"
                     >
                         <FolderOpen className="w-4 h-4 mr-2" />
                         Repositorio
@@ -44,7 +44,7 @@ const PartnerDocumentsPage = () => {
                     {isAdmin && (
                         <TabsTrigger 
                             value="requests" 
-                            className="data-[state=active]:bg-white data-[state=active]:text-red-600 data-[state=active]:shadow-sm font-medium transition-all"
+                            className="data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:text-red-600 data-[state=active]:shadow-sm font-medium transition-all"
                         >
                             <FileWarning className="w-4 h-4 mr-2" />
                             Solicitudes de Eliminación
@@ -58,7 +58,7 @@ const PartnerDocumentsPage = () => {
                 
                 {isAdmin && (
                     <TabsContent value="requests" className="outline-none animate-in fade-in-50 duration-300">
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                        <div className="bg-card dark:bg-slate-900 rounded-xl border border-border shadow-sm p-6">
                             <DeletionRequestsTable />
                         </div>
                     </TabsContent>

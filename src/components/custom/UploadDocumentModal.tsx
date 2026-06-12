@@ -99,7 +99,7 @@ export function UploadDocumentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] bg-white border-gray-200">
+      <DialogContent className="sm:max-w-[480px] bg-card dark:bg-slate-900 border-border">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-3">
             <UploadCloud className="h-6 w-6" />
