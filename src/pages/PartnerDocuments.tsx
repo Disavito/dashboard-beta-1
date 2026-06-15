@@ -16,7 +16,9 @@ import {
   ArrowDown,
   Users,
   AlertCircle,
-  XCircle
+  XCircle,
+  FileText,
+  Search
 } from 'lucide-react';
 import LocalidadCombobox from '@/components/custom/LocalidadCombobox';
 import DistritoCombobox from '@/components/custom/DistritoCombobox';
@@ -160,7 +162,7 @@ const LoteMedidoCell = React.memo(({ socioId, initialValue, disabled, socio, onU
       />
       <span className={cn(
         "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full transition-colors",
-        checked ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+        checked ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400"
       )}>
         {checked ? 'Medido' : 'Pendiente'}
       </span>
@@ -619,14 +621,14 @@ function PartnerDocuments() {
             <Badge className={cn(
               "w-fit text-[10px] font-black px-2 py-0.5 border border-border/50 shadow-sm",
               isPaid 
-                ? "bg-emerald-500 text-white" 
-                : "bg-red-500/10 text-red-600"
+                ? "bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000 text-white" 
+                : "bg-red-50 dark:bg-red-500/10 dark:text-red-4000/10 text-red-600"
             )}>
               {isPaid && <Ticket className="w-3 h-3 mr-1 inline" />}
               {row.original.paymentInfo.status.toUpperCase()}
             </Badge>
             {row.original.paymentInfo.receipt_number && (
-              <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 w-fit">
+              <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 px-1.5 py-0.5 rounded border border-amber-100 w-fit">
                 REC: {row.original.paymentInfo.receipt_number}
               </span>
             )}
@@ -651,7 +653,7 @@ function PartnerDocuments() {
             <Badge 
               variant="outline" 
               onClick={onClick}
-              className={`text-[10px] uppercase tracking-wider font-bold bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm shadow-emerald-500/10 ${onClick ? 'cursor-pointer hover:bg-emerald-100 transition-colors' : ''}`}
+              className={`text-[10px] uppercase tracking-wider font-bold bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10 ${onClick ? 'cursor-pointer hover:bg-emerald-100 transition-colors' : ''}`}
             >
               <CheckCircle2 className="w-3 h-3 mr-1" />
               {label}
@@ -716,16 +718,17 @@ function PartnerDocuments() {
   ], [canDeleteDocsOrAdmin, canDeleteBlueprints, isAdmin, isEngineer, canManageEngineering]);
 
   if (loading || userLoading) return (
-    <div className="min-h-screen bg-[#FAFBFC] page-enter pb-20">
-      <header className="relative h-64 md:h-80 flex items-center overflow-hidden bg-card dark:bg-slate-900 border-b border-border/50">
-        <div className="container mx-auto px-6 relative z-10">
+    <div className="min-h-screen bg-background page-enter pb-20">
+      <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#4892CC]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="max-w-3xl">
             <div className="h-6 w-32 bg-slate-200 rounded-full animate-pulse mb-4" />
             <div className="h-10 w-80 bg-slate-200 rounded-xl animate-pulse mb-3" />
             <div className="h-5 w-96 bg-muted rounded-lg animate-pulse" />
           </div>
         </div>
-      </header>
+      </div>
       <div className="container mx-auto px-6 -mt-10 relative z-20">
         <div className="flex gap-3 mb-6">
           <div className="h-12 w-72 bg-card dark:bg-slate-900 rounded-xl border animate-pulse shadow-sm" />
@@ -754,33 +757,30 @@ function PartnerDocuments() {
   );
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC] page-enter pb-20">
-      <header className="relative h-64 md:h-80 flex items-center overflow-hidden bg-card dark:bg-slate-900 border-b border-border/50">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#4892CC]/10 to-transparent z-0"></div>
-        <div className="absolute right-0 top-0 w-1/3 h-full opacity-10 pointer-events-none">
-          <LayoutGrid className="w-full h-full text-[#4892CC]" />
-        </div>
-        
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-3xl">
-            <Badge className="mb-4 bg-[#E8F1F8] text-[#4892CC] border-none font-bold px-4 py-1 rounded-full">
-              MÓDULO DE INGENIERÍA v2.0
-            </Badge>
-            <h1 className="text-5xl md:text-6xl font-black text-foreground tracking-tighter mb-4">
-              Expedientes <span className="text-[#4892CC]">Digitales</span>
-            </h1>
-            <p className="text-lg text-muted-foreground font-medium leading-relaxed">
-              Gestión centralizada de planimetría, memorias descriptivas y control de medición de lotes.
-            </p>
-            <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-[#4892CC]/10 text-[#4892CC] rounded-xl text-sm font-bold">
-              <Users className="w-4 h-4" />
-              <span>{filteredData.length} expediente{filteredData.length !== 1 ? 's' : ''} encontrado{filteredData.length !== 1 ? 's' : ''}</span>
+    <div className="min-h-screen bg-background page-enter pb-20">
+      <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#4892CC]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <FileText className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h1 className="text-4xl font-black text-foreground tracking-tight uppercase">Expedientes Digitales</h1>
+                  <Badge className="bg-primary/10 text-primary border-none font-bold px-3 py-0.5 rounded-full text-[10px]">
+                    MÓDULO DE INGENIERÍA
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground font-medium mt-1">Gestión centralizada de planimetría, memorias descriptivas y control de medición de lotes.</p>
+              </div>
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      <div className="container mx-auto px-6 -mt-12 relative z-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-6">
         {/* Tarjetas de Estadísticas de Lotes */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <Card className="p-5 rounded-2xl border-border/50 shadow-glass flex items-center gap-4 bg-card dark:bg-slate-900">
@@ -793,7 +793,7 @@ function PartnerDocuments() {
             </div>
           </Card>
           <Card className="p-5 rounded-2xl border-border/50 shadow-glass flex items-center gap-4 bg-card dark:bg-slate-900">
-            <div className="p-3 rounded-xl bg-emerald-50 text-emerald-600">
+            <div className="p-3 rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div>
@@ -802,7 +802,7 @@ function PartnerDocuments() {
             </div>
           </Card>
           <Card className="p-5 rounded-2xl border-border/50 shadow-glass flex items-center gap-4 bg-card dark:bg-slate-900">
-            <div className="p-3 rounded-xl bg-amber-50 text-amber-600">
+            <div className="p-3 rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400">
               <AlertCircle className="w-6 h-6" />
             </div>
             <div>
@@ -812,31 +812,32 @@ function PartnerDocuments() {
           </Card>
         </div>
 
-        <div className="bg-card dark:bg-slate-900 p-4 rounded-2xl shadow-glass border border-border/50 mb-8 flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1 w-full lg:w-[400px]">
+        <div className="bg-card dark:bg-slate-900 border border-border/50 rounded-2xl p-4 flex flex-col md:flex-row gap-4 shadow-sm items-center justify-between mb-8">
+          <div className="relative flex-1 w-full lg:w-96 shrink-0">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/70 z-10" />
             <SearchInputWithDebounce
               placeholder="Buscar por socio, DNI, manzana, lote o recibo..."
               onDebouncedChange={setDebouncedSearchQuery}
-              inputClassName="h-14 bg-muted/50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-foreground/80 font-bold w-full"
+              inputClassName="pl-12 h-11 bg-muted/50 border-transparent rounded-xl focus:bg-background focus:ring-2 focus:ring-primary/20 text-foreground/80 font-medium placeholder:text-muted-foreground/70 w-full transition-all"
             />
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto flex-wrap sm:flex-nowrap">
             <LocalidadCombobox
               value={selectedLocalidad}
               onValueChange={setSelectedLocalidad}
-              triggerClassName="h-14 w-full sm:w-[240px]"
+              triggerClassName="h-11 w-full sm:w-[240px] bg-muted/50 border-transparent rounded-xl text-sm font-medium"
               distritoFilter={selectedDistrito}
             />
 
             <DistritoCombobox
               value={selectedDistrito}
               onValueChange={setSelectedDistrito}
-              triggerClassName="h-14 w-full sm:w-[240px]"
+              triggerClassName="h-11 w-full sm:w-[240px] bg-muted/50 border-transparent rounded-xl text-sm font-medium"
             />
 
             <Select value={loteMedidoFilter} onValueChange={setLoteMedidoFilter}>
-              <SelectTrigger className="h-14 w-full sm:w-[200px] bg-muted/50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-foreground/80 font-bold">
+              <SelectTrigger className="h-11 w-full sm:w-[200px] bg-muted/50 border-transparent rounded-xl focus:ring-2 focus:ring-primary/20 text-sm font-medium">
                 <SelectValue placeholder="Estado Lote" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-border/50 shadow-premium">
@@ -847,7 +848,7 @@ function PartnerDocuments() {
             </Select>
 
             <Select value={cruceFilter} onValueChange={setCruceFilter}>
-              <SelectTrigger className="h-14 w-full sm:w-[230px] bg-muted/50 border-none rounded-2xl focus:ring-2 focus:ring-[#4892CC]/20 text-foreground/80 font-bold">
+              <SelectTrigger className="h-11 w-full sm:w-[230px] bg-muted/50 border-transparent rounded-xl focus:ring-2 focus:ring-primary/20 text-sm font-medium">
                 <SelectValue placeholder="Cruce Operativo" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-border/50 shadow-premium">
@@ -861,7 +862,7 @@ function PartnerDocuments() {
             {canManageEngineering && Object.keys(rowSelection).length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="h-14 px-6 bg-[#4892CC] hover:bg-[#3C8B93] rounded-2xl font-bold shadow-lg shadow-[#4892CC]/20">
+                  <Button className="h-11 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold shadow-sm">
                     Acciones ({Object.keys(rowSelection).length})
                   </Button>
                 </DropdownMenuTrigger>
@@ -885,10 +886,10 @@ function PartnerDocuments() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="flex flex-wrap bg-muted/50 p-1 rounded-2xl mb-6">
+          <TabsList className="bg-card dark:bg-slate-900/80 backdrop-blur-md border border-border p-1.5 rounded-2xl h-14 shadow-sm mb-6 flex overflow-x-auto max-w-full scrollbar-none shrink-0 justify-start sm:justify-center">
             <TabsTrigger 
               value="documents" 
-              className="flex-1 rounded-xl data-[state=active]:bg-[#4892CC] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-bold"
+              className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-muted-foreground transition-all"
             >
               Expedientes Digitales
             </TabsTrigger>
@@ -896,7 +897,7 @@ function PartnerDocuments() {
             {canDeleteDocsOrAdmin && (
               <TabsTrigger 
                 value="deletion-requests" 
-                className="flex-1 rounded-xl data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-bold"
+                className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-muted-foreground transition-all"
               >
                 Solicitudes de Eliminación
               </TabsTrigger>

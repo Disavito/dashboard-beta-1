@@ -305,12 +305,12 @@ const ClockManager: React.FC<ClockManagerProps> = ({
       "max-w-md mx-auto bg-card dark:bg-slate-900 rounded-2xl shadow-premium overflow-hidden border",
       bypassTimeRestrictions ? "border-amber-200 ring-4 ring-amber-50" : "border-border/50"
     )}>
-      <div className={cn("p-8 pb-12 text-white relative", bypassTimeRestrictions ? "bg-amber-500" : "bg-[#4892CC]")}>
+      <div className={cn("p-8 pb-12 relative", bypassTimeRestrictions ? "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400" : "bg-primary text-primary-foreground")}>
         <div className="relative z-10">
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-2xl font-bold">{colaborador.name} {colaborador.apellidos}</h2>
-              <p className="text-white/80 text-sm mt-1 capitalize flex items-center gap-2">
+              <p className="opacity-80 text-sm mt-1 capitalize flex items-center gap-2">
                 <CalendarIcon className="h-4 w-4" />
                 {format(targetDate, "EEEE, d 'de' MMMM yyyy", { locale: es })}
               </p>
@@ -325,25 +325,25 @@ const ClockManager: React.FC<ClockManagerProps> = ({
                   <span className="w-2 h-2 bg-emerald-900 rounded-full animate-pulse" /> EN ACTIVIDAD
                 </Badge>
                 {jornada?.fecha !== format(targetDate, 'yyyy-MM-dd') && (
-                  <div className="bg-red-500/20 border border-red-400/50 text-white text-xs px-3 py-2 rounded-lg mt-2 flex items-start gap-2">
+                  <div className="bg-red-50 dark:bg-red-500/10 dark:text-red-4000/20 border border-red-400/50 text-white text-xs px-3 py-2 rounded-lg mt-2 flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-200" />
                     <p>Tienes un turno pendiente por finalizar de un <b>día anterior ({jornada?.fecha})</b>. Por favor, finaliza esa jornada antes de continuar.</p>
                   </div>
                 )}
               </div>
             ) : completedJornadasToday.length > 0 ? (
-              <Badge className="bg-card dark:bg-slate-900/20 text-white border-none px-4 py-1 rounded-full flex items-center gap-2 w-fit font-bold">
+              <Badge className="bg-card dark:bg-slate-900/20 text-inherit border-none px-4 py-1 rounded-full flex items-center gap-2 w-fit font-bold">
                 <span className="w-2 h-2 bg-card dark:bg-slate-900 rounded-full" /> {completedJornadasToday.length} TURNO(S) COMPLETADO(S) HOY
               </Badge>
             ) : (
-              <Badge className="bg-card dark:bg-slate-900/10 text-white/70 border-none px-4 py-1 rounded-full">ESPERANDO INICIO</Badge>
+              <Badge className="bg-card dark:bg-slate-900/10 opacity-80 border-none px-4 py-1 rounded-full text-inherit">ESPERANDO INICIO</Badge>
             )}
           </div>
         </div>
       </div>
 
       <div className="px-8 -mt-6 relative z-20">
-        <div className="bg-card dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-gray-50 flex flex-col items-center mb-4">
+        <div className="bg-card dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-border/50 flex flex-col items-center mb-4">
           <p className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest mb-1">Hora actual del registro</p>
           <p className="text-4xl font-mono font-black text-foreground/90">
             {format(currentTime, 'HH:mm:ss')}
@@ -366,7 +366,7 @@ const ClockManager: React.FC<ClockManagerProps> = ({
         </div>
 
         {showJustification && contextualJustification && (
-          <div className="mt-6 p-6 bg-amber-50 rounded-3xl border border-amber-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="mt-6 p-6 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 rounded-3xl border border-amber-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
             <div className="flex items-center gap-2 text-amber-700 mb-2">
               <AlertCircle className="h-5 w-5" />
               <span className="font-bold text-sm">{contextualJustification.title}</span>
@@ -424,8 +424,8 @@ const ClockManager: React.FC<ClockManagerProps> = ({
               onClick={() => handleActionInitiate('clock-in')}
               disabled={isLocalSubmitting}
               className={cn(
-                "w-full h-16 text-white rounded-2xl text-lg font-bold shadow-premium transition-all active:scale-95",
-                bypassTimeRestrictions ? "bg-amber-600 hover:bg-amber-700 shadow-amber-100" : "bg-[#4892CC] hover:bg-[#3C8B93] shadow-sky-100"
+                "w-full h-16 rounded-2xl text-lg font-bold shadow-premium transition-all active:scale-95",
+                bypassTimeRestrictions ? "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-100" : "bg-primary hover:bg-primary/90 text-primary-foreground"
               )}
             >
               <Play className="mr-2 h-5 w-5 fill-current" /> {completedJornadasToday.length > 0 ? "Iniciar Turno Adicional" : "Iniciar Jornada"}
@@ -439,7 +439,7 @@ const ClockManager: React.FC<ClockManagerProps> = ({
                   size="lg"
                   onClick={() => executeMutation('start-lunch')}
                   disabled={isLocalSubmitting}
-                  className="w-full h-16 bg-[#F59E0B] hover:bg-[#D97706] text-white rounded-2xl text-lg font-bold shadow-lg shadow-amber-100 transition-all active:scale-95"
+                  className="w-full h-16 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl text-lg font-bold shadow-sm transition-all active:scale-95"
                 >
                   <Coffee className="mr-2 h-5 w-5" /> Iniciar Almuerzo
                 </Button>
@@ -450,7 +450,7 @@ const ClockManager: React.FC<ClockManagerProps> = ({
                   size="lg"
                   onClick={() => executeMutation('end-lunch')}
                   disabled={isLocalSubmitting}
-                  className="w-full h-16 bg-[#10B981] hover:bg-[#059669] text-white rounded-2xl text-lg font-bold shadow-lg shadow-emerald-100 transition-all active:scale-95"
+                  className="w-full h-16 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-lg font-bold shadow-sm transition-all active:scale-95"
                 >
                   <Clock className="mr-2 h-5 w-5" /> Finalizar Almuerzo
                 </Button>
@@ -461,7 +461,7 @@ const ClockManager: React.FC<ClockManagerProps> = ({
                 variant="destructive"
                 onClick={() => handleActionInitiate('clock-out')}
                 disabled={(hasStartedLunch && !hasEndedLunch) || isLocalSubmitting}
-                className="w-full h-16 bg-[#EF4444] hover:bg-[#DC2626] text-white rounded-2xl text-lg font-bold shadow-lg shadow-red-100 transition-all active:scale-95"
+                className="w-full h-16 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-2xl text-lg font-bold shadow-sm transition-all active:scale-95"
               >
                 <LogOut className="mr-2 h-5 w-5" /> Finalizar Jornada
               </Button>

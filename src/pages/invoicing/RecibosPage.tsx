@@ -364,7 +364,7 @@ export default function RecibosPage() {
             {/* SECCIÓN DE PAGO OBSERVADO */}
             <div className={cn(
               "p-6 rounded-2xl transition-all duration-300 border-2",
-              isObserved ? "bg-amber-50 border-amber-200" : "bg-muted/50/50 border-transparent"
+              isObserved ? "bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20" : "bg-muted/50/50 border-transparent"
             )}>
               <FormField
                 control={form.control}
@@ -375,7 +375,7 @@ export default function RecibosPage() {
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
-                        className="h-6 w-6 rounded-lg border-border data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
+                        className="h-6 w-6 rounded-lg border-border data-[state=checked]:bg-amber-50 dark:bg-amber-500/10 dark:text-amber-4000 data-[state=checked]:border-amber-500"
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">

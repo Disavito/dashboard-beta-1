@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO, isValid } from 'date-fns';
-import { PlusCircle, Edit, Loader2, Search, FilterX, Trash2, Calendar as CalendarIcon, Hash, User, MapPin, AlertCircle, Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { PlusCircle, Edit, Loader2, Search, FilterX, Trash2, Calendar as CalendarIcon, Hash, User, MapPin, AlertCircle, Download, FileSpreadsheet, FileText, ArrowDownToLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui-custom/DataTable';
 import {
@@ -173,7 +173,7 @@ function Income() {
                 <TooltipTrigger>
                   <AlertCircle className="h-4 w-4 text-amber-500 animate-pulse" />
                 </TooltipTrigger>
-                <TooltipContent className="bg-amber-50 border-amber-200 text-amber-900 p-3 rounded-xl shadow-premium max-w-xs">
+                <TooltipContent className="bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20 text-amber-900 p-3 rounded-xl shadow-premium max-w-xs">
                   <p className="font-black text-[10px] uppercase tracking-widest mb-1">Socio Observado</p>
                   <p className="text-xs font-medium">{row.original.socio_titulares?.payment_observation_detail || 'Sin detalle de observación'}</p>
                 </TooltipContent>
@@ -232,7 +232,7 @@ function Income() {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+            className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 dark:bg-red-500/10 dark:text-red-400 transition-colors"
             onClick={() => handleDeleteClick(row.original)}
           >
             <Trash2 className="h-4 w-4" />
@@ -255,19 +255,26 @@ function Income() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC] p-4 md:p-8 page-enter">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-black text-foreground tracking-tight uppercase">Ingresos</h1>
-            <p className="text-muted-foreground font-medium">Gestión y búsqueda avanzada de pagos</p>
-          </div>
+    <div className="min-h-screen bg-background page-enter pb-10">
+      <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#4892CC]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <ArrowDownToLine className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-black text-foreground tracking-tight uppercase">Ingresos</h1>
+                <p className="text-muted-foreground font-medium mt-1">Gestión y búsqueda avanzada de pagos.</p>
+              </div>
+            </div>
           <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="h-12 px-4 rounded-xl border-border text-muted-foreground font-bold shadow-sm hover:bg-muted/50 gap-2"
+                  className="h-11 px-4 rounded-xl border-border text-muted-foreground font-bold shadow-sm hover:bg-muted/50 gap-2"
                 >
                   <Download className="h-4 w-4" /> Exportar
                 </Button>
@@ -314,55 +321,57 @@ function Income() {
             {canManageFinances && (
               <Button 
                 onClick={handleNew}
-                className="bg-[#4892CC] hover:bg-[#3C8B93] text-white h-12 px-6 rounded-xl font-bold shadow-lg shadow-sky-100 transition-all active:scale-95 flex items-center gap-2"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6 rounded-xl font-bold shadow-sm transition-all flex items-center gap-2"
               >
                 <PlusCircle className="h-5 w-5" /> Nuevo Registro
               </Button>
             )}
           </div>
-        </header>
+        </div>
+      </div>
 
-        <Card className="border border-border/50 shadow-sm bg-card dark:bg-slate-900 rounded-2xl overflow-hidden">
-          <CardContent className="p-6">
-            <div className="flex flex-col lg:flex-row gap-4 mb-8">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
-                <Input
-                  placeholder="Busca por nombre, DNI, recibo u operación..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-12 h-14 bg-muted/50 border-none rounded-2xl focus:ring-2 focus:ring-corp-blue/20 text-foreground/80 font-medium placeholder:text-muted-foreground/70"
-                />
-                {searchInput && (
-                  <button 
-                    onClick={() => setSearchInput('')}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-muted-foreground"
-                  >
-                    <FilterX className="h-5 w-5" />
-                  </button>
-                )}
-              </div>
-              
-              <LocalidadCombobox
-                value={selectedLocalidadFilter}
-                onValueChange={setSelectedLocalidadFilter}
-                triggerClassName="w-full lg:w-[280px] h-14"
-                distritoFilter={selectedDistritoFilter}
-              />
+      <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-8">
+        <div className="bg-card dark:bg-slate-900 border border-border/50 rounded-2xl p-4 flex flex-col lg:flex-row gap-4 shadow-sm items-center">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
+            <Input
+              placeholder="Busca por nombre, DNI, recibo u operación..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="pl-12 h-11 bg-muted/50 border-transparent rounded-xl focus:bg-background focus:ring-2 focus:ring-primary/20 text-foreground/80 font-medium placeholder:text-muted-foreground/70 w-full"
+            />
+            {searchInput && (
+              <button 
+                onClick={() => setSearchInput('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-foreground"
+              >
+                <FilterX className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+          
+          <LocalidadCombobox
+            value={selectedLocalidadFilter}
+            onValueChange={setSelectedLocalidadFilter}
+            triggerClassName="w-full lg:w-[240px] h-11 rounded-xl bg-muted/50 border-transparent"
+            distritoFilter={selectedDistritoFilter}
+          />
 
-              <DistritoCombobox
-                value={selectedDistritoFilter}
-                onValueChange={setSelectedDistritoFilter}
-                triggerClassName="w-full lg:w-[280px] h-14"
-              />
+          <DistritoCombobox
+            value={selectedDistritoFilter}
+            onValueChange={setSelectedDistritoFilter}
+            triggerClassName="w-full lg:w-[240px] h-11 rounded-xl bg-muted/50 border-transparent"
+          />
 
-              <SavedFilters
-                pageKey="income"
-                currentFilters={currentFilters}
-                onApplyFilter={handleApplyFilter}
-              />
-            </div>
+          <SavedFilters
+            pageKey="income"
+            currentFilters={currentFilters}
+            onApplyFilter={handleApplyFilter}
+          />
+        </div>
 
+        <Card className="rounded-2xl border border-border/50 shadow-sm bg-card dark:bg-slate-900 overflow-hidden">
+          <CardContent className="p-0">
             {/* Vista Escritorio */}
             {!isMobile && (
               <div className="hidden md:block rounded-xl border border-border/50 overflow-hidden">
@@ -393,7 +402,7 @@ function Income() {
                   )}>
                     <div className={cn(
                       "p-4 border-b border-border/50 flex justify-between items-center",
-                      isObserved ? "bg-amber-50" : "bg-muted/50/50"
+                      isObserved ? "bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400" : "bg-muted/50/50"
                     )}>
                       <div className="flex items-center gap-2">
                         <CalendarIcon className="h-4 w-4 text-corp-blue" />
@@ -432,7 +441,7 @@ function Income() {
                       </div>
 
                       {isObserved && (
-                        <div className="p-3 bg-amber-50 rounded-xl border border-amber-100">
+                        <div className="p-3 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 rounded-xl border border-amber-100">
                           <p className="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-1">Detalle de Observación</p>
                           <p className="text-xs font-medium text-amber-900">{income.socio_titulares?.payment_observation_detail}</p>
                         </div>
@@ -465,7 +474,7 @@ function Income() {
                           </Button>
                           <Button 
                             variant="outline" 
-                            className="flex-1 h-10 rounded-xl border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600 font-bold text-xs"
+                            className="flex-1 h-10 rounded-xl border-red-100 text-red-500 hover:bg-red-50 dark:bg-red-500/10 dark:text-red-400 hover:text-red-600 font-bold text-xs"
                             onClick={() => handleDeleteClick(income)}
                           >
                             <Trash2 className="h-3.5 w-3.5 mr-2" /> Eliminar
@@ -537,6 +546,7 @@ function Income() {
         reasonPlaceholder="Escribe el motivo de la eliminación del ingreso..."
         confirmButtonText="Eliminar"
       />
+    </div>
     </div>
   );
 }

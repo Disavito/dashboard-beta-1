@@ -86,7 +86,7 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
 
         return (
           <Card key={socio.id} className="w-full bg-card dark:bg-slate-900 border border-border/50 shadow-sm rounded-2xl overflow-hidden">
-            <CardHeader className="p-4 border-b border-gray-50 flex flex-row items-start justify-between gap-2 bg-muted/50/50">
+            <CardHeader className="p-4 border-b border-border/50 flex flex-row items-start justify-between gap-2 bg-muted/50/50">
               <div className="flex flex-col min-w-0">
                 <span className="text-[10px] font-mono font-bold text-muted-foreground/70">DNI {socio.dni || 'N/A'}</span>
                 <CardTitle className="text-base font-black text-foreground uppercase leading-tight mt-0.5 truncate">
@@ -116,7 +116,7 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
               </div>
               
               {/* Lote Medido */}
-              <div className="flex flex-row justify-between items-center text-sm border-t border-gray-50 pt-4">
+              <div className="flex flex-row justify-between items-center text-sm border-t border-border/50 pt-4">
                 <span className="text-[10px] font-black text-muted-foreground/70 uppercase tracking-widest flex items-center gap-1.5">
                   {isMedido ? <CheckSquare className="h-4 w-4 text-emerald-500" /> : <Square className="h-4 w-4 text-amber-500" />} Ingeniería
                 </span>
@@ -125,7 +125,7 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
                   size="sm"
                   className={cn(
                     "h-8 text-xs font-bold rounded-xl", 
-                    isMedido ? "text-emerald-600 border-emerald-200 bg-emerald-50" : "text-amber-600 border-amber-200 bg-amber-50"
+                    isMedido ? "text-emerald-600 border-emerald-200 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400"
                   )}
                   onClick={() => onUpdateLoteMedido(socio.id, !isMedido, socio)}
                   disabled={!canManageLoteMedido}
@@ -135,13 +135,13 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
               </div>
 
               {/* Document Links */}
-              <div className="pt-4 border-t border-gray-50">
+              <div className="pt-4 border-t border-border/50">
                 <p className="text-[9px] font-black text-muted-foreground/70 uppercase tracking-widest mb-2 flex items-center gap-1.5"><FileText className="h-3 w-3" /> Expediente Digital</p>
                 <div className="flex flex-wrap gap-2 text-[10px] font-bold">
-                   <Badge variant="outline" className={socio.has_planos ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-muted/50 text-muted-foreground/70 border-border"}>
+                   <Badge variant="outline" className={socio.has_planos ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-muted/50 text-muted-foreground/70 border-border"}>
                       Planos {socio.has_planos ? '✅' : '❌'}
                    </Badge>
-                   <Badge variant="outline" className={socio.has_memoria ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-muted/50 text-muted-foreground/70 border-border"}>
+                   <Badge variant="outline" className={socio.has_memoria ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-muted/50 text-muted-foreground/70 border-border"}>
                       Memoria {socio.has_memoria ? '✅' : '❌'}
                    </Badge>
                 </div>
@@ -149,7 +149,7 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
 
               {/* Missing Documents Actions */}
               {missingDocs.length > 0 && (
-                <div className="pt-4 border-t border-gray-50">
+                <div className="pt-4 border-t border-border/50">
                   <p className="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 flex items-center gap-1.5"><Trash2 className="h-3 w-3" /> Faltantes obligatorios</p>
                   <div className="flex flex-wrap gap-2">
                     {missingDocs.map(docType => (
@@ -157,7 +157,7 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
                         key={docType}
                         variant="outline"
                         size="sm"
-                        className="h-8 text-[10px] font-bold border-red-200 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl"
+                        className="h-8 text-[10px] font-bold border-red-200 text-red-500 bg-red-50 dark:bg-red-500/10 dark:text-red-400 hover:bg-red-100 rounded-xl"
                         onClick={() => onOpenUploadModal(socio, docType)}
                       >
                         <Upload className="mr-1.5 h-3 w-3" />

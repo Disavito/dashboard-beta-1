@@ -408,9 +408,9 @@ function Dashboard() {
   }
 
   return (
-    <div className="pb-20 bg-[#FAFBFC] min-h-screen page-enter">
-      <header className="relative h-auto py-8 md:h-72 flex items-center overflow-hidden bg-card dark:bg-slate-900 border-b border-border/50/60">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#4892CC]/[0.06] via-transparent to-corp-teal/[0.02] z-0"></div>
+    <div className="pb-20 bg-background min-h-screen page-enter">
+      <header className="relative h-auto py-12 flex items-center overflow-hidden bg-card dark:bg-slate-900 border-b border-border/50 shadow-sm mb-8">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#4892CC]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div className="container mx-auto px-4 md:px-8 relative z-10">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div>
@@ -437,7 +437,7 @@ function Dashboard() {
               />
 
               <div className="bg-card dark:bg-slate-900 shadow-sm border border-border/50 p-1.5 rounded-2xl flex items-center gap-2 h-11 pr-4">
-                <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center cursor-pointer" onClick={() => setPreviewAsEngineer(!previewAsEngineer)} title="Click para simular vista">
+                <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-lg flex items-center justify-center cursor-pointer" onClick={() => setPreviewAsEngineer(!previewAsEngineer)} title="Click para simular vista">
                   <Activity className="text-emerald-500 w-4 h-4" />
                 </div>
                 <div>
@@ -508,7 +508,7 @@ function Dashboard() {
 
                                 <Card className="rounded-2xl border border-border/50 shadow-premium bg-card dark:bg-slate-900 p-8 hover:shadow-premium-lg hover:scale-[1.02] transition-all duration-300">
                                   <div className="flex justify-between items-start mb-6">
-                                    <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center"><UserCheck className="text-emerald-500 w-7 h-7" /></div>
+                                    <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-2xl flex items-center justify-center"><UserCheck className="text-emerald-500 w-7 h-7" /></div>
                                     <Badge className="bg-emerald-100 text-emerald-600 border-none font-bold">{socioStats.porcentaje}%</Badge>
                                   </div>
                                   <h3 className="text-5xl font-black text-emerald-600"><AnimatedNumber value={socioStats.pagados} /></h3>
@@ -517,7 +517,7 @@ function Dashboard() {
 
                                 <Card className="rounded-2xl border border-border/50 shadow-premium bg-card dark:bg-slate-900 p-8 hover:shadow-premium-lg hover:scale-[1.02] transition-all duration-300">
                                   <div className="flex justify-between items-start mb-6">
-                                    <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center"><UserMinus className="text-amber-500 w-7 h-7" /></div>
+                                    <div className="w-14 h-14 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 rounded-2xl flex items-center justify-center"><UserMinus className="text-amber-500 w-7 h-7" /></div>
                                     <Badge className="bg-amber-100 text-amber-600 border-none font-bold">Pendiente</Badge>
                                   </div>
                                   <h3 className="text-5xl font-black text-amber-600"><AnimatedNumber value={socioStats.pendientes} /></h3>
@@ -603,12 +603,12 @@ function Dashboard() {
                                   <p className="text-3xl font-black text-emerald-600 mt-1"><AnimatedNumber value={socios.filter(s => s.mz && s.lote).length} /></p>
                                   <p className="text-[10px] text-muted-foreground/70 font-medium mt-1">Mz y Lote asignado</p>
                                 </Card>
-                                <Card className="rounded-2xl border border-amber-100 shadow-sm p-5 bg-amber-50/30">
+                                <Card className="rounded-2xl border border-amber-100 shadow-sm p-5 bg-amber-50/30 dark:bg-amber-500/10 dark:text-amber-400">
                                   <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Sin Mz</p>
                                   <p className="text-3xl font-black text-amber-600 mt-1"><AnimatedNumber value={socios.filter(s => !s.mz).length} /></p>
                                   <p className="text-[10px] text-amber-500/80 font-medium mt-1">Faltan datos de manzana</p>
                                 </Card>
-                                <Card className="rounded-2xl border border-red-100 shadow-sm p-5 bg-red-50/30">
+                                <Card className="rounded-2xl border border-red-100 shadow-sm p-5 bg-red-50/30 dark:bg-red-500/10 dark:text-red-400">
                                   <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Sin Lote</p>
                                   <p className="text-3xl font-black text-red-600 mt-1"><AnimatedNumber value={socios.filter(s => !s.lote).length} /></p>
                                   <p className="text-[10px] text-red-500/80 font-medium mt-1">Faltan datos de lote</p>
@@ -633,14 +633,14 @@ function Dashboard() {
                                       <p className="font-bold text-foreground/90">Cargar Planos Faltantes</p>
                                       <p className="text-xs text-muted-foreground/70 font-medium mt-1">Hay {socios.filter(s => !s.mz).length} terrenos sin plano registrado.</p>
                                     </div>
-                                    <Badge className="bg-red-50 text-red-600 border-red-200">Alta Prioridad</Badge>
+                                    <Badge className="bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20">Alta Prioridad</Badge>
                                   </div>
                                   <div className="p-4 bg-card dark:bg-slate-900 rounded-xl border border-border/50 flex items-center justify-between">
                                     <div>
                                       <p className="font-bold text-foreground/90">Revisión de Memorias</p>
                                       <p className="text-xs text-muted-foreground/70 font-medium mt-1">Hay {socios.filter(s => !s.lote).length} terrenos sin memoria registrada.</p>
                                     </div>
-                                    <Badge className="bg-amber-50 text-amber-600 border-amber-200">Pendiente</Badge>
+                                    <Badge className="bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">Pendiente</Badge>
                                   </div>
                                 </div>
                               </Card>
@@ -651,7 +651,7 @@ function Dashboard() {
                             <SortableWidget key={widget.id} id={widget.id} isEditMode={isEditMode} className="col-span-1 md:col-span-2">
                               <Card className="rounded-2xl border border-border/50 shadow-premium bg-card dark:bg-slate-900 p-8 h-full">
                                 <div className="flex items-center gap-4 mb-6">
-                                  <div className="p-3 bg-emerald-50 rounded-xl"><Activity className="w-6 h-6 text-emerald-500"/></div>
+                                  <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-xl"><Activity className="w-6 h-6 text-emerald-500"/></div>
                                   <div>
                                     <h3 className="text-xl font-black text-foreground">Acceso Rápido</h3>
                                     <p className="text-sm text-muted-foreground font-medium">Navega directamente a tus módulos</p>
@@ -662,11 +662,11 @@ function Dashboard() {
                                     <span className="font-bold text-[#4892CC] group-hover:translate-x-1 transition-transform">📄 Expedientes Técnicos</span>
                                     <span className="text-[10px] font-black text-slate-300 uppercase">Ir →</span>
                                   </a>
-                                  <a href="/inventory" className="p-4 bg-emerald-50/50 rounded-xl border border-emerald-100 flex items-center justify-between hover:bg-emerald-50 transition-colors group">
+                                  <a href="/inventory" className="p-4 bg-emerald-50/50 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-xl border border-emerald-100 flex items-center justify-between hover:bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 transition-colors group">
                                     <span className="font-bold text-emerald-700 group-hover:translate-x-1 transition-transform">🧰 Inventario de Campo</span>
                                     <span className="text-[10px] font-black text-slate-300 uppercase">Ir →</span>
                                   </a>
-                                  <a href="/jornada" className="p-4 bg-amber-50/50 rounded-xl border border-amber-100 flex items-center justify-between hover:bg-amber-50 transition-colors group">
+                                  <a href="/jornada" className="p-4 bg-amber-50/50 dark:bg-amber-500/10 dark:text-amber-400 rounded-xl border border-amber-100 flex items-center justify-between hover:bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 transition-colors group">
                                     <span className="font-bold text-amber-700 group-hover:translate-x-1 transition-transform">⏰ Mi Jornada Laboral</span>
                                     <span className="text-[10px] font-black text-slate-300 uppercase">Ir →</span>
                                   </a>
@@ -770,7 +770,7 @@ function Dashboard() {
                                     </ResponsiveContainer>
                                   </div>
                                 </Card>
-                                <Card className={cn("rounded-2xl border-none shadow-lg p-6", filteredData.balance >= 0 ? "bg-[#E8F1F8]" : "bg-red-50")}>
+                                <Card className={cn("rounded-2xl border-none shadow-lg p-6", filteredData.balance >= 0 ? "bg-[#E8F1F8]" : "bg-red-50 dark:bg-red-500/10 dark:text-red-400")}>
                                   <p className={cn("font-bold text-xs uppercase tracking-widest mb-1", filteredData.balance >= 0 ? "text-[#4892CC]" : "text-red-600")}>Balance Neto</p>
                                   <h4 className={cn("text-2xl font-black", filteredData.balance >= 0 ? "text-[#4892CC]" : "text-red-700")}><AnimatedNumber value={filteredData.balance} isCurrency={true} /></h4>
                                   <div className="mt-3 h-[40px] w-full">
@@ -923,7 +923,7 @@ function Dashboard() {
             {drillDownIngresos.length > 0 && (
               <div>
                 <h4 className="text-sm font-black text-emerald-600 uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000 inline-block" />
                   Ingresos ({drillDownIngresos.length})
                 </h4>
                 <div className="rounded-xl border border-border/50 overflow-hidden">
@@ -937,7 +937,7 @@ function Dashboard() {
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {drillDownIngresos.slice(0, 50).map((item) => (
-                        <tr key={item.id} className="hover:bg-emerald-50/30 transition-colors">
+                        <tr key={item.id} className="hover:bg-emerald-50/30 dark:bg-emerald-500/10 dark:text-emerald-400 transition-colors">
                           <td className="py-2.5 px-4 text-muted-foreground font-medium whitespace-nowrap">{isValid(parseISO(item.date)) ? format(parseISO(item.date), 'dd/MM/yyyy') : item.date}</td>
                           <td className="py-2.5 px-4 text-right font-black text-emerald-700 whitespace-nowrap">{formatCurrency(item.amount)}</td>
                           <td className="py-2.5 px-4 text-muted-foreground font-medium truncate max-w-[200px]">{(item as any).full_name || item.dni || '—'}</td>
@@ -955,7 +955,7 @@ function Dashboard() {
             {drillDownGastos.length > 0 && (
               <div>
                 <h4 className="text-sm font-black text-red-600 uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+                  <span className="w-2 h-2 rounded-full bg-red-50 dark:bg-red-500/10 dark:text-red-4000 inline-block" />
                   Gastos ({drillDownGastos.length})
                 </h4>
                 <div className="rounded-xl border border-border/50 overflow-hidden">
@@ -969,7 +969,7 @@ function Dashboard() {
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {drillDownGastos.slice(0, 50).map((item) => (
-                        <tr key={item.id} className="hover:bg-red-50/30 transition-colors">
+                        <tr key={item.id} className="hover:bg-red-50/30 dark:bg-red-500/10 dark:text-red-400 transition-colors">
                           <td className="py-2.5 px-4 text-muted-foreground font-medium whitespace-nowrap">{isValid(parseISO(item.date)) ? format(parseISO(item.date), 'dd/MM/yyyy') : item.date}</td>
                           <td className="py-2.5 px-4 text-right font-black text-red-700 whitespace-nowrap">{formatCurrency(Math.abs(item.amount))}</td>
                           <td className="py-2.5 px-4 text-muted-foreground font-medium truncate max-w-[200px]">{(item as any).description || '—'}</td>

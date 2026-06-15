@@ -289,7 +289,7 @@ function DashboardLayout() {
       <div className="p-4 pb-24 lg:pb-4 mt-auto border-t border-border">
         <Button 
           variant="ghost" 
-          className="w-full justify-start gap-3 text-red-400 hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition-all duration-200 font-medium"
+          className="w-full justify-start gap-3 text-red-400 hover:bg-red-50 dark:bg-red-500/10 dark:text-red-4000/10 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition-all duration-200 font-medium"
           onClick={async () => {
             await supabase.auth.signOut();
             navigate('/auth');

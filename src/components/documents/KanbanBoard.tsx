@@ -199,7 +199,7 @@ const KanbanCard = ({ item, onOpenUploadModal }: { item: any; onOpenUploadModal:
       <Badge 
         variant="outline" 
         onClick={onClick}
-        className={`text-[10px] uppercase tracking-wider font-bold bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm shadow-emerald-500/10 ${onClick ? 'cursor-pointer hover:bg-emerald-100 transition-colors' : ''}`}
+        className={`text-[10px] uppercase tracking-wider font-bold bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10 ${onClick ? 'cursor-pointer hover:bg-emerald-100 transition-colors' : ''}`}
       >
         <CheckCircle2 className="w-3 h-3 mr-1" />
         {label}
@@ -231,11 +231,11 @@ const KanbanCard = ({ item, onOpenUploadModal }: { item: any; onOpenUploadModal:
         </div>
 
         <div className="flex flex-wrap gap-1 mb-3">
-          <Badge className={cn("text-[9px] px-1.5 py-0 border", isPaid ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-red-50 text-red-700 border-red-200")}>
+          <Badge className={cn("text-[9px] px-1.5 py-0 border", isPaid ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20")}>
             {isPaid ? 'PAGADO' : 'DEUDA'}
           </Badge>
           {item.paymentInfo?.receipt_number && (
-             <Badge className="bg-amber-50 text-amber-700 border-amber-200 text-[9px] px-1.5 py-0 font-mono">
+             <Badge className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20 text-[9px] px-1.5 py-0 font-mono">
                REC:{item.paymentInfo.receipt_number}
              </Badge>
           )}
@@ -355,7 +355,7 @@ export function KanbanBoard({ data, onOpenUploadModal }: KanbanBoardProps) {
           </div>
           <Badge className="bg-card dark:bg-slate-900 text-sky-700 font-bold border-none">{col1.length}</Badge>
         </div>
-        <ScrollArea className="bg-sky-50/50 border border-sky-100 border-t-0 rounded-b-2xl flex-1 p-3">
+        <ScrollArea className="bg-sky-50/50 dark:bg-sky-500/10 dark:text-sky-400 border border-sky-100 border-t-0 rounded-b-2xl flex-1 p-3">
           {col1.map(item => <KanbanCard key={item.id} item={item} onOpenUploadModal={onOpenUploadModal} />)}
           {col1.length === 0 && <div className="text-center py-8 text-sky-300 font-bold text-xs uppercase tracking-widest border-2 border-dashed border-sky-200/50 rounded-xl">Vacío</div>}
         </ScrollArea>
@@ -385,7 +385,7 @@ export function KanbanBoard({ data, onOpenUploadModal }: KanbanBoardProps) {
           </div>
           <Badge className="bg-card dark:bg-slate-900 text-amber-700 font-bold border-none">{col3.length}</Badge>
         </div>
-        <ScrollArea className="bg-amber-50/50 border border-amber-100 border-t-0 rounded-b-2xl flex-1 p-3">
+        <ScrollArea className="bg-amber-50/50 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-100 border-t-0 rounded-b-2xl flex-1 p-3">
           {col3.map(item => <KanbanCard key={item.id} item={item} onOpenUploadModal={onOpenUploadModal} />)}
           {col3.length === 0 && <div className="text-center py-8 text-amber-300 font-bold text-xs uppercase tracking-widest border-2 border-dashed border-amber-200/50 rounded-xl">Vacío</div>}
         </ScrollArea>
@@ -413,7 +413,7 @@ export function KanbanBoard({ data, onOpenUploadModal }: KanbanBoardProps) {
             </Button>
           )}
         </div>
-        <ScrollArea className="bg-emerald-50/50 border border-emerald-100 border-t-0 rounded-b-2xl flex-1 p-3">
+        <ScrollArea className="bg-emerald-50/50 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-100 border-t-0 rounded-b-2xl flex-1 p-3">
           {col4.map(item => <KanbanCard key={item.id} item={item} onOpenUploadModal={onOpenUploadModal} />)}
           {col4.length === 0 && <div className="text-center py-8 text-emerald-300 font-bold text-xs uppercase tracking-widest border-2 border-dashed border-emerald-200/50 rounded-xl">Vacío</div>}
         </ScrollArea>

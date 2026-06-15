@@ -183,7 +183,7 @@ function SocioStatusAndDocuments({ socioId }: SocioStatusAndDocumentsProps) {
           </TableHeader>
           <TableBody>
             {lots.map((lot) => (
-              <TableRow key={lot.id} className="group hover:bg-[#FFFFFF]/80 transition-all duration-300 border-b border-gray-50 last:border-0">
+              <TableRow key={lot.id} className="group hover:bg-[#FFFFFF]/80 transition-all duration-300 border-b border-border/50 last:border-0">
                 <TableCell className="pl-8 py-6">
                   <div className="flex items-center gap-4">
                     <Checkbox 
@@ -223,8 +223,8 @@ function SocioStatusAndDocuments({ socioId }: SocioStatusAndDocumentsProps) {
                       lot.paymentStatus === 'Anulado' ? "text-amber-600" : "text-red-500"
                     )}>
                       <div className={cn("w-1.5 h-1.5 rounded-full", 
-                        lot.paymentStatus === 'Pagado' ? "bg-emerald-500 animate-pulse" : 
-                        lot.paymentStatus === 'Anulado' ? "bg-amber-500" : "bg-red-500"
+                        lot.paymentStatus === 'Pagado' ? "bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000 animate-pulse" : 
+                        lot.paymentStatus === 'Anulado' ? "bg-amber-50 dark:bg-amber-500/10 dark:text-amber-4000" : "bg-red-50 dark:bg-red-500/10 dark:text-red-4000"
                       )}></div>
                       {lot.paymentStatus}
                     </div>

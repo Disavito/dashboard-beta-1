@@ -148,15 +148,15 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
       <Card className={cn(
         "relative overflow-hidden border transition-all duration-300 group",
         exists 
-          ? (isReceipt ? 'border-amber-500/40 bg-amber-50/50 shadow-md shadow-amber-100/20' : 'border-emerald-500/30 bg-emerald-500/5') 
+          ? (isReceipt ? 'border-amber-500/40 bg-amber-50/50 dark:bg-amber-500/10 dark:text-amber-400 shadow-md shadow-amber-100/20' : 'border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000/5') 
           : 'border-border bg-surface/50',
-        isReceipt && !exists && "border-dashed border-amber-300 bg-amber-50/10"
+        isReceipt && !exists && "border-dashed border-amber-300 bg-amber-50/10 dark:bg-amber-500/10 dark:text-amber-400"
       )}>
         <div className="absolute top-3 right-3">
           {isReceipt ? (
             <Badge className={cn(
               "text-[10px] flex items-center gap-1 px-2 py-0.5 border-none",
-              exists ? "bg-amber-500 text-white shadow-sm" : "bg-amber-100 text-amber-600"
+              exists ? "bg-amber-50 dark:bg-amber-500/10 dark:text-amber-4000 text-white shadow-sm" : "bg-amber-100 text-amber-600"
             )}>
               <Ticket className="w-3 h-3" /> {exists ? 'VERIFICADO' : 'PENDIENTE'}
             </Badge>
@@ -171,7 +171,7 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
           <div className={cn(
             "p-4 rounded-2xl transition-all duration-300 group-hover:scale-110",
             exists 
-              ? (isReceipt ? 'bg-amber-500 text-white shadow-lg shadow-amber-200' : 'bg-emerald-500/20 text-emerald-600') 
+              ? (isReceipt ? 'bg-amber-50 dark:bg-amber-500/10 dark:text-amber-4000 text-white shadow-lg shadow-amber-200' : 'bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000/20 text-emerald-600') 
               : 'bg-background text-textSecondary'
           )}>
             {icon}
@@ -271,7 +271,7 @@ export default function DocumentManager({ isAdmin }: DocumentManagerProps) {
                   {rawSearchResults.map((socio) => (
                     <div
                       key={socio.id}
-                      className="group px-4 py-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-all flex items-center justify-between"
+                      className="group px-4 py-3 hover:bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400 rounded-lg cursor-pointer transition-all flex items-center justify-between"
                       onClick={() => { setSelectedSocio(socio); setSearchInput(''); setRawSearchResults([]); }}
                     >
                       <div className="flex items-center gap-3">

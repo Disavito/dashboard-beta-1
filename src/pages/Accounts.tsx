@@ -252,7 +252,7 @@ const Accounts: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFBFC] page-enter flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-background page-enter flex flex-col items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-[#4892CC]" />
         <p className="text-muted-foreground mt-4 font-medium">Sincronizando estados financieros...</p>
       </div>
@@ -260,7 +260,7 @@ const Accounts: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC] page-enter text-foreground p-4 md:p-8 space-y-8">
+    <div className="min-h-screen bg-background page-enter text-foreground p-4 md:p-8 space-y-8">
       {/* Header Profesional */}
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 max-w-7xl mx-auto">
         <div className="space-y-1">
@@ -341,7 +341,7 @@ const Accounts: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold bg-emerald-50 w-fit px-3 py-1 rounded-full">
+              <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 w-fit px-3 py-1 rounded-full">
                 <ArrowUpRight className="w-4 h-4" />
                 <span>Capital en Sistema</span>
               </div>
@@ -580,7 +580,7 @@ const Accounts: React.FC = () => {
                     <td className="px-8 py-5">
                       <span className={cn(
                         "text-[10px] font-black uppercase px-2 py-1 rounded-md",
-                        t.type === 'income' ? "bg-emerald-50 text-emerald-600" : "bg-pink-50 text-pink-600"
+                        t.type === 'income' ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-pink-50 text-pink-600 dark:bg-pink-500/10 dark:text-pink-400"
                       )}>
                         {t.category}
                       </span>

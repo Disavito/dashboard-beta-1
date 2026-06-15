@@ -123,7 +123,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             onClick={handleConfirm}
             className={cn(
               "rounded-lg",
-              variant === 'destructive' ? "bg-red-500 hover:bg-red-600 text-white" : "bg-primary text-primary-foreground"
+              variant === 'destructive' ? "bg-red-50 dark:bg-red-500/10 dark:text-red-4000 hover:bg-red-600 text-white" : "bg-primary text-primary-foreground"
             )}
             disabled={isConfirmDisabled}
           >

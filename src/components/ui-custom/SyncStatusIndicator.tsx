@@ -116,7 +116,7 @@ export default function SyncStatusIndicator() {
               className={cn(
                 "flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-bold transition-all duration-200 active:scale-95 shadow-sm hover:shadow-md cursor-pointer select-none",
                 isOffline 
-                  ? "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-500" 
+                  ? "bg-amber-50 dark:bg-amber-500/10 dark:text-amber-4000/10 border-amber-500/20 text-amber-600 dark:text-amber-500" 
                   : "bg-primary/5 border-primary/10 text-primary"
               )}
             >
@@ -158,7 +158,7 @@ export default function SyncStatusIndicator() {
             {/* Estado de Red */}
             <div className={cn(
               "flex items-center justify-between p-4 rounded-xl border",
-              isOffline ? "bg-amber-500/5 border-amber-500/20" : "bg-[#4892CC]/5 border-[#4892CC]/20"
+              isOffline ? "bg-amber-50 dark:bg-amber-500/10 dark:text-amber-4000/5 border-amber-500/20" : "bg-[#4892CC]/5 border-[#4892CC]/20"
             )}>
               <div className="flex items-center gap-3">
                 {isOffline ? (
@@ -228,7 +228,7 @@ export default function SyncStatusIndicator() {
                         key={job.id} 
                         className={cn(
                           "p-3 rounded-xl border space-y-2 relative group",
-                          hasError ? "bg-red-500/5 border-red-200 dark:border-red-900/40" : "bg-card border-border"
+                          hasError ? "bg-red-50 dark:bg-red-500/10 dark:text-red-4000/5 border-red-200 dark:border-red-900/40" : "bg-card border-border"
                         )}
                       >
                         <div className="flex items-start justify-between gap-6">
@@ -269,7 +269,7 @@ export default function SyncStatusIndicator() {
                               size="icon"
                               variant="ghost"
                               onClick={() => handleDeleteJob(job.id)}
-                              className="h-7 w-7 text-red-400 hover:bg-red-500/10 hover:text-red-500 rounded-lg"
+                              className="h-7 w-7 text-red-400 hover:bg-red-50 dark:bg-red-500/10 dark:text-red-4000/10 hover:text-red-500 rounded-lg"
                               title="Descartar"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -279,7 +279,7 @@ export default function SyncStatusIndicator() {
 
                         {/* Detalle de error si falló */}
                         {hasError && job.errorMessage && (
-                          <div className="flex items-start gap-1.5 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-[10px] text-red-600 dark:text-red-400 font-medium">
+                          <div className="flex items-start gap-1.5 p-2 rounded-lg bg-red-50 dark:bg-red-500/10 dark:text-red-4000/10 border border-red-500/20 text-[10px] text-red-600 dark:text-red-400 font-medium">
                             <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
                             <span className="line-clamp-2">{job.errorMessage}</span>
                           </div>

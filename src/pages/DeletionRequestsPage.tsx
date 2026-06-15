@@ -17,7 +17,7 @@ const DeletionRequestsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC] page-enter pb-20">
+    <div className="min-h-screen bg-background page-enter pb-20">
       <header className="relative h-64 md:h-80 flex items-center overflow-hidden bg-card dark:bg-slate-900 border-b border-border/50">
         <div className="absolute inset-0 bg-gradient-to-r from-[#ef4444]/10 to-transparent z-0"></div>
         <div className="absolute right-0 top-0 w-1/3 h-full opacity-10 pointer-events-none">
@@ -26,7 +26,7 @@ const DeletionRequestsPage: React.FC = () => {
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-3xl">
-            <Badge className="mb-4 bg-red-50/20 text-red-600 border-none font-bold px-4 py-1 rounded-full">
+            <Badge className="mb-4 bg-red-50/20 text-red-600 dark:bg-red-500/10 dark:text-red-400 border-none font-bold px-4 py-1 rounded-full">
               ADMINISTRACIÓN DE DOCUMENTOS
             </Badge>
             <h1 className="text-5xl md:text-6xl font-black text-foreground tracking-tighter mb-4">

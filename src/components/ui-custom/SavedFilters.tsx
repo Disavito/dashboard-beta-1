@@ -115,7 +115,7 @@ export default function SavedFilters({
                   </span>
                 </div>
                 <button
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition-all shrink-0"
+                  className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:bg-red-500/10 dark:text-red-400 transition-all shrink-0"
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteFilter(sf.id);

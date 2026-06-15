@@ -165,7 +165,7 @@ export function DataTable<TData, TValue>({
                     return (
                       <TableRow 
                         key={row.id} 
-                        className={cn("border-gray-50 hover:bg-muted/50/70 transition-colors duration-150", rowClassName?.(row))}
+                        className={cn("border-border/50 hover:bg-muted/50/70 transition-colors duration-150", rowClassName?.(row))}
                       >
                         {row.getVisibleCells().map((cell) => (
                           <TableCell key={cell.id} className="py-4 px-4 text-sm text-muted-foreground whitespace-nowrap">
@@ -185,7 +185,7 @@ export function DataTable<TData, TValue>({
                 rows.map((row) => (
                   <TableRow 
                     key={row.id} 
-                    className={cn("border-gray-50 hover:bg-muted/50/70 transition-colors duration-150", rowClassName?.(row))}
+                    className={cn("border-border/50 hover:bg-muted/50/70 transition-colors duration-150", rowClassName?.(row))}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="py-4 px-4 text-sm text-muted-foreground whitespace-nowrap">

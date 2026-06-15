@@ -13,7 +13,7 @@ export default function InvoicingLayout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC] page-enter">
+    <div className="min-h-screen bg-background page-enter">
       {/* Header de Facturación Optimizado para Móvil */}
       <div className="bg-card dark:bg-slate-900 border-b border-border/50 sticky top-0 z-20">
         <div className="container mx-auto px-4 md:px-8 py-6">

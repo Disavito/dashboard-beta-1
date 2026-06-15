@@ -27,25 +27,38 @@
   }
 
   .dark {
-    --background: 0 1% 13%;
-    --foreground: 0 0% 98%;
-    --card: 0 1% 13%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 1% 13%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 207 56% 54%; /* #4892CC */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 17%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 17%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 0 0% 17%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 17%;
-    --input: 0 0% 17%;
-    --ring: 207 56% 54%;
+    /* 1. Elevaciones (Tinte Slate para reducir fatiga visual) */
+    --background: 220 16% 7%;  /* Nivel 0: Fondo base ~#0F1115 */
+    --foreground: 214 32% 91%; /* Texto High Emphasis ~#E2E8F0 */
+    
+    --card: 222 15% 13%;       /* Nivel 1: Tarjetas/Reportes ~#1C1F26 */
+    --card-foreground: 214 32% 91%;
+    
+    --popover: 220 13% 18%;    /* Nivel 2: Dropdowns/Flotantes ~#282C34 */
+    --popover-foreground: 214 32% 91%;
+
+    /* 2. Color Primario y Marca */
+    /* Original: 207 56% 54% (#4892CC). Ajustado a 65% luminosidad para evitar halo en dark mode */
+    --primary: 207 65% 65%;    
+    --primary-foreground: 220 16% 7%; /* Texto oscuro sobre fondo primario para contraste */
+    
+    --secondary: 220 13% 18%;
+    --secondary-foreground: 214 32% 91%;
+    
+    --muted: 220 13% 18%;
+    --muted-foreground: 215 16% 65%; /* Texto Low/Medium Emphasis ~#94A3B8 */
+    
+    --accent: 220 13% 22%;
+    --accent-foreground: 214 32% 91%;
+    
+    /* 3. Semántica Financiera */
+    --destructive: 350 80% 70%; /* Error/Gasto: Tono salmón pastel */
+    --destructive-foreground: 220 16% 7%;
+
+    /* 4. Bordes y Divisores (Equivalentes a opacidad blanca sobre Slate) */
+    --border: 220 13% 20%; /* Borde sutil (Grid/Tablas) */
+    --input: 220 13% 26%;  /* Fondo de inputs ligeramente elevado */
+    --ring: 207 65% 65%;   /* Ring interactivo igual al primario */
   }
 }
 

@@ -35,7 +35,7 @@ class ModuleErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySta
       return (
         <div className="flex flex-col items-center justify-center min-h-[400px] p-8">
           <div className="max-w-md w-full text-center space-y-6">
-            <div className="mx-auto w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center">
+            <div className="mx-auto w-16 h-16 bg-red-50 dark:bg-red-500/10 dark:text-red-400 rounded-2xl flex items-center justify-center">
               <AlertTriangle className="w-8 h-8 text-red-400" />
             </div>
             <div>

@@ -50,7 +50,7 @@ const HelpPage: React.FC = () => {
   }, [roles, customPermissions, isAdmin, isFinance, isEngineer, canManageInventory]);
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC] pb-20 page-enter">
+    <div className="min-h-screen bg-background pb-20 page-enter">
       {/* Header */}
       <header className="relative h-64 md:h-72 flex items-center overflow-hidden bg-card dark:bg-slate-900 border-b border-border/50">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent z-0"></div>
@@ -386,7 +386,7 @@ const HelpPage: React.FC = () => {
 
           {/* CONTENIDO: INVENTARIO */}
           <TabsContent value="inventario" className="space-y-6 focus-visible:outline-none">
-            <Card className="rounded-3xl border-none shadow-premium bg-[#FAFBFC] border border-border/60 p-8">
+            <Card className="rounded-3xl border-none shadow-premium bg-background border border-border/60 p-8">
               <h2 className="text-2xl font-black text-foreground flex items-center gap-3 border-b pb-4 mb-6 uppercase tracking-tight">
                 <Package className="w-6 h-6 text-[#4892CC]" />
                 Manual Operativo del Encargado de Inventario en el Dashboard

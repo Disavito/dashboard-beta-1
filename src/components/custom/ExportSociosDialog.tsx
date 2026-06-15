@@ -198,7 +198,7 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
   return (
     <div className="flex flex-col max-h-[90vh] md:max-h-[85vh]">
       {/* Header Fijo */}
-      <div className="p-6 md:p-8 pb-4 border-b border-gray-50">
+      <div className="p-6 md:p-8 pb-4 border-b border-border/50">
         <div className="flex items-center justify-between mb-4">
           <div className="w-10 h-10 md:w-12 md:h-12 bg-[#4892CC]/10 rounded-2xl flex items-center justify-center">
             <Settings2 className="h-5 w-5 md:h-6 md:w-6 text-[#4892CC]" />
@@ -224,9 +224,9 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
           {/* Formatos */}
           <div className="grid grid-cols-3 gap-3 md:gap-4">
             {[
-              { id: 'xlsx', label: 'Excel', icon: FileSpreadsheet, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-              { id: 'csv', label: 'CSV', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
-              { id: 'pdf', label: 'PDF', icon: FileJson, color: 'text-red-600', bg: 'bg-red-50' },
+              { id: 'xlsx', label: 'Excel', icon: FileSpreadsheet, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400' },
+              { id: 'csv', label: 'CSV', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400' },
+              { id: 'pdf', label: 'PDF', icon: FileJson, color: 'text-red-600', bg: 'bg-red-50 dark:bg-red-500/10 dark:text-red-400' },
             ].map((f) => (
               <button
                 key={f.id}
@@ -354,7 +354,7 @@ export default function ExportSociosDialog({ onClose, data: externalData }: Expo
       )}
 
       {/* Footer Fijo */}
-      <DialogFooter className="p-6 md:p-8 pt-4 border-t border-gray-50 bg-muted/50/30 flex-col sm:flex-row gap-3">
+      <DialogFooter className="p-6 md:p-8 pt-4 border-t border-border/50 bg-muted/50/30 flex-col sm:flex-row gap-3">
         <Button 
           variant="ghost" 
           onClick={onClose} 

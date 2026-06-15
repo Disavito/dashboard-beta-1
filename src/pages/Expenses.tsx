@@ -150,16 +150,36 @@ export default function Expenses() {
     [roles]
   );
 
-  const canAddExpense = canManageFinances || isEngineerAndNotAdmin;
+  // Permitir que cualquier usuario logueado pueda registrar un gasto o solicitar aprobación
+  const canAddExpense = !!user;
+
+  const [userColabId, setUserColabId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!canManageFinances && user?.id) {
+      const fetchColabId = async () => {
+        const { supabase } = await import('@/lib/supabaseClient');
+        const { data } = await supabase.from('colaboradores').select('id').eq('user_id', user.id).maybeSingle();
+        if (data) {
+          setUserColabId(data.id);
+        } else {
+          // Si no tiene colaborador asignado, usamos un ID inexistente para que no vea nada
+          setUserColabId('not-found');
+        }
+      };
+      fetchColabId();
+    }
+  }, [canManageFinances, user?.id]);
 
   // Filtro de servidor para que usuarios no financieros solo vean sus gastos
   const serverFilters = useMemo(() => {
     const filters: Record<string, any> = {};
-    if (!canManageFinances && user?.id) {
-      filters['colaborador_id'] = user.id;
+    if (!canManageFinances) {
+      // Si aún no ha cargado el colabId, prevenimos que traiga todos
+      filters['colaborador_id'] = userColabId || 'pending-fetch';
     }
     return filters;
-  }, [canManageFinances, user?.id]);
+  }, [canManageFinances, userColabId]);
 
   const { data: expenseData, totalCount, loading, addRecord, updateRecord, deleteRecord } = useSupabaseData<GastoType>({
     tableName: 'gastos',
@@ -177,8 +197,6 @@ export default function Expenses() {
     { id: 'offline-2', name: 'BBVA Empresa' } as Cuenta,
     { id: 'offline-3', name: 'Cuenta Fidel' } as Cuenta
   ];
-
-  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<GastoType | null>(null);
@@ -368,51 +386,6 @@ export default function Expenses() {
       });
     }
     setIsDialogOpen(true);
-  };
-
-
-  const handleOpenRequestDialog = (req: any) => {
-    setEditingRequest(req);
-    setEditingExpense(null);
-    const payload = req.payload;
-    const parsedDate = payload.date ? parseISO(payload.date) : new Date();
-    let desc = payload.description || '';
-    
-    const isDj = desc.startsWith('[Declaración Jurada]');
-    if (isDj) desc = desc.replace('[Declaración Jurada]', '').trim();
-
-    const receiptMatch = desc.match(/\n\nComprobante: (https?:\/\/[^\s]+)/);
-    if (receiptMatch) {
-      desc = desc.replace(receiptMatch[0], '').trim();
-    }
-
-    form.reset({
-      amount: Math.abs(payload.amount),
-      account: payload.account || '',
-      date: parsedDate,
-      category: payload.category || '',
-      sub_category: payload.sub_category || null,
-      description: desc,
-      numero_gasto: payload.numero_gasto || null,
-      colaborador_id: payload.colaborador_id || null,
-      is_declaracion_jurada: isDj,
-      presupuesto_id: payload.presupuesto_id || null,
-    });
-    setReceiptFile(null);
-    setDateInput(format(parsedDate, 'dd/MM/yyyy'));
-    setIsDialogOpen(true);
-  };
-
-  const handleDeleteRequest = async (reqId: string) => {
-    try {
-      const { supabase } = await import('@/lib/supabaseClient');
-      const { error } = await supabase.from('approval_requests').delete().eq('id', reqId);
-      if (error) throw error;
-      toast.success('Solicitud eliminada');
-      setPendingRequests(prev => prev.filter(r => r.id !== reqId));
-    } catch (err: any) {
-      toast.error('Error al eliminar solicitud: ' + err.message);
-    }
   };
 
   const handleConfirmSubmit = async () => {
@@ -622,7 +595,7 @@ export default function Expenses() {
             <div className="flex flex-col gap-1 items-start">
               <span className="font-medium text-muted-foreground">{desc}</span>
               <div className="flex gap-2 items-center">
-                {isDj && <Badge variant="outline" className="w-fit text-[9px] bg-amber-50 text-amber-700 border-amber-200">Declaración Jurada</Badge>}
+                {isDj && <Badge variant="outline" className="w-fit text-[9px] bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">Declaración Jurada</Badge>}
                 {receiptUrl && (
                   <a href={receiptUrl} target="_blank" rel="noreferrer" className="text-[10px] flex items-center gap-1 text-corp-blue hover:underline bg-corp-blue/10 px-2 py-0.5 rounded-full font-bold">
                     <FileText className="w-3 h-3" /> Ver Comprobante
@@ -674,7 +647,7 @@ export default function Expenses() {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleDeleteClick(expense.id)}
-                className="h-8 w-8 p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
+                className="h-8 w-8 p-0 text-red-400 hover:text-red-600 hover:bg-red-50 dark:bg-red-500/10 dark:text-red-400"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -690,28 +663,26 @@ export default function Expenses() {
   const mobileData = expenseData.slice(0, mobileVisibleCount);
 
   return (
-    <div className="p-4 md:p-8 bg-[#F8FAFC] min-h-screen">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-red-500 rounded-2xl shadow-lg shadow-red-500/20">
-              <TrendingDown className="w-6 h-6 text-white" />
+    <div className="min-h-screen bg-background page-enter pb-10">
+      <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#4892CC]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <TrendingDown className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-black text-foreground tracking-tight uppercase">Gastos</h1>
+                <p className="text-muted-foreground font-medium mt-1">Registro y control de egresos.</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">
-                Gastos
-              </h1>
-              <p className="text-muted-foreground font-medium text-sm">
-                Registro y control de egresos
-              </p>
-            </div>
-          </div>
           <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="h-12 px-4 rounded-xl border-border text-muted-foreground font-bold shadow-sm hover:bg-muted/50 gap-2"
+                  className="h-11 px-4 rounded-xl border-border text-muted-foreground font-bold shadow-sm hover:bg-muted/50 gap-2"
                 >
                   <Download className="h-4 w-4" /> Exportar
                 </Button>
@@ -760,92 +731,35 @@ export default function Expenses() {
             {canAddExpense && (
               <Button 
                 onClick={() => handleOpenDialog()}
-                className="bg-corp-teal hover:bg-corp-dark text-white font-bold rounded-xl shadow-lg shadow-corp-teal/20 h-12 px-6"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl h-11 px-6 shadow-sm transition-all flex items-center gap-2"
               >
-                <PlusCircle className="mr-2 h-5 w-5" /> Nuevo Gasto
+                <PlusCircle className="h-5 w-5" /> Nuevo Gasto
               </Button>
             )}
           </div>
-        </header>
+        </div>
+      </div>
 
-        {!canManageFinances && pendingRequests.length > 0 && (
-          <Card className="border border-amber-200 bg-amber-50/50 shadow-sm rounded-3xl overflow-hidden mb-6">
-            <CardHeader className="border-b border-amber-100 bg-amber-100/50 p-4">
-              <CardTitle className="text-sm font-black uppercase text-amber-900 flex items-center gap-2">
-                <FileText className="w-4 h-4 text-amber-600" /> Mis Solicitudes Pendientes / Rechazadas
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="divide-y divide-amber-100">
-                {pendingRequests.map(req => (
-                  <div key={req.id} className="p-4 flex items-center justify-between hover:bg-amber-100/30 transition-colors">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-amber-900">{req.payload?.description || 'Sin descripción'}</span>
-                      <span className="text-xs text-amber-700/80 font-medium">
-                        {req.payload?.category} • {format(parseISO(req.created_at), 'dd/MM/yyyy')}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="font-black text-amber-900">
-                        {formatCurrency(req.payload?.amount || 0)}
-                      </span>
-                      {req.status === 'pending' ? (
-                        <Badge className="bg-amber-200 text-amber-800 border-none font-bold uppercase text-[10px]">Pendiente</Badge>
-                      ) : (
-                        <Badge className="bg-red-200 text-red-800 border-none font-bold uppercase text-[10px]">Rechazado</Badge>
-                      )}
-                      <div className="flex items-center gap-1 ml-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-corp-teal hover:text-corp-dark hover:bg-corp-teal/10 rounded-lg"
-                          onClick={() => handleOpenRequestDialog(req)}
-                          title="Editar Solicitud"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                          onClick={() => {
-                            if (window.confirm('¿Estás seguro de eliminar esta solicitud?')) {
-                              handleDeleteRequest(req.id);
-                            }
-                          }}
-                          title="Eliminar Solicitud"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+      <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-8">
 
-        <Card className="border-none shadow-xl shadow-slate-200/40 bg-card dark:bg-slate-900/50 backdrop-blur-xl rounded-3xl overflow-hidden">
-          <CardHeader className="border-b border-border/50 bg-card dark:bg-slate-900 p-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <CardTitle className="text-lg font-black uppercase text-foreground/90 flex items-center gap-2">
-                <Database className="w-5 h-5 text-corp-teal" /> Historial de Gastos
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
-                  <Input
-                    placeholder="Buscar gastos..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    className="pl-9 bg-muted/50 border-border focus:border-corp-teal focus:ring-corp-teal rounded-xl w-full md:w-64 h-10 font-medium"
-                  />
-                </div>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
+        <div className="bg-card dark:bg-slate-900 border border-border/50 rounded-2xl p-4 flex flex-col md:flex-row gap-4 shadow-sm items-center justify-between mb-6">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Database className="w-5 h-5 text-primary" />
+            <span className="font-bold uppercase tracking-wider text-sm">Historial de Gastos</span>
+          </div>
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/70" />
+            <Input
+              placeholder="Buscar gastos..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="pl-12 h-11 bg-muted/50 border-transparent rounded-xl focus:bg-background focus:ring-2 focus:ring-primary/20 text-foreground/80 font-medium placeholder:text-muted-foreground/70 w-full"
+            />
+          </div>
+        </div>
+
+        <Card className="rounded-2xl border border-border/50 shadow-sm bg-card dark:bg-slate-900 overflow-hidden">
+          <CardContent className="p-0">
             {!isMobile && (
               <div className="hidden md:block">
                 <DataTable
@@ -894,7 +808,7 @@ export default function Expenses() {
                       </p>
                       <div className="flex gap-2 items-center mt-1">
                         {(expense.description || '').startsWith('[Declaración Jurada]') && (
-                          <Badge variant="outline" className="w-fit text-[9px] bg-amber-50 text-amber-700 border-amber-200">Declaración Jurada</Badge>
+                          <Badge variant="outline" className="w-fit text-[9px] bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">Declaración Jurada</Badge>
                         )}
                         {(expense.description || '').match(/\n\nComprobante: (https?:\/\/[^\s]+)/) && (
                           <a href={(expense.description || '').match(/\n\nComprobante: (https?:\/\/[^\s]+)/)![1]} target="_blank" rel="noreferrer" className="text-[10px] flex items-center gap-1 text-corp-blue hover:underline bg-corp-blue/10 px-2 py-0.5 rounded-full font-bold w-fit">
@@ -935,7 +849,7 @@ export default function Expenses() {
                           <Button 
                             variant="outline" 
                             size="icon"
-                            className="h-10 w-10 rounded-xl border-red-100 text-red-500 hover:bg-red-50"
+                            className="h-10 w-10 rounded-xl border-red-100 text-red-500 hover:bg-red-50 dark:bg-red-500/10 dark:text-red-400"
                             onClick={() => handleDeleteClick(expense.id)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -1125,7 +1039,7 @@ export default function Expenses() {
                       </div>
                     </div>
                     {field.value && (
-                      <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                      <div className="p-3 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 rounded-lg border border-amber-200">
                         <p className="text-xs text-amber-800 leading-relaxed font-medium">
                           <strong>Advertencia:</strong> Al marcar esta opción, declaras bajo juramento que los fondos fueron utilizados estrictamente para los fines descritos y asumes total responsabilidad sobre la veracidad de este gasto ante cualquier auditoría.
                         </p>
@@ -1175,6 +1089,7 @@ export default function Expenses() {
         isConfirming={isDeletingExpense}
       />
     </div>
-  </div>
+    </div>
+    </div>
   );
 }

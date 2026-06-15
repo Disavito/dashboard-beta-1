@@ -105,12 +105,12 @@ const AuthPage: React.FC = () => {
               />
             </div>
             {error && (
-              <div className="p-3 bg-red-50 border border-red-100 rounded-xl animate-slide-up-fade">
+              <div className="p-3 bg-red-50 dark:bg-red-500/10 dark:text-red-400 border border-red-100 rounded-xl animate-slide-up-fade">
                 <p className="text-red-600 text-sm font-medium text-center">{error}</p>
               </div>
             )}
             {message && (
-              <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl animate-slide-up-fade">
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-100 rounded-xl animate-slide-up-fade">
                 <p className="text-emerald-600 text-sm font-medium text-center">{message}</p>
               </div>
             )}

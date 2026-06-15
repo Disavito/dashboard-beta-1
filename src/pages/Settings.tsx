@@ -37,22 +37,27 @@ const SettingsPage: React.FC = () => {
   const defaultTab = isAdminOrFinanzas ? 'horarios' : 'perfil';
 
   return (
-    <div className="p-4 md:p-8 bg-[#FFFFFF] min-h-screen max-w-5xl mx-auto space-y-8">
-      <header className="space-y-2">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-[#4892CC] rounded-2xl shadow-lg shadow-[#4892CC]/20">
-            <SettingsIcon className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">
-              Configuración
-            </h1>
-            <p className="text-muted-foreground font-medium text-sm">
-              Gestiona los parámetros del sistema
-            </p>
+    <div className="min-h-screen bg-background page-enter pb-10">
+      <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-primary/10 rounded-xl">
+              <SettingsIcon className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-black tracking-tight text-foreground uppercase">
+                Configuración
+              </h1>
+              <p className="text-muted-foreground font-medium mt-1">
+                Gestiona los parámetros del sistema
+              </p>
+            </div>
           </div>
         </div>
-      </header>
+      </div>
+
+      <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-8">
 
       <Tabs defaultValue={defaultTab} className="space-y-6">
         <TabsList className="bg-muted/50 p-1 rounded-2xl border border-border/50 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1 h-auto">
@@ -122,6 +127,7 @@ const SettingsPage: React.FC = () => {
           </TabsContent>
         )}
       </Tabs>
+      </div>
     </div>
   );
 };
@@ -223,7 +229,7 @@ const HorariosSection: React.FC<{ isAdmin?: boolean }> = ({ isAdmin }) => {
         ) : (
           <>
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="space-y-4 p-6 bg-emerald-50/50 rounded-2xl border border-emerald-100">
+              <div className="space-y-4 p-6 bg-emerald-50/50 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-2xl border border-emerald-100">
                 <h3 className="font-black text-emerald-800 uppercase text-sm tracking-tight">Ventana de Entrada</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -237,7 +243,7 @@ const HorariosSection: React.FC<{ isAdmin?: boolean }> = ({ isAdmin }) => {
                 </div>
               </div>
 
-              <div className="space-y-4 p-6 bg-red-50/50 rounded-2xl border border-red-100">
+              <div className="space-y-4 p-6 bg-red-50/50 dark:bg-red-500/10 dark:text-red-400 rounded-2xl border border-red-100">
                 <h3 className="font-black text-red-800 uppercase text-sm tracking-tight">Ventana de Salida</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -732,7 +738,7 @@ const PlantillasSection: React.FC = () => {
                   <h3 className="font-black text-foreground/90 uppercase text-sm tracking-tight flex items-center gap-2">
                     <FileText className="w-4 h-4 text-[#4892CC]" /> Ficha Técnica
                   </h3>
-                  <Badge variant={fichaTemplateId ? 'default' : 'outline'} className={fichaTemplateId ? 'bg-emerald-500 text-white' : 'text-muted-foreground/70 border-border'}>
+                  <Badge variant={fichaTemplateId ? 'default' : 'outline'} className={fichaTemplateId ? 'bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000 text-white' : 'text-muted-foreground/70 border-border'}>
                     {fichaTemplateId ? 'ACTIVO' : 'PENDIENTE'}
                   </Badge>
                 </div>
@@ -800,7 +806,7 @@ const PlantillasSection: React.FC = () => {
                   <h3 className="font-black text-foreground/90 uppercase text-sm tracking-tight flex items-center gap-2">
                     <FileText className="w-4 h-4 text-[#4892CC]" /> Contrato de Socio
                   </h3>
-                  <Badge variant={contratoTemplateId ? 'default' : 'outline'} className={contratoTemplateId ? 'bg-emerald-500 text-white' : 'text-muted-foreground/70 border-border'}>
+                  <Badge variant={contratoTemplateId ? 'default' : 'outline'} className={contratoTemplateId ? 'bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000 text-white' : 'text-muted-foreground/70 border-border'}>
                     {contratoTemplateId ? 'ACTIVO' : 'PENDIENTE'}
                   </Badge>
                 </div>

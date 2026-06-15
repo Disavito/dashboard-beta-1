@@ -16,12 +16,12 @@ export function formatCurrency(amount: number) {
  * Calcula el estado del socio basado en su última transacción
  */
 export function getSocioStatus(lastTransactionType: string | null, amount: number) {
-  if (!lastTransactionType) return { label: 'Activo', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' };
+  if (!lastTransactionType) return { label: 'Activo', color: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' };
   
   const type = lastTransactionType.toLowerCase();
   
   if (type.includes('devolución') || type.includes('retirado')) {
-    return { label: 'Retirado', color: 'bg-red-50 text-red-700 border-red-100' };
+    return { label: 'Retirado', color: 'bg-red-50 text-red-700 border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20' };
   }
   
   if (type.includes('anulación') || type.includes('anulado')) {
@@ -29,10 +29,10 @@ export function getSocioStatus(lastTransactionType: string | null, amount: numbe
   }
 
   if (amount > 0) {
-    return { label: 'Activo', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' };
+    return { label: 'Activo', color: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' };
   }
 
-  return { label: 'Activo', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' };
+  return { label: 'Activo', color: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' };
 }
 
 /**

@@ -337,19 +337,25 @@ const ReportesPage: React.FC = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 bg-[#FFFFFF] min-h-screen max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-[#4892CC] rounded-2xl shadow-lg shadow-[#4892CC]/20">
-            <BarChart3 className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">Reportes</h1>
-            <p className="text-muted-foreground font-medium text-sm">Analiza el rendimiento de tu organización</p>
+    <div className="min-h-screen bg-background page-enter pb-10">
+      <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#4892CC]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-[#4892CC] rounded-2xl shadow-lg shadow-[#4892CC]/20">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-black tracking-tight text-foreground uppercase">Reportes</h1>
+                <p className="text-muted-foreground font-medium mt-1">Analiza el rendimiento de tu organización.</p>
+              </div>
+            </div>
           </div>
         </div>
-      </header>
+      </div>
+
+      <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-8">
 
       {/* ── Barra de navegación de periodo ── */}
       <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-end p-5 bg-card dark:bg-slate-900 border border-border/50 rounded-2xl shadow-sm">
@@ -630,7 +636,7 @@ const ReportesPage: React.FC = () => {
                             <span className="text-xs font-black text-red-500 flex items-center gap-1">
                               <TrendingDown className="w-3 h-3" /> {formatCurrency(vals.gastos)}
                             </span>
-                            <Badge className={cn("text-[10px] font-black border-none px-2", vals.ingresos - vals.gastos >= 0 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600")}>
+                            <Badge className={cn("text-[10px] font-black border-none px-2", vals.ingresos - vals.gastos >= 0 ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400")}>
                               {formatCurrency(vals.ingresos - vals.gastos)}
                             </Badge>
                           </div>
@@ -784,8 +790,8 @@ const ReportesPage: React.FC = () => {
                             <td className="px-5 py-3">
                               {(r.justInicio || r.justFin) ? (
                                 <div className="flex gap-1">
-                                  {r.justInicio && <Badge className="bg-amber-50 text-amber-600 border-none text-[9px] px-1.5">E: {r.justInicio}</Badge>}
-                                  {r.justFin && <Badge className="bg-red-50 text-red-600 border-none text-[9px] px-1.5">S: {r.justFin}</Badge>}
+                                  {r.justInicio && <Badge className="bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 border-none text-[9px] px-1.5">E: {r.justInicio}</Badge>}
+                                  {r.justFin && <Badge className="bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 border-none text-[9px] px-1.5">S: {r.justFin}</Badge>}
                                 </div>
                               ) : <span className="text-slate-300 text-xs">—</span>}
                             </td>
@@ -881,7 +887,7 @@ const ReportesPage: React.FC = () => {
                                 <td className="px-5 py-3">
                                   <div className="flex items-center gap-2">
                                     <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden w-24">
-                                      <div className={cn("h-full rounded-full transition-all", pct === 100 ? "bg-emerald-500" : "bg-[#4892CC]")} style={{ width: `${pct}%` }} />
+                                      <div className={cn("h-full rounded-full transition-all", pct === 100 ? "bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000" : "bg-[#4892CC]")} style={{ width: `${pct}%` }} />
                                     </div>
                                     <span className="text-[10px] font-black text-muted-foreground">{pct.toFixed(0)}%</span>
                                   </div>
@@ -942,7 +948,7 @@ const ReportesPage: React.FC = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                        {/* Morosidad Alerta */}
                        <Card className="rounded-2xl border border-red-100 shadow-sm overflow-hidden">
-                         <CardHeader className="p-5 border-b border-red-50 bg-red-50/30">
+                         <CardHeader className="p-5 border-b border-red-50 bg-red-50/30 dark:bg-red-500/10 dark:text-red-400">
                            <CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2 text-red-800">
                              <AlertTriangle className="w-4 h-4 text-red-500" /> Alerta de Morosidad (Críticos)
                            </CardTitle>
@@ -998,6 +1004,7 @@ const ReportesPage: React.FC = () => {
           )}
         </Tabs>
       )}
+    </div>
     </div>
   );
 };

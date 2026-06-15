@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 import {
   Loader2, Package, Plus, ArrowDownToLine, ArrowUpFromLine,
   History, Box, Trash2, UserCheck, ClipboardList,
-  Download, FileSpreadsheet, FileText
+  Download, FileSpreadsheet, FileText, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -25,6 +25,9 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+} from '@/components/ui/table';
+import {
   fetchInventoryItems, fetchAssignments, fetchActiveAssignments,
   fetchColaboradores, addInventoryItem, checkoutEquipment,
   returnEquipment, returnAllByColaborador, deleteInventoryItem,
@@ -35,13 +38,6 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useUser } from '@/context/UserContext';
 import { cn } from '@/lib/utils';
-// AG Grid Imports (Lazy Loaded)
-const AgGridReact = lazy(() => import('ag-grid-react').then(async mod => {
-  await import('ag-grid-community/styles/ag-grid.css');
-  await import('ag-grid-community/styles/ag-theme-alpine.css');
-  return { default: mod.AgGridReact };
-}));
-
 // ── Tipo local para el formulario de salida multi-ítem ──
 interface CheckoutRow {
   item_id: string;
@@ -81,6 +77,15 @@ export default function InventoryPage() {
   // Return All Modal
   const [isReturnAllOpen, setIsReturnAllOpen] = useState(false);
   const [returnAllColabId, setReturnAllColabId] = useState('');
+
+  // Pagination for History
+  const [historyPage, setHistoryPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+  const paginatedHistory = useMemo(() => {
+    const start = (historyPage - 1) * ITEMS_PER_PAGE;
+    return allAssignments.slice(start, start + ITEMS_PER_PAGE);
+  }, [allAssignments, historyPage]);
+  const totalHistoryPages = Math.ceil(allAssignments.length / ITEMS_PER_PAGE);
 
   // ── Data Loading ──────────────────────────────────────
   const loadData = useCallback(async (showSpinner = false) => {
@@ -342,8 +347,8 @@ export default function InventoryPage() {
       filter: true,
       cellRenderer: (params: any) => {
         return params.value === 'Devuelto' 
-          ? '<span class="text-green-600 font-bold border border-green-200 bg-green-50 px-2 py-1 rounded-full text-xs">Devuelto</span>'
-          : '<span class="text-amber-600 font-bold border border-amber-200 bg-amber-50 px-2 py-1 rounded-full text-xs">En Uso</span>';
+          ? <span className="text-emerald-600 font-black border border-emerald-200 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 px-2.5 py-1 rounded-lg text-[9px] uppercase tracking-widest">Devuelto</span>
+          : <span className="text-amber-600 font-black border border-amber-200 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20 px-2.5 py-1 rounded-lg text-[9px] uppercase tracking-widest">En Uso</span>;
       }
     }
   ], []);
@@ -352,7 +357,7 @@ export default function InventoryPage() {
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-[#4892CC]" />
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
@@ -361,22 +366,26 @@ export default function InventoryPage() {
   const ingenierosEnCampo = Object.keys(activeByColab).length;
 
   return (
-    <div className="p-6 md:p-8 pb-20 max-w-7xl mx-auto">
-      {/* ── Header ──────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3">
-            <Package className="w-8 h-8 text-[#4892CC]" />
-            Inventario de Campo
-          </h1>
-          <p className="text-muted-foreground mt-1 font-medium">
-            Registro de entrada y salida de equipos para ingenieros en salidas a campo.
-          </p>
-        </div>
+    <div className="min-h-screen bg-background page-enter pb-10">
+      <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <Package className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-black text-foreground tracking-tight uppercase">Inventario de Campo</h1>
+                <p className="text-muted-foreground font-medium mt-1">
+                  Registro de entrada y salida de equipos para ingenieros en salidas a campo.
+                </p>
+              </div>
+            </div>
         <div className="flex flex-wrap gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="rounded-xl border-border shadow-sm gap-2">
+              <Button variant="outline" className="h-11 px-4 rounded-xl border-border text-muted-foreground font-bold shadow-sm hover:bg-muted/50 gap-2">
                 <Download className="w-4 h-4" /> Exportar
               </Button>
             </DropdownMenuTrigger>
@@ -419,20 +428,23 @@ export default function InventoryPage() {
           </DropdownMenu>
           {canEdit && (
             <>
-              <Button onClick={() => setIsAddItemOpen(true)} variant="outline" className="rounded-xl border-border shadow-sm">
-                <Plus className="w-4 h-4 mr-2" /> Nuevo Equipo
+              <Button onClick={() => setIsAddItemOpen(true)} variant="outline" className="h-11 px-4 rounded-xl border-border shadow-sm text-muted-foreground font-bold hover:bg-muted/50 gap-2">
+                <Plus className="w-4 h-4" /> Nuevo Equipo
               </Button>
-              <Button onClick={() => setIsReturnAllOpen(true)} variant="outline" className="rounded-xl border-border shadow-sm">
-                <ArrowDownToLine className="w-4 h-4 mr-2" /> Recepción Total
+              <Button onClick={() => setIsReturnAllOpen(true)} variant="outline" className="h-11 px-4 rounded-xl border-border shadow-sm text-muted-foreground font-bold hover:bg-muted/50 gap-2">
+                <ArrowDownToLine className="w-4 h-4" /> Recepción Total
               </Button>
-              <Button onClick={() => setIsCheckoutOpen(true)} className="bg-[#4892CC] hover:bg-[#8b6ae5] text-white rounded-xl shadow-glass">
-                <ArrowUpFromLine className="w-4 h-4 mr-2" /> Registrar Salida
+              <Button onClick={() => setIsCheckoutOpen(true)} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl h-11 px-6 shadow-sm transition-all flex items-center gap-2">
+                <ArrowUpFromLine className="w-4 h-4" /> Registrar Salida
               </Button>
             </>
           )}
+          </div>
         </div>
       </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-8">
       {/* ── Stats rápidos ───────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card className="rounded-2xl border-border/50 shadow-glass">
@@ -455,7 +467,7 @@ export default function InventoryPage() {
         </Card>
         <Card className="rounded-2xl border-border/50 shadow-glass">
           <CardContent className="p-5 text-center">
-            <p className="text-3xl font-black text-[#4892CC]">{ingenierosEnCampo}</p>
+            <p className="text-3xl font-black text-primary">{ingenierosEnCampo}</p>
             <p className="text-xs font-bold text-muted-foreground/70 uppercase mt-1">Ingenieros en Campo</p>
           </CardContent>
         </Card>
@@ -464,13 +476,13 @@ export default function InventoryPage() {
       {/* ── Tabs ────────────────────────────────────── */}
       <Tabs defaultValue="active" className="w-full">
         <TabsList className="bg-card dark:bg-slate-900/80 backdrop-blur-md border border-border p-1.5 rounded-2xl h-14 shadow-sm mb-6 flex overflow-x-auto max-w-full scrollbar-none shrink-0 justify-start sm:justify-center">
-          <TabsTrigger value="active" className="rounded-xl px-6 data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-bold text-muted-foreground transition-all">
+          <TabsTrigger value="active" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-muted-foreground transition-all">
             <UserCheck className="w-4 h-4 mr-2" /> Equipos en Campo
           </TabsTrigger>
-          <TabsTrigger value="catalog" className="rounded-xl px-6 data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-bold text-muted-foreground transition-all">
+          <TabsTrigger value="catalog" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-muted-foreground transition-all">
             <Box className="w-4 h-4 mr-2" /> Catálogo
           </TabsTrigger>
-          <TabsTrigger value="history" className="rounded-xl px-6 data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-bold text-muted-foreground transition-all">
+          <TabsTrigger value="history" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-muted-foreground transition-all">
             <History className="w-4 h-4 mr-2" /> Historial
           </TabsTrigger>
         </TabsList>
@@ -489,11 +501,11 @@ export default function InventoryPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {Object.entries(activeByColab).map(([colabId, { name, items: colabItems }]) => (
                 <Card key={colabId} className="rounded-2xl border border-border/50 shadow-glass overflow-hidden">
-                  <CardHeader className="pb-3 bg-gradient-to-r from-slate-50 to-sky-50/30 border-b border-border/50">
+                  <CardHeader className="pb-3 bg-gradient-to-r from-slate-50 to-sky-50/30 dark:from-slate-800/80 dark:to-slate-900/50 border-b border-border/50">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base font-black text-foreground/90 flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-[#4892CC]/10 flex items-center justify-center">
-                          <UserCheck className="w-4 h-4 text-[#4892CC]" />
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <UserCheck className="w-4 h-4 text-primary" />
                         </div>
                         {name}
                       </CardTitle>
@@ -542,12 +554,12 @@ export default function InventoryPage() {
                   {canEdit && (
                     <button
                       onClick={() => handleDeleteItem(item)}
-                      className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500"
+                      className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-red-50 dark:bg-red-500/10 dark:text-red-400 text-slate-300 hover:text-red-500"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}
-                  <CardHeader className="pb-3 border-b border-gray-50 bg-muted/50/50">
+                  <CardHeader className="pb-3 border-b border-border/50 bg-muted/50/50">
                     <CardTitle className="text-base font-bold text-foreground/90">{item.name}</CardTitle>
                     {item.description && <CardDescription className="line-clamp-1 text-xs">{item.description}</CardDescription>}
                   </CardHeader>
@@ -572,7 +584,7 @@ export default function InventoryPage() {
                     </div>
                     {/* Barra de progreso */}
                     <div className="w-full bg-muted rounded-full h-2">
-                       <div className="h-2 rounded-full bg-gradient-to-r from-[#4892CC] to-[#3C9384] transition-all" style={{ width: `${pct}%` }} />
+                       <div className="h-2 rounded-full bg-gradient-to-r from-primary to-[#3C9384] transition-all" style={{ width: `${pct}%` }} />
                     </div>
                   </CardContent>
                 </Card>
@@ -592,23 +604,92 @@ export default function InventoryPage() {
 
         {/* ── TAB: Historial ───────────────────────── */}
         <TabsContent value="history" className="mt-4">
-          {/* Vista Desktop: AG Grid */}
-          <Card className="hidden md:block rounded-2xl border border-border/50 shadow-glass overflow-hidden h-[500px]">
-             <div className="ag-theme-alpine w-full h-full">
-              <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-[#4892CC]" /></div>}>
-                <AgGridReact
-                  rowData={allAssignments}
-                  columnDefs={historyColumnDefs}
-                  pagination={true}
-                  paginationPageSize={10}
-                  domLayout="normal"
-                  defaultColDef={{
-                    sortable: true,
-                    resizable: true,
-                  }}
-                  overlayNoRowsTemplate="Aún no hay movimientos de inventario registrados."
-                />
-              </Suspense>
+          {/* Vista Desktop: Tabla Golden UI */}
+          <Card className="hidden md:block rounded-2xl border border-border/50 shadow-premium overflow-hidden">
+             <div className="w-full">
+              <Table>
+                <TableHeader className="bg-muted/50/50">
+                  <TableRow className="border-border/50">
+                    <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground">Equipo</TableHead>
+                    <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground">Ingeniero</TableHead>
+                    <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground text-center">Cant.</TableHead>
+                    <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground">Salida</TableHead>
+                    <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground">Retorno</TableHead>
+                    <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground">Estado</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedHistory.length > 0 ? (
+                    paginatedHistory.map(item => {
+                      const colab = item.colaboradores;
+                      const colabName = colab ? `${colab.name} ${colab.apellidos || ''}`.trim() : '—';
+                      return (
+                        <TableRow key={item.id} className="hover:bg-muted/50/50 transition-colors border-border/50">
+                          <TableCell className="font-bold text-sm">{item.inventory_items?.name || '—'}</TableCell>
+                          <TableCell className="font-medium text-xs text-muted-foreground">{colabName}</TableCell>
+                          <TableCell className="text-center font-mono font-bold text-xs">{item.quantity}</TableCell>
+                          <TableCell className="text-xs text-muted-foreground font-medium">
+                            {item.assigned_at ? format(new Date(item.assigned_at), "d MMM yy, HH:mm", { locale: es }) : '—'}
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground font-medium">
+                            {item.status === 'Devuelto' && item.returned_at ? format(new Date(item.returned_at), "d MMM yy, HH:mm", { locale: es }) : '—'}
+                          </TableCell>
+                          <TableCell>
+                            {item.status === 'Devuelto' ? (
+                              <span className="text-emerald-600 font-black border border-emerald-200 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 px-2.5 py-1 rounded-lg text-[9px] uppercase tracking-widest">
+                                Devuelto
+                              </span>
+                            ) : (
+                              <span className="text-amber-600 font-black border border-amber-200 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20 px-2.5 py-1 rounded-lg text-[9px] uppercase tracking-widest">
+                                En Uso
+                              </span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                        <div className="flex flex-col items-center justify-center">
+                          <ClipboardList className="h-8 w-8 mb-2 opacity-20" />
+                          <span className="text-xs font-bold uppercase tracking-widest opacity-50">Aún no hay movimientos de inventario registrados</span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+              {totalHistoryPages > 1 && (
+                <div className="p-4 border-t border-border/50 flex items-center justify-between bg-muted/20">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Mostrando {((historyPage - 1) * ITEMS_PER_PAGE) + 1} a {Math.min(historyPage * ITEMS_PER_PAGE, allAssignments.length)} de {allAssignments.length}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8 rounded-lg" 
+                      onClick={() => setHistoryPage(p => Math.max(1, p - 1))}
+                      disabled={historyPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="text-xs font-bold px-2">
+                      {historyPage} / {totalHistoryPages}
+                    </span>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8 rounded-lg" 
+                      onClick={() => setHistoryPage(p => Math.min(totalHistoryPages, p + 1))}
+                      disabled={historyPage === totalHistoryPages}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
 
@@ -679,22 +760,22 @@ export default function InventoryPage() {
             <div className="space-y-2">
               <label className="text-sm font-bold text-foreground/80">Nombre</label>
               <Input placeholder="Ej. Casco de Seguridad" value={newName} onChange={e => setNewName(e.target.value)}
-                className="rounded-xl bg-muted/50 border-border focus-visible:ring-[#4892CC]" />
+                className="rounded-xl bg-muted/50 border-border focus-visible:ring-primary" />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold text-foreground/80">Descripción (Opcional)</label>
               <Input placeholder="Color, talla, marca..." value={newDesc} onChange={e => setNewDesc(e.target.value)}
-                className="rounded-xl bg-muted/50 border-border focus-visible:ring-[#4892CC]" />
+                className="rounded-xl bg-muted/50 border-border focus-visible:ring-primary" />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold text-foreground/80">Stock Inicial</label>
               <Input type="number" min="1" value={newQty} onChange={e => setNewQty(e.target.value)}
-                className="rounded-xl bg-muted/50 border-border focus-visible:ring-[#4892CC]" />
+                className="rounded-xl bg-muted/50 border-border focus-visible:ring-primary" />
             </div>
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setIsAddItemOpen(false)} className="rounded-xl">Cancelar</Button>
-            <Button onClick={handleAddItem} disabled={saving} className="bg-[#4892CC] hover:bg-[#8b6ae5] text-white rounded-xl">
+            <Button onClick={handleAddItem} disabled={saving} className="bg-primary hover:bg-primary/90 text-white rounded-xl">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar'}
             </Button>
           </DialogFooter>
@@ -713,7 +794,7 @@ export default function InventoryPage() {
             <div className="space-y-2">
               <label className="text-sm font-bold text-foreground/80">Ingeniero / Colaborador</label>
               <Select onValueChange={setCheckoutColabId} value={checkoutColabId}>
-                <SelectTrigger className="rounded-xl bg-muted/50 border-border focus:ring-[#4892CC]">
+                <SelectTrigger className="rounded-xl bg-muted/50 border-border focus:ring-primary">
                   <SelectValue placeholder="¿Quién sale a campo?" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl max-h-60">
@@ -730,7 +811,7 @@ export default function InventoryPage() {
               {checkoutRows.map((row, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <Select onValueChange={v => updateCheckoutRow(index, 'item_id', v)} value={row.item_id}>
-                    <SelectTrigger className="rounded-xl bg-muted/50 border-border focus:ring-[#4892CC] flex-1">
+                    <SelectTrigger className="rounded-xl bg-muted/50 border-border focus:ring-primary flex-1">
                       <SelectValue placeholder="Seleccionar equipo" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -744,7 +825,7 @@ export default function InventoryPage() {
                   <Input
                     type="number" min="1" value={row.quantity}
                     onChange={e => updateCheckoutRow(index, 'quantity', parseInt(e.target.value) || 1)}
-                    className="w-20 rounded-xl bg-muted/50 border-border focus-visible:ring-[#4892CC] text-center"
+                    className="w-20 rounded-xl bg-muted/50 border-border focus-visible:ring-primary text-center"
                   />
                   {checkoutRows.length > 1 && (
                     <Button size="icon" variant="ghost" onClick={() => removeCheckoutRow(index)} className="h-9 w-9 text-muted-foreground/70 hover:text-red-500">
@@ -763,12 +844,12 @@ export default function InventoryPage() {
               <label className="text-sm font-bold text-foreground/80">Observaciones (Opcional)</label>
               <Input placeholder="Ej. Salida a Zona Norte, proyecto ABC..." value={checkoutNotes}
                 onChange={e => setCheckoutNotes(e.target.value)}
-                className="rounded-xl bg-muted/50 border-border focus-visible:ring-[#4892CC]" />
+                className="rounded-xl bg-muted/50 border-border focus-visible:ring-primary" />
             </div>
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setIsCheckoutOpen(false)} className="rounded-xl">Cancelar</Button>
-            <Button onClick={handleCheckout} disabled={saving} className="bg-[#4892CC] hover:bg-[#8b6ae5] text-white rounded-xl">
+            <Button onClick={handleCheckout} disabled={saving} className="bg-primary hover:bg-primary/90 text-white rounded-xl">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirmar Salida'}
             </Button>
           </DialogFooter>
@@ -786,7 +867,7 @@ export default function InventoryPage() {
             <div className="space-y-2">
               <label className="text-sm font-bold text-foreground/80">Ingeniero que regresa</label>
               <Select onValueChange={setReturnAllColabId} value={returnAllColabId}>
-                <SelectTrigger className="rounded-xl bg-muted/50 border-border focus:ring-[#4892CC]">
+                <SelectTrigger className="rounded-xl bg-muted/50 border-border focus:ring-primary">
                   <SelectValue placeholder="Seleccionar colaborador" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl max-h-60">
@@ -818,6 +899,7 @@ export default function InventoryPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
     </div>
   );
 }

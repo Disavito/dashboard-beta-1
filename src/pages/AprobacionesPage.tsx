@@ -184,7 +184,7 @@ export default function AprobacionesPage() {
             <div><span className="text-muted-foreground block text-xs uppercase font-bold">Categoría</span><span className="font-medium">{payload.category} - {payload.sub_category}</span></div>
             <div className="col-span-2"><span className="text-muted-foreground block text-xs uppercase font-bold">Descripción</span><span className="text-foreground/80">{desc}</span></div>
             {payload.presupuesto_id && (
-              <div className="col-span-2 bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 text-xs">
+              <div className="col-span-2 bg-blue-50/50 dark:bg-blue-500/10 dark:text-blue-400 p-2.5 rounded-xl border border-blue-100 text-xs">
                 <span className="font-bold text-[#4892CC] block">Vinculado a Presupuesto Operativo:</span>
                 <span className="font-semibold text-foreground/80">{getBudgetMotivo(payload.presupuesto_id)}</span>
               </div>
@@ -196,7 +196,7 @@ export default function AprobacionesPage() {
     
     if (request.request_type.startsWith('delete_')) {
       return (
-        <div className="mt-4 p-4 bg-red-50/50 rounded-xl space-y-2 border border-red-100">
+        <div className="mt-4 p-4 bg-red-50/50 dark:bg-red-500/10 dark:text-red-400 rounded-xl space-y-2 border border-red-100">
           <div className="flex items-center gap-2 text-red-600 font-bold mb-2">
             <Trash2 className="w-4 h-4" /> Eliminación de Registro
           </div>
@@ -212,22 +212,36 @@ export default function AprobacionesPage() {
   if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando solicitudes...</div>;
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-12">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground">
-            {isAdminOrFinanzas ? 'Aprobaciones Pendientes' : 'Estado de mis Solicitudes'}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {isAdminOrFinanzas 
-              ? 'Gestiona solicitudes de eliminación y gastos elevados del equipo.' 
-              : 'Consulta el estado de tus solicitudes de gastos y eliminaciones de archivos.'}
-          </p>
+    <div className="min-h-screen bg-background page-enter pb-10">
+      <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <Check className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-black text-foreground tracking-tight uppercase">
+                  {isAdminOrFinanzas ? 'Aprobaciones Pendientes' : 'Estado de mis Solicitudes'}
+                </h1>
+                <p className="text-muted-foreground font-medium mt-1">
+                  {isAdminOrFinanzas 
+                    ? 'Gestiona solicitudes de eliminación y gastos elevados del equipo.' 
+                    : 'Consulta el estado de tus solicitudes de gastos y eliminaciones de archivos.'}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Badge className="bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20 px-4 py-2 text-sm font-bold uppercase rounded-xl">
+                {pendingRequests.length} pendientes
+              </Badge>
+            </div>
+          </div>
         </div>
-        <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 px-4 py-1 text-sm font-bold">
-          {pendingRequests.length} pendientes
-        </Badge>
       </div>
+
+      <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-8">
 
       {!canApprove && isAdminOrFinanzas && (
         <div className="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-xl text-sm font-medium">
@@ -247,8 +261,8 @@ export default function AprobacionesPage() {
             <Card key={request.id} className="rounded-2xl border border-border/50 shadow-premium overflow-hidden">
               <div className="flex items-start justify-between p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#4892CC]/10 flex items-center justify-center flex-shrink-0">
-                    <FileText className="w-6 h-6 text-[#4892CC]" />
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <FileText className="w-6 h-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-foreground">
@@ -313,9 +327,9 @@ export default function AprobacionesPage() {
                       <td className="px-6 py-4 text-muted-foreground">{format(parseISO(h.created_at), 'dd MMM yyyy', { locale: es })}</td>
                       <td className="px-6 py-4">
                         {h.status === 'approved' ? (
-                          <Badge className="bg-emerald-50 text-emerald-600 border-none">Aprobado</Badge>
+                          <Badge className="bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border-none">Aprobado</Badge>
                         ) : (
-                          <Badge className="bg-red-50 text-red-600 border-none">Rechazado</Badge>
+                          <Badge className="bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 border-none">Rechazado</Badge>
                         )}
                       </td>
                       <td className="px-6 py-4 text-muted-foreground">{h.reviewed_by ? getColaboradorName(h.reviewed_by) : '-'}</td>
@@ -327,6 +341,7 @@ export default function AprobacionesPage() {
           </Card>
         </div>
       )}
+    </div>
     </div>
   );
 }

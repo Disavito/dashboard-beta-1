@@ -95,15 +95,15 @@ function computeDiff(oldData: Record<string, unknown> | null, newData: Record<st
 
 // ─── Action color maps ───────────────────────────────────────
 const ACTION_DOT_COLORS: Record<string, string> = {
-  INSERT: 'bg-emerald-500 shadow-emerald-500/40',
+  INSERT: 'bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000 shadow-emerald-500/40',
   UPDATE: 'bg-corp-blue shadow-corp-blue/40',
-  DELETE: 'bg-red-500 shadow-red-500/40',
+  DELETE: 'bg-red-50 dark:bg-red-500/10 dark:text-red-4000 shadow-red-500/40',
 };
 
 const ACTION_ICON_BG: Record<string, string> = {
-  INSERT: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400',
-  UPDATE: 'bg-blue-50 text-corp-blue dark:bg-blue-500/10 dark:text-blue-400',
-  DELETE: 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400',
+  INSERT: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 dark:bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000/10 dark:text-emerald-400',
+  UPDATE: 'bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400 text-corp-blue dark:bg-blue-50 dark:bg-blue-500/10 dark:text-blue-4000/10 dark:text-blue-400',
+  DELETE: 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 dark:bg-red-50 dark:bg-red-500/10 dark:text-red-4000/10 dark:text-red-400',
 };
 
 const ACTION_ICONS: Record<string, typeof Plus> = {
@@ -175,9 +175,9 @@ function TimelineEntry({ log, index }: { log: AuditLog; index: number }) {
             {/* Expand chevron */}
             <div className="flex items-center gap-2 flex-shrink-0">
               <Badge className={`text-[10px] font-bold px-2 py-0.5 border-none ${
-                actionUpper === 'INSERT' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400' :
-                actionUpper === 'UPDATE' ? 'bg-blue-100 text-corp-blue dark:bg-blue-500/15 dark:text-blue-400' :
-                actionUpper === 'DELETE' ? 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400' :
+                actionUpper === 'INSERT' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000/15 dark:text-emerald-400' :
+                actionUpper === 'UPDATE' ? 'bg-blue-100 text-corp-blue dark:bg-blue-50 dark:bg-blue-500/10 dark:text-blue-4000/15 dark:text-blue-400' :
+                actionUpper === 'DELETE' ? 'bg-red-100 text-red-700 dark:bg-red-50 dark:bg-red-500/10 dark:text-red-4000/15 dark:text-red-400' :
                 'bg-muted text-foreground/80'
               }`}>
                 {log.table_name}
@@ -209,10 +209,10 @@ function TimelineEntry({ log, index }: { log: AuditLog; index: number }) {
                         {diffs.map(diff => (
                           <tr key={diff.key} className="border-t border-border/50 dark:border-slate-700/50 hover:bg-muted/50/50 dark:hover:bg-slate-800/40 transition-colors">
                             <td className="px-3 py-2.5 font-bold text-foreground/80 dark:text-slate-300 whitespace-nowrap">{prettyKey(diff.key)}</td>
-                            <td className="px-3 py-2.5 font-mono text-[11px] text-red-500 dark:text-red-400 bg-red-50/40 dark:bg-red-500/5 break-all">
+                            <td className="px-3 py-2.5 font-mono text-[11px] text-red-500 dark:text-red-400 bg-red-50/40 dark:bg-red-500/10 dark:text-red-400 dark:bg-red-50 dark:bg-red-500/10 dark:text-red-4000/5 break-all">
                               <span className="line-through opacity-70">{formatValue(diff.oldVal)}</span>
                             </td>
-                            <td className="px-3 py-2.5 font-mono text-[11px] text-emerald-600 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-500/5 break-all">
+                            <td className="px-3 py-2.5 font-mono text-[11px] text-emerald-600 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-500/10 dark:text-emerald-400 dark:bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000/5 break-all">
                               {formatValue(diff.newVal)}
                             </td>
                           </tr>
@@ -367,7 +367,7 @@ export default function AuditPage() {
   ];
 
   return (
-    <div className="pb-20 bg-[#FAFBFC] dark:bg-background min-h-screen page-enter">
+    <div className="pb-20 bg-background dark:bg-background min-h-screen page-enter">
       {/* HEADER */}
       <header className="relative h-auto py-8 md:h-64 flex items-center overflow-hidden bg-card dark:bg-slate-900 dark:bg-card border-b border-border/50/60 dark:border-border">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/[0.03] via-transparent to-slate-900/[0.02] z-0"></div>
@@ -489,7 +489,7 @@ export default function AuditPage() {
 
       {/* MODAL DETAIL */}
       <Dialog open={!!selectedLog} onOpenChange={(open) => !open && setSelectedLog(null)}>
-        <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden bg-[#FAFBFC] dark:bg-card border-border dark:border-border rounded-3xl">
+        <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden bg-background dark:bg-card border-border dark:border-border rounded-3xl">
           <div className="p-6 bg-card dark:bg-slate-900 dark:bg-card border-b border-border/50 dark:border-border flex items-center justify-between">
             <div>
               <DialogTitle className="text-xl font-black text-foreground dark:text-foreground flex items-center gap-2">
@@ -523,7 +523,7 @@ export default function AuditPage() {
                 {/* OLD DATA */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-red-50 dark:bg-red-500/10 dark:text-red-4000"></span>
                     <h4 className="font-black text-sm text-foreground/90 dark:text-slate-200 uppercase tracking-wide">Datos Anteriores</h4>
                   </div>
                   <div className="bg-slate-900 rounded-2xl p-4 overflow-auto max-h-[300px] border border-slate-800 shadow-inner">
@@ -542,7 +542,7 @@ export default function AuditPage() {
                 {/* NEW DATA */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000"></span>
                     <h4 className="font-black text-sm text-foreground/90 dark:text-slate-200 uppercase tracking-wide">Datos Nuevos</h4>
                   </div>
                   <div className="bg-slate-900 rounded-2xl p-4 overflow-auto max-h-[300px] border border-slate-800 shadow-inner">

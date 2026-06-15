@@ -109,7 +109,7 @@ const AccountDetails: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFBFC] page-enter flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-background page-enter flex flex-col items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-[#4892CC]" />
         <p className="text-muted-foreground mt-4 font-medium">Cargando detalles de la cuenta...</p>
       </div>
@@ -118,8 +118,8 @@ const AccountDetails: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#FAFBFC] page-enter flex items-center justify-center">
-        <div className="text-center p-8 bg-red-50 rounded-2xl border border-red-100 max-w-md">
+      <div className="min-h-screen bg-background page-enter flex items-center justify-center">
+        <div className="text-center p-8 bg-red-50 dark:bg-red-500/10 dark:text-red-400 rounded-2xl border border-red-100 max-w-md">
           <p className="text-red-600 font-bold text-lg">Error al cargar los detalles de la cuenta.</p>
           <p className="text-red-400 mt-2 text-sm">Por favor, inténtalo de nuevo o contacta soporte.</p>
         </div>
@@ -129,7 +129,7 @@ const AccountDetails: React.FC = () => {
 
   if (!account) {
     return (
-      <div className="min-h-screen bg-[#FAFBFC] page-enter flex items-center justify-center">
+      <div className="min-h-screen bg-background page-enter flex items-center justify-center">
         <p className="text-muted-foreground font-bold">No se encontró la cuenta.</p>
       </div>
     );

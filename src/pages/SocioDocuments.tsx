@@ -261,7 +261,7 @@ function SocioDocuments() {
           <TabsTrigger value="expedientes" className="data-[state=active]:bg-[#4892CC] data-[state=active]:text-white font-semibold px-6">
             EXPEDIENTES
           </TabsTrigger>
-          <TabsTrigger value="solicitudes" className="data-[state=active]:bg-red-500 data-[state=active]:text-white font-semibold px-6 flex gap-2">
+          <TabsTrigger value="solicitudes" className="data-[state=active]:bg-red-50 dark:bg-red-500/10 dark:text-red-4000 data-[state=active]:text-white font-semibold px-6 flex gap-2">
             <Trash2 className="w-4 h-4" />
             SOLICITUDES DE ELIMINACIÓN
           </TabsTrigger>

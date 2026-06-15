@@ -12,7 +12,7 @@ export function useNavigationAccess() {
     if (isAdmin) return true;
 
     // Rutas públicas básicas para cualquier usuario autenticado
-    const openPaths = ['/dashboard', '/reportes', '/jornada', '/inventory', '/presupuestos', '/ayuda'];
+    const openPaths = ['/dashboard', '/reportes', '/jornada', '/inventory', '/presupuestos', '/ayuda', '/expenses', '/aprobaciones'];
     if (openPaths.includes(path)) return true;
 
     // Validación especial para Auditoría

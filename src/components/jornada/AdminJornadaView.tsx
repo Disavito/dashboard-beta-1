@@ -106,7 +106,7 @@ const AdminJornadaView: React.FC = () => {
             <label className="text-[10px] font-black uppercase text-muted-foreground/70 tracking-widest ml-1">Colaborador</label>
             <Select value={selectedColaboradorId} onValueChange={setSelectedColaboradorId} disabled={isLoadingColaboradores}>
               <SelectTrigger className="h-12 rounded-xl border-border/50 bg-muted/50 font-bold">
-                <Users className="mr-2 h-4 w-4 text-[#4892CC]" />
+                <Users className="mr-2 h-4 w-4 text-primary" />
                 <SelectValue placeholder="Seleccionar colaborador" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -123,7 +123,7 @@ const AdminJornadaView: React.FC = () => {
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant={"outline"} className={cn("w-full h-12 justify-start text-left font-bold rounded-xl border-border/50 bg-muted/50")}>
-                  <CalendarIcon className="mr-2 h-4 w-4 text-[#4892CC]" />
+                  <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
                   <span>{renderDateRange()}</span>
                 </Button>
               </PopoverTrigger>
@@ -156,7 +156,7 @@ const AdminJornadaView: React.FC = () => {
 
         {/* Tabla de Registros */}
         <div className="border border-border/50 shadow-premium rounded-2xl overflow-hidden bg-card dark:bg-slate-900">
-          <div className="p-6 border-b border-gray-50 flex items-center justify-between">
+          <div className="p-6 border-b border-border/50 flex items-center justify-between">
             <h3 className="text-lg font-black uppercase tracking-tight">Detalle de Asistencia</h3>
             <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground/70 bg-muted/50 px-3 py-1.5 rounded-full">
               <Info className="h-3.5 w-3.5" />
@@ -181,7 +181,7 @@ const AdminJornadaView: React.FC = () => {
               <TableBody>
                 {jornadas && jornadas.length > 0 ? (
                   jornadas.map((jornada) => (
-                    <TableRow key={jornada.id} className="group border-gray-50 hover:bg-muted/50/50 transition-colors">
+                    <TableRow key={jornada.id} className="group border-border/50 hover:bg-muted/50/50 transition-colors">
                       <TableCell className="font-bold text-sm">
                         {jornada.colaboradores?.name} {jornada.colaboradores?.apellidos}
                       </TableCell>
@@ -198,7 +198,7 @@ const AdminJornadaView: React.FC = () => {
                         <div className="flex flex-col items-center">
                           <span className="font-mono font-bold text-xs">{formatTime(jornada.hora_inicio_jornada)}</span>
                           {jornada.justificacion_inicio && (
-                            <div className="flex items-center gap-1 mt-1 text-[9px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 max-w-[100px]">
+                            <div className="flex items-center gap-1 mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded border max-w-[100px] bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
                               <MessageSquare className="h-2.5 w-2.5 shrink-0" />
                               <span className="truncate">{jornada.justificacion_inicio}</span>
                             </div>
@@ -214,7 +214,7 @@ const AdminJornadaView: React.FC = () => {
                         <div className="flex flex-col items-center">
                           <span className="font-mono font-bold text-xs">{formatTime(jornada.hora_fin_jornada)}</span>
                           {jornada.justificacion_fin && (
-                            <div className="flex items-center gap-1 mt-1 text-[9px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 max-w-[100px]">
+                            <div className="flex items-center gap-1 mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded border max-w-[100px] bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
                               <MessageSquare className="h-2.5 w-2.5 shrink-0" />
                               <span className="truncate">{jornada.justificacion_fin}</span>
                             </div>
@@ -223,12 +223,12 @@ const AdminJornadaView: React.FC = () => {
                       </TableCell>
 
                       <TableCell className="text-right">
-                        <span className="font-mono font-black text-[#4892CC] bg-[#4892CC]/5 px-2 py-1 rounded-lg text-xs">
+                        <span className="font-mono font-black text-primary bg-primary/5 px-2 py-1 rounded-lg text-xs">
                           {formatMinutesToHours(calculateWorkedMinutesForJornada(jornada))}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(jornada)} className="rounded-xl hover:bg-[#4892CC]/10 hover:text-[#4892CC]">
+                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(jornada)} className="rounded-xl hover:bg-primary/10 hover:text-primary">
                           <Pencil className="h-4 w-4" />
                         </Button>
                       </TableCell>

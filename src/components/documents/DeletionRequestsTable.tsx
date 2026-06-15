@@ -82,7 +82,7 @@ const DeletionRequestsTable = () => {
             accessorKey: 'document_type',
             header: 'Documento a Eliminar',
             cell: ({ row }) => (
-                <Badge variant="outline" className="bg-red-50 text-red-600 border-red-100 font-bold text-[10px] uppercase">
+                <Badge variant="outline" className="bg-red-50 text-red-600 border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 font-bold text-[10px] uppercase">
                     <Trash2 className="w-3 h-3 mr-1" /> {row.original.document_type}
                 </Badge>
             ),
@@ -120,7 +120,7 @@ const DeletionRequestsTable = () => {
                                     size="sm"
                                     onClick={() => handleAction(request, 'Approved')}
                                     disabled={isCurrentProcessing}
-                                    className="h-8 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 font-bold text-[10px]"
+                                    className="h-8 bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 hover:bg-emerald-100 hover:text-emerald-700 font-bold text-[10px]"
                                 >
                                     {isCurrentProcessing ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle className="h-3 w-3 mr-1" />}
                                     APROBAR
@@ -130,7 +130,7 @@ const DeletionRequestsTable = () => {
                                     size="sm"
                                     onClick={() => handleAction(request, 'Rejected')}
                                     disabled={isCurrentProcessing}
-                                    className="h-8 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 font-bold text-[10px]"
+                                    className="h-8 bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 hover:bg-red-100 hover:text-red-700 font-bold text-[10px]"
                                 >
                                     {isCurrentProcessing ? <Loader2 className="h-3 w-3 animate-spin" /> : <XCircle className="h-3 w-3 mr-1" />}
                                     RECHAZAR

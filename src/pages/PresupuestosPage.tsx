@@ -355,7 +355,7 @@ export default function PresupuestosPage() {
                       <Button 
                         size="sm" 
                         onClick={() => openApproveModal(p)}
-                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg shadow-sm"
+                        className="flex-1 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000 hover:bg-emerald-600 text-white font-bold rounded-lg shadow-sm"
                       >
                         <Check className="w-4 h-4 mr-1"/> Aprobar
                       </Button>
@@ -443,7 +443,7 @@ export default function PresupuestosPage() {
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setIsApproveModalOpen(false)}>Cancelar</Button>
-            <Button onClick={handleApprove} disabled={saving} className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold">
+            <Button onClick={handleApprove} disabled={saving} className="bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000 hover:bg-emerald-600 text-white font-bold">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirmar Aprobación'}
             </Button>
           </DialogFooter>

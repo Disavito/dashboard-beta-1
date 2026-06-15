@@ -62,7 +62,7 @@ const NotificationBell: React.FC = () => {
                     
                     {hasPending && (
                         <span className="absolute -top-1 -right-1 flex h-5 w-5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-50 dark:bg-red-500/10 dark:text-red-4000 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-5 w-5 bg-red-600 border-2 border-[#373435] text-[10px] font-black text-white items-center justify-center shadow-sm">
                                 {totalUnread > 99 ? '99+' : totalUnread}
                             </span>
@@ -169,7 +169,7 @@ const NotificationBell: React.FC = () => {
                                             className="p-4 hover:bg-card dark:bg-slate-900/5 transition-colors border-b border-white/5 last:border-0 group"
                                         >
                                             <div className="flex gap-3">
-                                                <div className="mt-1 p-2 rounded-lg bg-red-500/10 text-red-500 group-hover:bg-red-500 group-hover:text-white transition-all duration-300">
+                                                <div className="mt-1 p-2 rounded-lg bg-red-50 dark:bg-red-500/10 dark:text-red-4000/10 text-red-500 group-hover:bg-red-50 dark:bg-red-500/10 dark:text-red-4000 group-hover:text-white transition-all duration-300">
                                                     <FileText size={16} />
                                                 </div>
                                                 <div className="flex-1 space-y-1">
@@ -229,7 +229,7 @@ const NotificationBell: React.FC = () => {
                         <Button 
                             variant="default" 
                             size="sm" 
-                            className="w-full text-xs font-bold shadow-md bg-emerald-600 hover:bg-emerald-500 text-white" 
+                            className="w-full text-xs font-bold shadow-md bg-emerald-600 hover:bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-4000 text-white" 
                             onClick={subscribeToPush}
                         >
                             Activar Notificaciones de Escritorio

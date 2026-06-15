@@ -232,9 +232,9 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
                   <FormControl>
                     <SelectTrigger className={cn(
                       "h-14 border-none rounded-xl font-bold text-lg transition-all",
-                      field.value === 'Anulación' && "bg-red-50 text-red-600 ring-2 ring-red-100",
-                      field.value === 'Devolución' && "bg-amber-50 text-amber-600 ring-2 ring-amber-100",
-                      field.value === 'Ingreso' && "bg-emerald-50 text-emerald-600 ring-2 ring-emerald-100"
+                      field.value === 'Anulación' && "bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 ring-2 ring-red-100",
+                      field.value === 'Devolución' && "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 ring-2 ring-amber-100",
+                      field.value === 'Ingreso' && "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 ring-2 ring-emerald-100"
                     )}>
                       <SelectValue placeholder="Seleccionar tipo" />
                     </SelectTrigger>
@@ -415,7 +415,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
 
         <div className={cn(
           "p-6 rounded-2xl transition-all duration-300 border-2",
-          isObserved ? "bg-amber-50 border-amber-200" : "bg-muted/50/50 border-transparent"
+          isObserved ? "bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20" : "bg-muted/50/50 border-transparent"
         )}>
           <FormField
             control={form.control}
@@ -426,7 +426,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    className="h-6 w-6 rounded-lg border-border data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
+                    className="h-6 w-6 rounded-lg border-border data-[state=checked]:bg-amber-50 dark:bg-amber-500/10 dark:text-amber-4000 data-[state=checked]:border-amber-500"
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
