@@ -29,13 +29,13 @@
   .dark {
     /* 1. Elevaciones (Tinte Slate para reducir fatiga visual) */
     --background: 220 16% 7%;  /* Nivel 0: Fondo base ~#0F1115 */
-    --foreground: 214 32% 91%; /* Texto High Emphasis ~#E2E8F0 */
+    --foreground: 215 20% 82%; /* Texto High Emphasis ~#CBD5E1 (más suave) */
     
     --card: 222 15% 13%;       /* Nivel 1: Tarjetas/Reportes ~#1C1F26 */
-    --card-foreground: 214 32% 91%;
+    --card-foreground: 215 20% 82%;
     
     --popover: 220 13% 18%;    /* Nivel 2: Dropdowns/Flotantes ~#282C34 */
-    --popover-foreground: 214 32% 91%;
+    --popover-foreground: 215 20% 82%;
 
     /* 2. Color Primario y Marca */
     /* Original: 207 56% 54% (#4892CC). Ajustado a 65% luminosidad para evitar halo en dark mode */
