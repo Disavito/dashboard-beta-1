@@ -17,8 +17,7 @@ import {
   AlertCircle,
   XCircle,
   FileText,
-  Search,
-  RefreshCw
+  Search
 } from 'lucide-react';
 import LocalidadCombobox from '@/components/custom/LocalidadCombobox';
 import DistritoCombobox from '@/components/custom/DistritoCombobox';
@@ -858,16 +857,6 @@ function PartnerDocuments() {
                 <SelectItem value="listo_impresion" className="rounded-xl font-bold text-emerald-600">Listo para Imprimir</SelectItem>
               </SelectContent>
             </Select>
-
-            <Button 
-              variant="outline" 
-              onClick={refreshAllData} 
-              disabled={loading}
-              className="h-11 px-4 border-border/50 hover:bg-primary/5 rounded-xl text-muted-foreground hover:text-foreground shrink-0"
-              title="Sincronizar base de datos"
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            </Button>
 
             {canManageEngineering && Object.keys(rowSelection).length > 0 && (
               <DropdownMenu>
