@@ -17,7 +17,8 @@ import {
   AlertCircle,
   XCircle,
   FileText,
-  Search
+  Search,
+  RefreshCw
 } from 'lucide-react';
 import LocalidadCombobox from '@/components/custom/LocalidadCombobox';
 import DistritoCombobox from '@/components/custom/DistritoCombobox';
@@ -847,16 +848,26 @@ function PartnerDocuments() {
             </Select>
 
             <Select value={cruceFilter} onValueChange={setCruceFilter}>
-              <SelectTrigger className="h-11 w-full sm:w-[230px] bg-muted/50 border-transparent rounded-xl focus:ring-2 focus:ring-primary/20 text-sm font-medium">
+              <SelectTrigger className="h-11 w-full sm:w-[200px] bg-muted/50 border-transparent rounded-xl focus:ring-2 focus:ring-primary/20 text-sm font-medium">
                 <SelectValue placeholder="Cruce Operativo" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-border/50 shadow-premium">
-                <SelectItem value="all" className="rounded-xl font-bold">Todos los socios</SelectItem>
-                <SelectItem value="medido_sin_pago" className="rounded-xl font-bold text-rose-600">⚠️ Medidos sin Pago</SelectItem>
-                <SelectItem value="pagado_por_medir" className="rounded-xl font-bold text-sky-600">⚡ Pagados por Medir</SelectItem>
-                <SelectItem value="listo_impresion" className="rounded-xl font-bold text-emerald-600">✅ Listos para Impresión</SelectItem>
+                <SelectItem value="all" className="rounded-xl font-bold">Sin Filtro Especial</SelectItem>
+                <SelectItem value="medido_sin_pago" className="rounded-xl font-bold text-rose-600">Alerta: Medido sin Pago</SelectItem>
+                <SelectItem value="pagado_por_medir" className="rounded-xl font-bold text-blue-600">Alerta: Pagado, sin medir</SelectItem>
+                <SelectItem value="listo_impresion" className="rounded-xl font-bold text-emerald-600">Listo para Imprimir</SelectItem>
               </SelectContent>
             </Select>
+
+            <Button 
+              variant="outline" 
+              onClick={refreshAllData} 
+              disabled={loading}
+              className="h-11 px-4 border-border/50 hover:bg-primary/5 rounded-xl text-muted-foreground hover:text-foreground shrink-0"
+              title="Sincronizar base de datos"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
 
             {canManageEngineering && Object.keys(rowSelection).length > 0 && (
               <DropdownMenu>
