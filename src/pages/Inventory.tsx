@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import {
   Loader2, Package, Plus, ArrowDownToLine, ArrowUpFromLine,
@@ -307,51 +307,7 @@ export default function InventoryPage() {
     setCheckoutRows(prev => prev.filter((_, i) => i !== index));
   };
 
-  // ── Configuracion de Columnas AG Grid ─────────────────
-  const historyColumnDefs: any[] = useMemo(() => [
-    { 
-      headerName: "Equipo", 
-      field: "inventory_items.name", 
-      flex: 1, 
-      filter: true 
-    },
-    { 
-      headerName: "Ingeniero", 
-      valueGetter: (params: any) => {
-        const colab = params.data?.colaboradores;
-        return colab ? `${colab.name} ${colab.apellidos || ''}`.trim() : '—';
-      },
-      flex: 1,
-      filter: true
-    },
-    { field: "quantity", headerName: "Cant.", width: 100 },
-    { 
-      headerName: "Salida", 
-      valueGetter: (params: any) => params.data?.assigned_at ? format(new Date(params.data.assigned_at), "d MMM yy, HH:mm", { locale: es }) : '—',
-      width: 150
-    },
-    { 
-      headerName: "Retorno", 
-      valueGetter: (params: any) => {
-        if (params.data?.status === 'Devuelto' && params.data?.returned_at) {
-          return format(new Date(params.data.returned_at), "d MMM yy, HH:mm", { locale: es });
-        }
-        return '—';
-      },
-      width: 150
-    },
-    { 
-      field: "status", 
-      headerName: "Estado", 
-      width: 150, 
-      filter: true,
-      cellRenderer: (params: any) => {
-        return params.value === 'Devuelto' 
-          ? <span className="text-emerald-600 font-black border border-emerald-200 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 px-2.5 py-1 rounded-lg text-[9px] uppercase tracking-widest">Devuelto</span>
-          : <span className="text-amber-600 font-black border border-amber-200 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20 px-2.5 py-1 rounded-lg text-[9px] uppercase tracking-widest">En Uso</span>;
-      }
-    }
-  ], []);
+
 
   // ── Render ────────────────────────────────────────────
   if (loading) {

@@ -14,7 +14,6 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Users,
   AlertCircle,
   XCircle,
   FileText,

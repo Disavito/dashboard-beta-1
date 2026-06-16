@@ -5,7 +5,7 @@ import { es } from 'date-fns/locale';
 import { PlusCircle, Edit, CalendarIcon, Search, Trash2, Hash, Tag, FileText, Loader2, TrendingDown, Database, Download, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui-custom/DataTable';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -145,10 +145,7 @@ export default function Expenses() {
   
   const checkRole = (roleName: string) => roles?.some(r => r.toLowerCase().includes(roleName.toLowerCase()));
 
-  const isEngineerAndNotAdmin = useMemo(() => 
-    !!((checkRole('ingenier') || checkRole('engin') || checkRole('engen')) && !checkRole('admin') && !checkRole('finanzas_senior')),
-    [roles]
-  );
+
 
   // Permitir que cualquier usuario logueado pueda registrar un gasto o solicitar aprobación
   const canAddExpense = !!user;
@@ -201,6 +198,7 @@ export default function Expenses() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<GastoType | null>(null);
   const [editingRequest, setEditingRequest] = useState<any | null>(null);
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
   const [dateInput, setDateInput] = useState('');
 
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
