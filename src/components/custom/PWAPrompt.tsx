@@ -11,6 +11,11 @@ export function PWAPrompt() {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (!refreshing) {
         refreshing = true;
+        
+        // Limpiar la caché persistente (Offline First) para evitar que
+        // la nueva versión lea datos corruptos o antiguos de versiones previas.
+        window.indexedDB.deleteDatabase('dashboard-offline-db');
+        
         window.location.reload();
       }
     });
