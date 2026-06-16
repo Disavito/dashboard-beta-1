@@ -452,15 +452,7 @@ export default function Expenses() {
           if (error) throw error;
           toast.success('Solicitud de gasto actualizada');
           
-          const { data } = await supabase
-            .from('approval_requests')
-            .select('*')
-            .eq('requested_by', user?.id)
-            .in('request_type', ['engineer_expense', 'expense_approval'])
-            .in('status', ['pending', 'rejected'])
-            .order('created_at', { ascending: false });
-          if (data) setPendingRequests(data);
-          
+
           setEditingRequest(null);
         } else if (editingExpense) {
           const oldPresupuestoId = (editingExpense as any).presupuesto_id;
