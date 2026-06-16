@@ -80,14 +80,14 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
       if (sort) {
         query = query.order(sort.column, { ascending: sort.ascending });
         // Secondary sort for stable pagination
-        if (sort.column !== 'id') {
+        if (sort.column !== 'id' && !tableName.startsWith('vw_')) {
           query = query.order('id', { ascending: true });
         }
       } else {
         const tablesWithCreatedAt = ['ingresos', 'gastos', 'colaboradores', 'socio_titulares'];
         if (tablesWithCreatedAt.includes(tableName)) {
           query = query.order('created_at', { ascending: false }).order('id', { ascending: true });
-        } else {
+        } else if (!tableName.startsWith('vw_')) {
           query = query.order('id', { ascending: true });
         }
       }
