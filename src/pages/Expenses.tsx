@@ -198,7 +198,6 @@ export default function Expenses() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<GastoType | null>(null);
   const [editingRequest, setEditingRequest] = useState<any | null>(null);
-  const [, setPendingRequests] = useState<any[]>([]);
   const [dateInput, setDateInput] = useState('');
 
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -251,26 +250,6 @@ export default function Expenses() {
 
     loadPresupuestosAndColaboradores();
   }, [user, roles]);
-
-  // Cargar solicitudes pendientes si es usuario no financiero
-  useEffect(() => {
-    const fetchPending = async () => {
-      if (!canManageFinances && user?.id) {
-        const { supabase } = await import('@/lib/supabaseClient');
-        const { data, error } = await supabase
-          .from('approval_requests')
-          .select('*')
-          .eq('requested_by', user.id)
-          .in('request_type', ['engineer_expense', 'expense_approval'])
-          .in('status', ['pending', 'rejected'])
-          .order('created_at', { ascending: false });
-        if (!error && data) {
-          setPendingRequests(data);
-        }
-      }
-    };
-    fetchPending();
-  }, [canManageFinances, user?.id, isConfirmDialogOpen]); // Refresh on close dialog
 
   // Infinite scroll para móvil
   const [mobileVisibleCount, setMobileVisibleCount] = useState(10);
