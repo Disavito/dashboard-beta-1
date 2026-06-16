@@ -198,7 +198,7 @@ export default function Expenses() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<GastoType | null>(null);
   const [editingRequest, setEditingRequest] = useState<any | null>(null);
-  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [, setPendingRequests] = useState<any[]>([]);
   const [dateInput, setDateInput] = useState('');
 
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
