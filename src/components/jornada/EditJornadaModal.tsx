@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { format, parseISO, setHours, setMinutes, setSeconds } from 'date-fns';
-import { es } from 'date-fns/locale'; // Importar el locale aquí
+import { format, parseISO, setHours, setMinutes, setSeconds, addDays } from 'date-fns';
+import { es } from 'date-fns/locale'; 
 import { Jornada, Colaborador, adminUpdateJornada } from '@/lib/api/jornadaApi';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -84,20 +84,29 @@ const EditJornadaModal: React.FC<EditJornadaModalProps> = ({ isOpen, onClose, jo
   const handleSave = () => {
     const jornadaDate = parseISO(jornada.fecha);
 
-    const toISOString = (time: string): string | null => {
+    const toISOString = (time: string, compareWithStart: boolean = false): string | null => {
       if (!time) return null;
       const [hours, minutes] = time.split(':').map(Number);
       let date = setHours(jornadaDate, hours);
       date = setMinutes(date, minutes);
       date = setSeconds(date, 0);
+      
+      if (compareWithStart && times.inicioJornada) {
+        const [startH, startM] = times.inicioJornada.split(':').map(Number);
+        const startDate = setMinutes(setHours(jornadaDate, startH), startM);
+        if (date < startDate) {
+          date = addDays(date, 1);
+        }
+      }
+      
       return date.toISOString();
     };
 
     const updatedData = {
       hora_inicio_jornada: toISOString(times.inicioJornada),
-      hora_inicio_almuerzo: toISOString(times.inicioAlmuerzo),
-      hora_fin_almuerzo: toISOString(times.finAlmuerzo),
-      hora_fin_jornada: toISOString(times.finJornada),
+      hora_inicio_almuerzo: toISOString(times.inicioAlmuerzo, true),
+      hora_fin_almuerzo: toISOString(times.finAlmuerzo, true),
+      hora_fin_jornada: toISOString(times.finJornada, true),
     };
     
     mutation.mutate(updatedData);

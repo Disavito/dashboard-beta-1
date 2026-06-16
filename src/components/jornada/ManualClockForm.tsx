@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createManualJornada, getJornadaByDate, adminUpdateJornada, Colaborador } from '@/lib/api/jornadaApi';
-import { format, setHours, setMinutes } from 'date-fns';
+import { format, setHours, setMinutes, addDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -25,13 +25,21 @@ const ManualClockForm: React.FC<ManualClockFormProps> = ({ colaborador, date }) 
   });
   const [notes, setNotes] = useState('');
 
-  const combineDateAndTime = (timeStr: string) => {
+  const combineDateAndTime = (timeStr: string, isEndOrLunch: boolean = false) => {
     if (!timeStr) return null;
     try {
       const [hours, minutes] = timeStr.split(':').map(Number);
       let newDate = new Date(date);
       newDate = setHours(newDate, hours);
       newDate = setMinutes(newDate, minutes);
+      
+      if (isEndOrLunch && times.inicio) {
+        const [startH, startM] = times.inicio.split(':').map(Number);
+        const startDate = setMinutes(setHours(new Date(date), startH), startM);
+        if (newDate < startDate) {
+          newDate = addDays(newDate, 1);
+        }
+      }
       return newDate.toISOString();
     } catch (e) {
       return null;
@@ -46,9 +54,9 @@ const ManualClockForm: React.FC<ManualClockFormProps> = ({ colaborador, date }) 
         colaborador_id: colaborador.id,
         fecha: format(date, 'yyyy-MM-dd'),
         hora_inicio_jornada: combineDateAndTime(times.inicio),
-        hora_inicio_almuerzo: combineDateAndTime(times.inicioAlmuerzo),
-        hora_fin_almuerzo: combineDateAndTime(times.finAlmuerzo),
-        hora_fin_jornada: combineDateAndTime(times.fin),
+        hora_inicio_almuerzo: combineDateAndTime(times.inicioAlmuerzo, true),
+        hora_fin_almuerzo: combineDateAndTime(times.finAlmuerzo, true),
+        hora_fin_jornada: combineDateAndTime(times.fin, true),
         observaciones_inicio: notes || 'Registro manual administrativo',
       };
 
@@ -68,9 +76,9 @@ const ManualClockForm: React.FC<ManualClockFormProps> = ({ colaborador, date }) 
         colaborador_id: colaborador.id,
         fecha: format(date, 'yyyy-MM-dd'),
         hora_inicio_jornada: combineDateAndTime(times.inicio),
-        hora_inicio_almuerzo: combineDateAndTime(times.inicioAlmuerzo),
-        hora_fin_almuerzo: combineDateAndTime(times.finAlmuerzo),
-        hora_fin_jornada: combineDateAndTime(times.fin),
+        hora_inicio_almuerzo: combineDateAndTime(times.inicioAlmuerzo, true),
+        hora_fin_almuerzo: combineDateAndTime(times.finAlmuerzo, true),
+        hora_fin_jornada: combineDateAndTime(times.fin, true),
         observaciones_inicio: notes || 'Registro manual administrativo',
         id: `temp-${Date.now()}`
       };
