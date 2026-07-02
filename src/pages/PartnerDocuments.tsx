@@ -19,7 +19,6 @@ import {
   FileText,
   Search
 } from 'lucide-react';
-import { LoteMedidoCell } from '@/components/custom/LoteMedidoCell';
 import { smartSearch } from '@/lib/utils';
 import LocalidadCombobox from '@/components/custom/LocalidadCombobox';
 import DistritoCombobox from '@/components/custom/DistritoCombobox';

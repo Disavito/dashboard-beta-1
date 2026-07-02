@@ -45,7 +45,7 @@ import {
 } from 'recharts';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { cn, formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency, smartSearch } from '@/lib/utils';
 import TransactionForm from '@/components/custom/TransactionForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
