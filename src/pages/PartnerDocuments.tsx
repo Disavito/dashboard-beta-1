@@ -466,7 +466,8 @@ function PartnerDocuments() {
         socio.mz, 
         socio.lote, 
         (socio as any).distritoVivienda, 
-        socio.localidad
+        socio.localidad,
+        socio.receiptNumber
       ]);
     });
   }, [sociosConDocumentos, debouncedSearchQuery, selectedLocalidad, selectedDistrito, loteMedidoFilter, cruceFilter]);
