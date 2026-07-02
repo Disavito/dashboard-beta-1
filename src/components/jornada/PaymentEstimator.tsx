@@ -49,8 +49,8 @@ const PaymentEstimator: React.FC<PaymentEstimatorProps> = ({ totalMinutes, colab
   }, [totalMinutes, baseSalary, workingDays, hoursPerDay]);
 
   return (
-    <Card className="border border-border/50 shadow-premium bg-[#373435] text-white rounded-2xl overflow-hidden">
-      <CardHeader className="border-b border-white/5 pb-8">
+    <Card className="border border-border shadow-premium bg-card text-card-foreground dark:bg-[#373435] dark:text-white rounded-2xl overflow-hidden">
+      <CardHeader className="border-b border-border dark:border-white/5 pb-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-[#4892CC] rounded-2xl flex items-center justify-center shadow-lg shadow-[#4892CC]/20">
@@ -78,7 +78,7 @@ const PaymentEstimator: React.FC<PaymentEstimatorProps> = ({ totalMinutes, colab
                 type="number" 
                 value={baseSalary} 
                 onChange={(e) => setBaseSalary(Number(e.target.value))}
-                className="h-12 pl-10 rounded-xl border-white/5 bg-card dark:bg-slate-900/5 font-bold focus:ring-[#4892CC] text-white"
+                className="h-12 pl-10 rounded-xl border-border dark:border-white/5 bg-background dark:bg-white/5 font-bold focus:ring-[#4892CC] text-foreground dark:text-white"
               />
             </div>
           </div>
@@ -90,7 +90,7 @@ const PaymentEstimator: React.FC<PaymentEstimatorProps> = ({ totalMinutes, colab
                 type="number" 
                 value={workingDays} 
                 onChange={(e) => setWorkingDays(Number(e.target.value))}
-                className="h-12 pl-10 rounded-xl border-white/5 bg-card dark:bg-slate-900/5 font-bold focus:ring-[#4892CC] text-white"
+                className="h-12 pl-10 rounded-xl border-border dark:border-white/5 bg-background dark:bg-white/5 font-bold focus:ring-[#4892CC] text-foreground dark:text-white"
               />
             </div>
           </div>
@@ -102,22 +102,22 @@ const PaymentEstimator: React.FC<PaymentEstimatorProps> = ({ totalMinutes, colab
                 type="number" 
                 value={hoursPerDay} 
                 onChange={(e) => setHoursPerDay(Number(e.target.value))}
-                className="h-12 pl-10 rounded-xl border-white/5 bg-card dark:bg-slate-900/5 font-bold focus:ring-[#4892CC] text-white"
+                className="h-12 pl-10 rounded-xl border-border dark:border-white/5 bg-background dark:bg-white/5 font-bold focus:ring-[#4892CC] text-foreground dark:text-white"
               />
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-4 rounded-2xl bg-card dark:bg-slate-900/5 border border-white/5">
+          <div className="p-4 rounded-2xl bg-muted/50 dark:bg-white/5 border border-border dark:border-white/5">
             <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-1">Horas Totales</span>
             <span className="text-xl font-bold">{stats.totalHours}h</span>
           </div>
-          <div className="p-4 rounded-2xl bg-card dark:bg-slate-900/5 border border-white/5">
+          <div className="p-4 rounded-2xl bg-muted/50 dark:bg-white/5 border border-border dark:border-white/5">
             <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-1">Valor Hora</span>
             <span className="text-xl font-bold">S/. {stats.hourlyRate}</span>
           </div>
-          <div className="p-4 rounded-2xl bg-card dark:bg-slate-900/5 border border-white/5">
+          <div className="p-4 rounded-2xl bg-muted/50 dark:bg-white/5 border border-border dark:border-white/5">
             <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-1">Meta Mensual</span>
             <span className="text-xl font-bold">{workingDays * hoursPerDay}h</span>
           </div>
@@ -132,7 +132,7 @@ const PaymentEstimator: React.FC<PaymentEstimatorProps> = ({ totalMinutes, colab
             <span>Progreso de Jornada</span>
             <span>{stats.totalHours} / {workingDays * hoursPerDay} Horas</span>
           </div>
-          <div className="h-3 w-full bg-card dark:bg-slate-900/5 rounded-full overflow-hidden">
+          <div className="h-3 w-full bg-muted dark:bg-white/5 rounded-full overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-[#4892CC] to-[#3C9384] transition-all duration-1000 ease-out"
               style={{ width: `${stats.progress}%` }}
