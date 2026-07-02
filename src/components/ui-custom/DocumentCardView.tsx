@@ -27,18 +27,22 @@ interface SocioConDocumentos {
 
 interface DocumentCardViewProps {
   data: SocioConDocumentos[];
-  canManageLoteMedido: boolean; 
+  canManageLoteMedido?: boolean; 
   onOpenUploadModal: (socio: SocioConDocumentos, documentType: string) => void;
   onUpdateLoteMedido: (socioId: string, newValue: boolean, socio: SocioConDocumentos) => void;
+  onDeleteDocument?: (socioId: string, tipoDocumento: string, socioName: string) => void;
+  canDeleteBlueprints?: boolean;
   resetTrigger?: string;
 }
 
 const DocumentCardView: React.FC<DocumentCardViewProps> = ({
   data,
   resetTrigger,
-  canManageLoteMedido,
+  canManageLoteMedido = false,
   onOpenUploadModal,
   onUpdateLoteMedido,
+  onDeleteDocument,
+  canDeleteBlueprints = false,
 }) => {
   const [visibleCount, setVisibleCount] = useState(10);
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -138,11 +142,29 @@ const DocumentCardView: React.FC<DocumentCardViewProps> = ({
               <div className="pt-4 border-t border-border/50">
                 <p className="text-[9px] font-black text-muted-foreground/70 uppercase tracking-widest mb-2 flex items-center gap-1.5"><FileText className="h-3 w-3" /> Expediente Digital</p>
                 <div className="flex flex-wrap gap-2 text-[10px] font-bold">
-                   <Badge variant="outline" className={socio.has_planos ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-muted/50 text-muted-foreground/70 border-border"}>
+                   <Badge variant="outline" className={cn(
+                     socio.has_planos ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-muted/50 text-muted-foreground/70 border-border",
+                     "flex items-center gap-1"
+                   )}>
                       Planos {socio.has_planos ? '✅' : '❌'}
+                      {socio.has_planos && canDeleteBlueprints && onDeleteDocument && (
+                        <Trash2 
+                          className="w-3 h-3 ml-1 text-red-400 hover:text-red-600 cursor-pointer" 
+                          onClick={(e) => { e.stopPropagation(); onDeleteDocument(socio.id, 'Planos de ubicación', `${socio.nombres} ${socio.apellidoPaterno}`); }} 
+                        />
+                      )}
                    </Badge>
-                   <Badge variant="outline" className={socio.has_memoria ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-muted/50 text-muted-foreground/70 border-border"}>
+                   <Badge variant="outline" className={cn(
+                     socio.has_memoria ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-muted/50 text-muted-foreground/70 border-border",
+                     "flex items-center gap-1"
+                   )}>
                       Memoria {socio.has_memoria ? '✅' : '❌'}
+                      {socio.has_memoria && canDeleteBlueprints && onDeleteDocument && (
+                        <Trash2 
+                          className="w-3 h-3 ml-1 text-red-400 hover:text-red-600 cursor-pointer" 
+                          onClick={(e) => { e.stopPropagation(); onDeleteDocument(socio.id, 'Memoria descriptiva', `${socio.nombres} ${socio.apellidoPaterno}`); }} 
+                        />
+                      )}
                    </Badge>
                 </div>
               </div>

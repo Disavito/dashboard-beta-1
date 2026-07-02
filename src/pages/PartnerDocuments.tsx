@@ -17,7 +17,8 @@ import {
   AlertCircle,
   XCircle,
   FileText,
-  Search
+  Search,
+  Trash2
 } from 'lucide-react';
 import { smartSearch } from '@/lib/utils';
 import LocalidadCombobox from '@/components/custom/LocalidadCombobox';
@@ -381,7 +382,7 @@ function PartnerDocuments() {
   const { roles, customPermissions, loading: userLoading } = useUser();
   const isAdmin = useMemo(() => roles?.includes('admin') ?? false, [roles]);
   const canDeleteDocsOrAdmin = useMemo(() => isAdmin || !!customPermissions?.can_delete_documents, [isAdmin, customPermissions]);
-  const canDeleteBlueprints = useMemo(() => !!customPermissions?.can_delete_blueprints, [customPermissions]);
+  const canDeleteBlueprints = useMemo(() => isAdmin || !!customPermissions?.can_delete_blueprints, [isAdmin, customPermissions]);
   const isEngineer = useMemo(() => roles?.includes('engineer') ?? false, [roles]);
   const canManageEngineering = useMemo(() => isAdmin || isEngineer, [isAdmin, isEngineer]);
 
@@ -559,6 +560,36 @@ function PartnerDocuments() {
     );
   };
 
+  const confirmDeleteDocument = useCallback(async (socioId: string, tipoDocumento: string, socioName: string) => {
+    toast.loading('Buscando documento...', { id: 'delete-search' });
+    try {
+      const { data, error } = await supabase
+        .from('socio_documentos')
+        .select('id, link_documento')
+        .eq('socio_id', socioId)
+        .eq('tipo_documento', tipoDocumento)
+        .maybeSingle();
+
+      toast.dismiss('delete-search');
+      if (error) throw error;
+      
+      if (data && data.link_documento) {
+        deleteDialogRef.current?.open({
+          documentId: data.id,
+          documentLink: data.link_documento,
+          documentType: tipoDocumento,
+          socioName: socioName
+        });
+      } else {
+        toast.error('No se encontró el archivo físico');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.dismiss('delete-search');
+      toast.error('Error al buscar documento');
+    }
+  }, []);
+
   const columns: ColumnDef<SocioConDocumentos>[] = useMemo(() => [
     {
       id: 'select',
@@ -650,7 +681,7 @@ function PartnerDocuments() {
       id: 'documentos',
       header: 'Expediente Digital',
       cell: ({ row }) => {
-        const renderTableBadge = (status: boolean, label: string, onClick?: () => void) => {
+        const renderTableBadge = (status: boolean, label: string, onClick?: () => void, onDelete?: () => void) => {
           if (!status) {
             return (
               <Badge variant="outline" className="text-[10px] uppercase tracking-wider font-bold bg-muted text-muted-foreground/70 border-dashed border-border">
@@ -663,10 +694,19 @@ function PartnerDocuments() {
             <Badge 
               variant="outline" 
               onClick={onClick}
-              className={`text-[10px] uppercase tracking-wider font-bold bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10 ${onClick ? 'cursor-pointer hover:bg-emerald-100 transition-colors' : ''}`}
+              className={`text-[10px] uppercase tracking-wider font-bold bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-sm shadow-emerald-500/10 flex items-center ${onClick ? 'cursor-pointer hover:bg-emerald-100 transition-colors' : ''}`}
             >
               <CheckCircle2 className="w-3 h-3 mr-1" />
               {label}
+              {onDelete && (
+                <Trash2 
+                  className="w-3 h-3 ml-2 text-red-400 hover:text-red-600 cursor-pointer" 
+                  onClick={(e) => { 
+                    e.stopPropagation(); 
+                    onDelete(); 
+                  }} 
+                />
+              )}
             </Badge>
           );
         };
@@ -674,8 +714,18 @@ function PartnerDocuments() {
         return (
           <div className="flex flex-col gap-1.5">
              <div className="flex flex-wrap gap-1.5 text-[10px] font-bold max-w-[200px]">
-                {renderTableBadge(row.original.has_planos ?? false, 'Planos', () => openDocumentDirectly(row.original.id, 'Planos de ubicación'))}
-                {renderTableBadge(row.original.has_memoria ?? false, 'Memoria', () => openDocumentDirectly(row.original.id, 'Memoria descriptiva'))}
+                {renderTableBadge(
+                  row.original.has_planos ?? false, 
+                  'Planos', 
+                  () => openDocumentDirectly(row.original.id, 'Planos de ubicación'),
+                  canDeleteBlueprints ? () => confirmDeleteDocument(row.original.id, 'Planos de ubicación', row.original.nombreCompleto) : undefined
+                )}
+                {renderTableBadge(
+                  row.original.has_memoria ?? false, 
+                  'Memoria', 
+                  () => openDocumentDirectly(row.original.id, 'Memoria descriptiva'),
+                  canDeleteBlueprints ? () => confirmDeleteDocument(row.original.id, 'Memoria descriptiva', row.original.nombreCompleto) : undefined
+                )}
                 {renderTableBadge(row.original.has_ficha ?? false, 'Ficha', () => openDocumentDirectly(row.original.id, 'Ficha'))}
                 {renderTableBadge(row.original.has_contrato ?? false, 'Contrato', () => openDocumentDirectly(row.original.id, 'Contrato'))}
                 {(() => {
@@ -943,6 +993,8 @@ function PartnerDocuments() {
                         data={filteredData}
                         resetTrigger={debouncedSearchQuery + selectedLocalidad + selectedDistrito}
                         canManageLoteMedido={canManageEngineering}
+                        canDeleteBlueprints={canDeleteBlueprints}
+                        onDeleteDocument={confirmDeleteDocument}
                         onOpenUploadModal={(socio, type) => uploadModalRef.current?.open({ 
                           socioId: socio.id, 
                           socioName: `${socio.nombres} ${socio.apellidoPaterno} ${socio.apellidoMaterno}`, 
