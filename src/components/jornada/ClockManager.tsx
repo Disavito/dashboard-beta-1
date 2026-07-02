@@ -110,19 +110,19 @@ const ClockManager: React.FC<ClockManagerProps> = ({
   const completedJornadasToday = jornadasState?.completedJornadasToday || [];
 
   const mutation = useMutation({
-    mutationFn: async ({ action, just, obs }: { action: string, just?: string, obs?: string }) => {
+    mutationFn: async ({ action, just, obs, jornadaId }: { action: string, just?: string, obs?: string, jornadaId?: number | string }) => {
       const dateToSend = bypassTimeRestrictions ? targetDate : undefined;
       
       // Validación de seguridad para acciones que requieren ID de jornada
-      if (['start-lunch', 'end-lunch', 'clock-out'].includes(action) && !jornada) {
+      if (['start-lunch', 'end-lunch', 'clock-out'].includes(action) && !jornadaId) {
         throw new Error("No se encontró un registro de jornada activo.");
       }
 
       switch (action) {
         case 'clock-in': return await clockIn(colaborador.id, just, obs, dateToSend);
-        case 'start-lunch': return await startLunch(jornada!.id, dateToSend);
-        case 'end-lunch': return await endLunch(jornada!.id, dateToSend);
-        case 'clock-out': return await clockOut(jornada!.id, just, obs, dateToSend);
+        case 'start-lunch': return await startLunch(jornadaId as number, dateToSend);
+        case 'end-lunch': return await endLunch(jornadaId as number, dateToSend);
+        case 'clock-out': return await clockOut(jornadaId as number, just, obs, dateToSend);
         default: throw new Error("Acción no válida");
       }
     },
@@ -222,7 +222,7 @@ const ClockManager: React.FC<ClockManagerProps> = ({
     if (submittingRef.current) return;
     submittingRef.current = true;
     setIsLocalSubmitting(true);
-    mutation.mutate({ action, just, obs });
+    mutation.mutate({ action, just, obs, jornadaId: jornada?.id });
   };
 
   const handleActionInitiate = (action: 'clock-in' | 'clock-out') => {
