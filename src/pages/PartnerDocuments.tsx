@@ -522,18 +522,29 @@ function PartnerDocuments() {
     }
   }, [canManageEngineering, refreshAllData, queryClient]);
 
-  const handleDeleteDocumentDirect = useCallback(async (_documentId: number, documentLink: string, documentType: string) => {
+  const handleDeleteDocumentDirect = useCallback(async (documentId: number, documentLink: string, documentType: string) => {
     try {
-      const bucketName = getBucketNameForDocumentType(documentType);
-      const url = new URL(documentLink);
-      const filePath = url.pathname.split('/').slice(-2).join('/');
+      // 1. Delete from database (this triggers realtime update and clears the view)
+      const { error: dbError } = await supabase
+        .from('socio_documentos')
+        .delete()
+        .eq('id', documentId);
+        
+      if (dbError) throw dbError;
 
-      // Remove from storage
-      await supabase.storage.from(bucketName).remove([filePath]);
+      // 2. Try to remove from storage (best effort)
+      try {
+        const bucketName = getBucketNameForDocumentType(documentType);
+        const url = new URL(documentLink);
+        const filePath = url.pathname.split(`/${bucketName}/`)[1] || url.pathname.split('/').slice(-2).join('/');
+        await supabase.storage.from(bucketName).remove([decodeURIComponent(filePath)]);
+      } catch (storageError) {
+        console.warn('Could not remove file from storage, but DB row was deleted', storageError);
+      }
       
-      // No optimistic delete UI manual here, the realtime hook handles it
       toast.success('Documento eliminado');
     } catch (error) {
+      console.error('Error delete:', error);
       toast.error('Error al eliminar');
       refreshAllData();
     }
