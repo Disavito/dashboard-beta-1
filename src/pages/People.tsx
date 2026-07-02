@@ -93,6 +93,7 @@ function People() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [socioToDelete, setSocioToDelete] = useState<EnrichedSocio | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   
   const [debouncedSearch, setDebouncedSearch] = useState('');
   
@@ -138,6 +139,58 @@ function People() {
   });
 
   const socios = rawSocios || [];
+
+  const handleExport = async (type: 'excel' | 'csv') => {
+    try {
+      setIsExporting(true);
+      
+      let query = supabase.from('vw_socio_titulares_estado').select('*');
+
+      // Aplica los filtros de la interfaz
+      for (const key in serverFilters) {
+        query = query.eq(key, serverFilters[key]);
+      }
+
+      // Aplica la búsqueda inteligente global
+      if (debouncedSearch) {
+        const searchCols = ['nombres', 'apellidoPaterno', 'apellidoMaterno', 'dni', 'receiptNumber'];
+        const tokens = debouncedSearch.trim().split(/\s+/).filter(Boolean);
+        tokens.forEach(token => {
+          const searchConditions = searchCols.map(col => `${col}.ilike.%${token}%`).join(',');
+          query = query.or(searchConditions);
+        });
+      }
+
+      query = query.order('apellidoPaterno', { ascending: true }).order('id', { ascending: true });
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const headers = ['DNI', 'Nombres', 'Apellido Paterno', 'Apellido Materno', 'Localidad', 'Mz', 'Lote', 'Estado'];
+      const rows = (data || []).map(s => [
+        s.dni || '',
+        s.nombres || '',
+        s.apellidoPaterno || '',
+        s.apellidoMaterno || '',
+        s.localidad || '',
+        s.mz || '',
+        s.lote || '',
+        s.status || '',
+      ]);
+
+      if (type === 'excel') {
+        exportToExcel({ filePrefix: 'socios_completos', headers, rows });
+      } else {
+        exportToCSV({ filePrefix: 'socios_completos', headers, rows });
+      }
+      toast.success(`Se exportaron ${data.length} registros`);
+    } catch (err) {
+      console.error('Error al exportar:', err);
+      toast.error('Error al exportar los datos');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Realtime updates (Optimized Cache Merging)
   useEffect(() => {
@@ -447,47 +500,25 @@ function People() {
               <Button 
                 variant="outline" 
                 className="h-11 border-border text-muted-foreground font-bold gap-2 rounded-xl px-4 hover:bg-muted shadow-sm w-full lg:w-auto shrink-0"
+                disabled={isExporting}
               >
-                <Download className="h-4 w-4" /> <span className="hidden sm:inline">Exportar</span>
+                {isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />} 
+                <span className="hidden sm:inline">{isExporting ? 'Procesando...' : 'Exportar'}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="rounded-xl shadow-lg w-56">
               <DropdownMenuItem
                 className="gap-2 font-medium cursor-pointer"
-                onClick={() => {
-                  const headers = ['DNI', 'Nombres', 'Apellido Paterno', 'Apellido Materno', 'Localidad', 'Mz', 'Lote', 'Estado'];
-                  const rows = socios.map(s => [
-                    s.dni || '',
-                    s.nombres || '',
-                    s.apellidoPaterno || '',
-                    s.apellidoMaterno || '',
-                    s.localidad || '',
-                    s.mz || '',
-                    s.lote || '',
-                    s.status || '',
-                  ]);
-                  exportToExcel({ filePrefix: 'socios', headers, rows });
-                }}
+                onClick={() => handleExport('excel')}
+                disabled={isExporting}
               >
                 <FileSpreadsheet className="h-4 w-4 text-green-600" />
                 Exportar Excel (.xlsx)
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="gap-2 font-medium cursor-pointer"
-                onClick={() => {
-                  const headers = ['DNI', 'Nombres', 'Apellido Paterno', 'Apellido Materno', 'Localidad', 'Mz', 'Lote', 'Estado'];
-                  const rows = socios.map(s => [
-                    s.dni || '',
-                    s.nombres || '',
-                    s.apellidoPaterno || '',
-                    s.apellidoMaterno || '',
-                    s.localidad || '',
-                    s.mz || '',
-                    s.lote || '',
-                    s.status || '',
-                  ]);
-                  exportToCSV({ filePrefix: 'socios', headers, rows });
-                }}
+                onClick={() => handleExport('csv')}
+                disabled={isExporting}
               >
                 <FileText className="h-4 w-4 text-blue-600" />
                 Exportar CSV
