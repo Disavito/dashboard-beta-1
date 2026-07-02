@@ -17,7 +17,7 @@ const SearchInputWithDebounce = React.memo(
     placeholder = 'Buscar...',
     initialValue = '',
     onDebouncedChange,
-    debounceTime = 300,
+    debounceTime = 150,
     className,
     inputClassName,
   }: SearchInputWithDebounceProps) => {

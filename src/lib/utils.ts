@@ -54,6 +54,9 @@ export const sortNames = (rowA: any, rowB: any, _columnId: string) => {
   return a.localeCompare(b);
 };
 
+let lastSearchQuery = '';
+let cachedSearchTokens: string[] = [];
+
 /**
  * Búsqueda inteligente (Token-Based Search)
  * Separa el término de búsqueda en palabras y requiere que todas estén presentes.
@@ -65,8 +68,11 @@ export function smartSearch(query: string, fields: (string | undefined | null | 
   const normalize = (text: string) => 
     String(text).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-  // Limpiamos y dividimos el query en tokens (palabras) ignorando espacios extra
-  const tokens = normalize(query).trim().split(/\s+/);
+  // Optimización: Solo normalizamos y separamos el query si cambió
+  if (query !== lastSearchQuery) {
+    lastSearchQuery = query;
+    cachedSearchTokens = normalize(query).trim().split(/\s+/).filter(Boolean);
+  }
   
   // Concatenamos todos los campos en un solo string para buscar
   const textToSearch = normalize(fields
@@ -74,5 +80,5 @@ export function smartSearch(query: string, fields: (string | undefined | null | 
     .join(' '));
 
   // Cada token debe encontrarse en algún lugar del texto concatenado
-  return tokens.every(token => textToSearch.includes(token));
+  return cachedSearchTokens.every(token => textToSearch.includes(token));
 }
