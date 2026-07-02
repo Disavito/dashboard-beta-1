@@ -718,13 +718,13 @@ function PartnerDocuments() {
                   row.original.has_planos ?? false, 
                   'Planos', 
                   () => openDocumentDirectly(row.original.id, 'Planos de ubicación'),
-                  canDeleteBlueprints ? () => confirmDeleteDocument(row.original.id, 'Planos de ubicación', row.original.nombreCompleto) : undefined
+                  canDeleteBlueprints ? () => confirmDeleteDocument(row.original.id, 'Planos de ubicación', row.original.nombreCompleto || '') : undefined
                 )}
                 {renderTableBadge(
                   row.original.has_memoria ?? false, 
                   'Memoria', 
                   () => openDocumentDirectly(row.original.id, 'Memoria descriptiva'),
-                  canDeleteBlueprints ? () => confirmDeleteDocument(row.original.id, 'Memoria descriptiva', row.original.nombreCompleto) : undefined
+                  canDeleteBlueprints ? () => confirmDeleteDocument(row.original.id, 'Memoria descriptiva', row.original.nombreCompleto || '') : undefined
                 )}
                 {renderTableBadge(row.original.has_ficha ?? false, 'Ficha', () => openDocumentDirectly(row.original.id, 'Ficha'))}
                 {renderTableBadge(row.original.has_contrato ?? false, 'Contrato', () => openDocumentDirectly(row.original.id, 'Contrato'))}
