@@ -13,6 +13,8 @@ import { Badge } from '@/components/ui/badge';
 import { DataTable } from '@/components/ui-custom/DataTable';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useDebounce } from '@/hooks/useDebounce';
+import { GlobalRealtimeContext } from '@/context/GlobalRealtimeProvider';
+import { smartSearch } from '@/lib/utils';
 // Librería xlsx importada dinámicamente cuando se requiere
 
 interface AuditLog {
@@ -288,11 +290,7 @@ export default function AuditPage() {
 
   const filteredLogs = useMemo(() => {
     return logs.filter(log => {
-      const matchSearch = debouncedSearchTerm === '' ||
-        log.table_name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        log.action.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        log.record_id.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-      return matchSearch;
+      return smartSearch(debouncedSearchTerm, [log.table_name, log.action, log.record_id]);
     });
   }, [logs, debouncedSearchTerm]);
 

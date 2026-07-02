@@ -10,7 +10,7 @@ import {
   CommandGroup,
   CommandItem,
 } from '@/components/ui/command';
-import { cn } from '@/lib/utils';
+import { cn, smartSearch } from '@/lib/utils';
 import { supabase } from '@/lib/supabaseClient';
 
 interface DistritoComboboxProps {
@@ -59,7 +59,7 @@ export default function DistritoCombobox({
   }, [open, fetchDistritos]);
 
   const filteredDistritos = distritos.filter(d =>
-    d.toLowerCase().includes(searchQuery.toLowerCase())
+    smartSearch(searchQuery, [d])
   );
 
   const displayValue = value === 'all' ? placeholder : value;

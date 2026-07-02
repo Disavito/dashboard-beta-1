@@ -51,7 +51,7 @@
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
     "@react-pdf/renderer": "^4.4.1",
-    "@supabase/supabase-js": "^2.106.1",
+    "@supabase/supabase-js": "^2.109.0",
     "@tanstack/react-query": "^5.90.10",
     "@tanstack/react-query-persist-client": "^5.100.11",
     "@tanstack/react-table": "^8.21.3",

@@ -10,7 +10,7 @@ import {
   CommandGroup,
   CommandItem,
 } from '@/components/ui/command';
-import { cn } from '@/lib/utils';
+import { cn, smartSearch } from '@/lib/utils';
 import { supabase } from '@/lib/supabaseClient';
 
 interface LocalidadComboboxProps {
@@ -66,7 +66,7 @@ export default function LocalidadCombobox({
   }, [open, fetchLocalities]);
 
   const filteredLocalities = localities.filter(loc =>
-    loc.toLowerCase().includes(searchQuery.toLowerCase())
+    smartSearch(searchQuery, [loc])
   );
 
   const displayValue = value === 'all' ? placeholder : value;

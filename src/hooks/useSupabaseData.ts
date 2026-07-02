@@ -63,10 +63,13 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
     const buildQuery = () => {
       let query = supabase.from(tableName).select(selectQuery, { count: 'exact' });
 
-      // Apply search if provided
+      // Apply smart search (token-based)
       if (searchQuery && searchColumns && searchColumns.length > 0) {
-        const searchConditions = searchColumns.map(col => `${col}.ilike.%${searchQuery}%`).join(',');
-        query = query.or(searchConditions);
+        const tokens = searchQuery.trim().split(/\s+/).filter(Boolean);
+        tokens.forEach(token => {
+          const searchConditions = searchColumns.map(col => `${col}.ilike.%${token}%`).join(',');
+          query = query.or(searchConditions);
+        });
       }
 
       // Apply filters

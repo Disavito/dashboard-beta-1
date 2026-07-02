@@ -53,3 +53,26 @@ export const sortNames = (rowA: any, rowB: any, _columnId: string) => {
   const b = `${rowB.original.nombres} ${rowB.original.apellidoPaterno}`.toLowerCase();
   return a.localeCompare(b);
 };
+
+/**
+ * Búsqueda inteligente (Token-Based Search)
+ * Separa el término de búsqueda en palabras y requiere que todas estén presentes.
+ * Normaliza los textos para ignorar acentos y mayúsculas.
+ */
+export function smartSearch(query: string, fields: (string | undefined | null | number)[]): boolean {
+  if (!query || !query.trim()) return true;
+  
+  const normalize = (text: string) => 
+    String(text).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  // Limpiamos y dividimos el query en tokens (palabras) ignorando espacios extra
+  const tokens = normalize(query).trim().split(/\s+/);
+  
+  // Concatenamos todos los campos en un solo string para buscar
+  const textToSearch = normalize(fields
+    .filter(val => val !== undefined && val !== null)
+    .join(' '));
+
+  // Cada token debe encontrarse en algún lugar del texto concatenado
+  return tokens.every(token => textToSearch.includes(token));
+}

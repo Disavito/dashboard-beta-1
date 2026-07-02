@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
+import { smartSearch } from '@/lib/utils';
 
 export interface ExpedienteSocio {
   id: string;
@@ -118,10 +119,8 @@ export function useExpedienteData(options: UseExpedienteDataOptions = {}) {
 
   // Filtrado memoizado
   const filteredSocios = useMemo(() => {
-    const term = searchTerm.toLowerCase();
     return socios.filter(s => {
-      const matchesSearch = !term ||
-        `${s.nombres} ${s.apellidoPaterno} ${s.dni} ${s.mz} ${s.lote}`.toLowerCase().includes(term);
+      const matchesSearch = smartSearch(searchTerm, [s.nombres, s.apellidoPaterno, s.dni, s.mz, s.lote]);
       const matchesLocalidad = localidadFilter === 'all' || s.localidad === localidadFilter;
       return matchesSearch && matchesLocalidad;
     });

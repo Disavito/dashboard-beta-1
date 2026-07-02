@@ -19,6 +19,8 @@ import {
   FileText,
   Search
 } from 'lucide-react';
+import { LoteMedidoCell } from '@/components/custom/LoteMedidoCell';
+import { smartSearch } from '@/lib/utils';
 import LocalidadCombobox from '@/components/custom/LocalidadCombobox';
 import DistritoCombobox from '@/components/custom/DistritoCombobox';
 import { Badge } from '@/components/ui/badge';
@@ -457,7 +459,16 @@ function PartnerDocuments() {
       // Si no quedan más palabras que buscar, retornamos true (cumple Mz/Lote)
       if (tokens.length === 0) return true;
 
-      return tokens.every(token => socio.searchableContent?.includes(token));
+      return smartSearch(remainingQuery, [
+        socio.nombres, 
+        socio.apellidoPaterno, 
+        socio.apellidoMaterno, 
+        socio.dni, 
+        socio.mz, 
+        socio.lote, 
+        (socio as any).distritoVivienda, 
+        socio.localidad
+      ]);
     });
   }, [sociosConDocumentos, debouncedSearchQuery, selectedLocalidad, selectedDistrito, loteMedidoFilter, cruceFilter]);
 

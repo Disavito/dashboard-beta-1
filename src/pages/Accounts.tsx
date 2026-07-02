@@ -147,8 +147,7 @@ const Accounts: React.FC = () => {
       .filter(t => {
         const matchesAccount = selectedAccount === 'all' || t.account === selectedAccount;
         const matchesTipo = !validAccountNames || validAccountNames.has(t.account);
-        const matchesSearch = t.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) || 
-                             (t.ref && t.ref.toLowerCase().includes(debouncedSearchTerm.toLowerCase()));
+        const matchesSearch = smartSearch(debouncedSearchTerm, [t.description, t.ref]);
         return matchesAccount && matchesTipo && matchesSearch;
       })
       .sort((a, b) => {
