@@ -699,7 +699,11 @@ function People() {
 
       <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
         <DialogContent className="max-w-4xl p-0 overflow-hidden bg-card dark:bg-slate-900 border-none rounded-[2rem]">
-          <ExportSociosDialog onClose={() => setIsExportDialogOpen(false)} data={socios} />
+          <ExportSociosDialog 
+            onClose={() => setIsExportDialogOpen(false)} 
+            filters={serverFilters} 
+            searchQuery={debouncedSearch} 
+          />
         </DialogContent>
       </Dialog>
 

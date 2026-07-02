@@ -32,7 +32,8 @@ import {
 
 interface ExportSociosDialogProps {
   onClose: () => void;
-  data?: any[];
+  filters?: Record<string, any>;
+  searchQuery?: string;
 }
 
 const EXPORT_FIELDS = [
@@ -53,14 +54,16 @@ const EXPORT_FIELDS = [
   { id: 'has_contrato', label: 'Contrato', category: 'Documentos' },
 ];
 
-export default function ExportSociosDialog({ onClose, data: externalData }: ExportSociosDialogProps) {
+export default function ExportSociosDialog({ onClose, filters = {}, searchQuery = '' }: ExportSociosDialogProps) {
   const { data: fetchedData, loading } = useSupabaseData<any>({
     tableName: 'vw_socio_titulares_estado',
     fetchAll: true,
-    enabled: !externalData // Only fetch if externalData is not provided
+    initialFilters: filters,
+    searchQuery: searchQuery,
+    searchColumns: ['nombres', 'apellidoPaterno', 'apellidoMaterno', 'dni', 'receiptNumber']
   });
 
-  const data = externalData || fetchedData || [];
+  const data = fetchedData || [];
 
   const [selectedFields, setSelectedFields] = useState<string[]>(['dni', 'fullName', 'localidad', 'mz', 'lote', 'receiptNumber', 'observacion', 'payment_observation_detail']);
   const [format, setFormat] = useState<'xlsx' | 'csv' | 'pdf'>('xlsx');
