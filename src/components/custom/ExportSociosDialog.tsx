@@ -39,6 +39,7 @@ interface ExportSociosDialogProps {
 const EXPORT_FIELDS = [
   { id: 'dni', label: 'DNI', category: 'Básico' },
   { id: 'fullName', label: 'Nombre Completo', category: 'Básico' },
+  { id: 'telefono', label: 'Teléfono / Celular', category: 'Básico' },
   { id: 'localidad', label: 'Comunidad/Localidad', category: 'Básico' },
   { id: 'distritoVivienda', label: 'Distrito Vivienda', category: 'Básico' },
   { id: 'mz', label: 'Manzana', category: 'Básico' },
@@ -65,7 +66,7 @@ export default function ExportSociosDialog({ onClose, filters = {}, searchQuery 
 
   const data = fetchedData || [];
 
-  const [selectedFields, setSelectedFields] = useState<string[]>(['dni', 'fullName', 'localidad', 'mz', 'lote', 'receiptNumber', 'observacion', 'payment_observation_detail']);
+  const [selectedFields, setSelectedFields] = useState<string[]>(['dni', 'fullName', 'telefono', 'localidad', 'mz', 'lote', 'receiptNumber', 'observacion', 'payment_observation_detail']);
   const [format, setFormat] = useState<'xlsx' | 'csv' | 'pdf'>('xlsx');
   const [isExporting, setIsExporting] = useState(false);
   const [loteMedidoFilter, setLoteMedidoFilter] = useState<'all' | 'medido' | 'no_medido'>('all');
@@ -107,6 +108,7 @@ export default function ExportSociosDialog({ onClose, filters = {}, searchQuery 
       const row: any = {};
       if (selectedFields.includes('dni')) row['DNI'] = item.dni;
       if (selectedFields.includes('fullName')) row['Socio'] = `${item.nombres} ${item.apellidoPaterno} ${item.apellidoMaterno}`;
+      if (selectedFields.includes('telefono')) row['Teléfono / Celular'] = item.celular || item.telefono || '-';
       if (selectedFields.includes('localidad')) row['Localidad'] = item.localidad;
       if (selectedFields.includes('mz')) row['Manzana'] = item.mz || '-';
       if (selectedFields.includes('lote')) row['Lote'] = item.lote || '-';
