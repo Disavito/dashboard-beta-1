@@ -82,7 +82,7 @@ export default function ArchiveManagement() {
       if (error) throw error;
       toast.success('Contenedor creado');
       setContenedores([...contenedores, data]);
-      setSelectedContenedor(data.id.toString());
+      setSelectedContenedor(String(data.id));
       setNewContenedorName('');
     } catch (e: any) {
       toast.error('Error al crear contenedor', { description: e.message });
@@ -205,15 +205,15 @@ export default function ArchiveManagement() {
                   <div className="space-y-2">
                     <Label>Seleccionar Caja Existente</Label>
                     <Select onValueChange={(val) => {
-                      const c = cajas.find(c => c.id.toString() === val);
+                      const c = cajas.find(c => String(c.id) === val);
                       setSelectedCaja(c);
                     }}>
                       <SelectTrigger>
                         <SelectValue placeholder="Elige una caja..." />
                       </SelectTrigger>
                       <SelectContent>
-                        {cajas.map(c => (
-                          <SelectItem key={c.id} value={c.id.toString()}>
+                        {cajas.map((c, i) => (
+                          <SelectItem key={c.id || i} value={String(c.id || i)}>
                             {c.codigo_etiqueta} ({c.localidad_codigos?.nombre_localidad})
                           </SelectItem>
                         ))}
@@ -233,8 +233,8 @@ export default function ArchiveManagement() {
                         <SelectValue placeholder="Seleccione..." />
                       </SelectTrigger>
                       <SelectContent>
-                        {localidades.map(l => (
-                          <SelectItem key={l.id} value={l.id.toString()}>{l.nombre_localidad}</SelectItem>
+                        {localidades.map((l, i) => (
+                          <SelectItem key={l.id || i} value={String(l.id || i)}>{l.nombre_localidad}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -248,8 +248,8 @@ export default function ArchiveManagement() {
                           <SelectValue placeholder="Seleccione..." />
                         </SelectTrigger>
                         <SelectContent>
-                          {contenedores.map(c => (
-                            <SelectItem key={c.id} value={c.id.toString()}>{c.codigo_contenedor}</SelectItem>
+                          {contenedores.map((c, i) => (
+                            <SelectItem key={c.id || i} value={String(c.id || i)}>{c.codigo_contenedor}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
