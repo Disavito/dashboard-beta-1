@@ -11,6 +11,54 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { generateBoxPDF, CajaLogica } from '@/components/archive/BoxPDFGenerator';
 
+const compareArchiveSocios = (a: any, b: any) => {
+  const getRank = (receipt: string | null | undefined) => {
+    if (!receipt) return { group: 6, val: "" };
+    const trimmed = receipt.trim().toUpperCase();
+    
+    // 1. Números puros
+    if (/^\d+$/.test(trimmed)) {
+      const num = parseInt(trimmed, 10);
+      if (num >= 30000 && num < 40000) return { group: 1, val: num };
+      if (num >= 50000 && num < 60000) return { group: 2, val: num };
+      return { group: 3, val: num }; // 1 al 1300 etc.
+    }
+    
+    // 2. Empiezan con B- o R-
+    if (trimmed.startsWith('B-')) return { group: 4, val: trimmed };
+    if (trimmed.startsWith('R-')) return { group: 5, val: trimmed };
+    
+    return { group: 6, val: trimmed }; // fallback o sin recibo válido
+  };
+
+  const rankA = getRank(a.receiptNumber);
+  const rankB = getRank(b.receiptNumber);
+
+  // Si están en distintos grupos (ej. 30000s vs 50000s vs 1-1300)
+  if (rankA.group !== rankB.group) {
+    return rankA.group - rankB.group;
+  }
+
+  // Si están en el grupo de 'sin recibo', ordenar por DNI numéricamente
+  if (rankA.group === 6) {
+    const dniA = Number(a.dni) || 0;
+    const dniB = Number(b.dni) || 0;
+    return dniA - dniB;
+  }
+
+  // Grupos numéricos (30000, 50000, 1-1300) -> ordenar de menor a mayor
+  if (typeof rankA.val === 'number' && typeof rankB.val === 'number') {
+    return rankA.val - rankB.val;
+  }
+
+  // Grupos texto (B-, R-) -> ordenar alfanuméricamente
+  if (typeof rankA.val === 'string' && typeof rankB.val === 'string') {
+    return rankA.val.localeCompare(rankB.val, undefined, { numeric: true, sensitivity: 'base' });
+  }
+
+  return 0;
+};
+
 export default function ArchiveManagement() {
   const [localidades, setLocalidades] = useState<any[]>([]);
   const [contenedores, setContenedores] = useState<any[]>([]);
@@ -24,6 +72,7 @@ export default function ArchiveManagement() {
   const [selectedPeopleIds, setSelectedPeopleIds] = useState<Set<string>>(new Set());
   const [isLoadingPeople, setIsLoadingPeople] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [activeLocalidadFilter, setActiveLocalidadFilter] = useState('');
 
   // New Caja Form
   const [isCreatingCaja, setIsCreatingCaja] = useState(false);
@@ -58,9 +107,29 @@ export default function ArchiveManagement() {
       return;
     }
     try {
+      // Find the name of the selected localidad to query socio_titulares
+      const loc = localidades.find(l => String(l.id) === selectedLocalidad);
+      let yearToUse = new Date().getFullYear();
+      
+      if (loc?.nombre_localidad) {
+        // Find the oldest record for this association
+        const { data: earliestSocio } = await supabase
+          .from('socio_titulares')
+          .select('created_at')
+          .eq('localidad', loc.nombre_localidad)
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .single();
+          
+        if (earliestSocio && earliestSocio.created_at) {
+          yearToUse = new Date(earliestSocio.created_at).getFullYear();
+        }
+      }
+
       const { data, error } = await supabase.from('cajas_archivo').insert({
         localidad_id: parseInt(selectedLocalidad),
-        contenedor_id: parseInt(selectedContenedor)
+        contenedor_id: parseInt(selectedContenedor),
+        anio: yearToUse
       }).select('*, localidad_codigos(nombre_localidad), contenedores_fisicos(codigo_contenedor)').single();
 
       if (error) throw error;
@@ -91,7 +160,7 @@ export default function ArchiveManagement() {
   };
 
   const fetchPeople = async () => {
-    if (!selectedCaja?.localidad_codigos?.nombre_localidad) {
+    if (!activeLocalidadFilter || !selectedCaja) {
       setPeopleInLocalidad([]);
       setSelectedPeopleIds(new Set());
       return;
@@ -102,11 +171,12 @@ export default function ArchiveManagement() {
       const { data, error } = await supabase
         .from('vw_socio_titulares_estado')
         .select('id, nombres, apellidoPaterno, apellidoMaterno, dni, receiptNumber, caja_id')
-        .eq('localidad', selectedCaja.localidad_codigos.nombre_localidad)
-        .order('apellidoPaterno', { ascending: true });
+        .eq('localidad', activeLocalidadFilter);
 
       if (error) throw error;
-      setPeopleInLocalidad(data || []);
+      
+      const sortedData = (data || []).sort(compareArchiveSocios);
+      setPeopleInLocalidad(sortedData);
       
       const inBox = (data || []).filter(p => p.caja_id === selectedCaja.id).map(p => p.id);
       setSelectedPeopleIds(new Set(inBox));
@@ -118,8 +188,16 @@ export default function ArchiveManagement() {
   };
 
   useEffect(() => {
-    fetchPeople();
+    if (selectedCaja?.localidad_codigos?.nombre_localidad) {
+      setActiveLocalidadFilter(selectedCaja.localidad_codigos.nombre_localidad);
+    } else {
+      setActiveLocalidadFilter('');
+    }
   }, [selectedCaja]);
+
+  useEffect(() => {
+    fetchPeople();
+  }, [activeLocalidadFilter]);
 
   const handleTogglePerson = (person: any) => {
     const isAssignedToOther = person.caja_id && person.caja_id !== selectedCaja?.id;
@@ -319,13 +397,27 @@ export default function ArchiveManagement() {
           <Card className="h-full shadow-md border-border/50">
             <CardHeader>
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                <div>
+                <div className="space-y-2">
                   <CardTitle>Asignación de Expedientes</CardTitle>
-                  <CardDescription>
-                    {selectedCaja 
-                      ? `Personas de la Localidad: ${selectedCaja.localidad_codigos?.nombre_localidad}`
-                      : 'Selecciona una caja para ver los expedientes disponibles.'}
-                  </CardDescription>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+                      Viendo asociación:
+                    </span>
+                    <Select 
+                      disabled={!selectedCaja || isProcessing}
+                      value={activeLocalidadFilter} 
+                      onValueChange={setActiveLocalidadFilter}
+                    >
+                      <SelectTrigger className="w-full max-w-[300px] h-9 text-sm">
+                        <SelectValue placeholder="Seleccionar asociación" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {localidades.map((l, i) => (
+                          <SelectItem key={l.id || i} value={l.nombre_localidad}>{l.nombre_localidad}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 {selectedCaja && (
                   <div className="text-right">
@@ -347,7 +439,7 @@ export default function ArchiveManagement() {
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row justify-between items-center bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800 gap-4">
                     <p className="text-sm text-blue-800 dark:text-blue-300">
-                      Marca las personas cuyos expedientes guardarás físicamente en <strong>{selectedCaja.codigo_etiqueta}</strong>.
+                      Marca las personas cuyos expedientes guardarás en la caja <strong>{selectedCaja.codigo_etiqueta}</strong>. Puedes cambiar la asociación arriba para agregar expedientes de otras localidades a esta misma caja.
                     </p>
                     <Button 
                       onClick={handleSaveChanges} 
