@@ -108,7 +108,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ resourcePath, children 
   }
 
   // Rutas generales — necesitan permiso explícito
-  if (!isAuthorized && resourcePath !== '/' && resourcePath !== '/dashboard') {
+  if (!isAuthorized && resourcePath !== '/' && resourcePath !== '/dashboard' && resourcePath !== '/cajas') {
     return (
       <div className="flex flex-col items-center justify-center h-screen text-center bg-background text-text">
         <h1 className="text-4xl font-bold text-error">Sin Permisos</h1>
