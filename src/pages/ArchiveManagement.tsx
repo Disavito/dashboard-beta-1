@@ -159,11 +159,11 @@ export default function ArchiveManagement() {
     }
   };
 
-  const handleDeleteCaja = async (id: number) => {
+  const handleDeleteCaja = async (id_caja: string) => {
     if (!window.confirm('¿Estás seguro de eliminar esta caja lógica? Esto no borrará los expedientes, solo los dejará "sin caja".')) return;
     try {
       setIsProcessing(true);
-      const { error } = await supabase.from('cajas_archivo').delete().eq('id', id);
+      const { error } = await supabase.from('cajas_archivo').delete().eq('id_caja', id_caja);
       if (error) throw error;
       toast.success('Caja eliminada');
       setSelectedCaja(null);
@@ -175,11 +175,11 @@ export default function ArchiveManagement() {
     }
   };
 
-  const handleDeleteContenedor = async (id: string) => {
+  const handleDeleteContenedor = async (id_contenedor: string) => {
     if (!window.confirm('¿Estás seguro de eliminar este contenedor físico? Las cajas dentro quedarán "sin contenedor".')) return;
     try {
       setIsProcessing(true);
-      const { error } = await supabase.from('contenedores_fisicos').delete().eq('id', parseInt(id));
+      const { error } = await supabase.from('contenedores_fisicos').delete().eq('id_contenedor', parseInt(id_contenedor));
       if (error) throw error;
       toast.success('Contenedor eliminado');
       setSelectedContenedor('');
@@ -210,7 +210,7 @@ export default function ArchiveManagement() {
       const sortedData = (data || []).sort(compareArchiveSocios);
       setPeopleInLocalidad(sortedData);
       
-      const inBox = (data || []).filter(p => p.caja_id === selectedCaja.id).map(p => p.id);
+      const inBox = (data || []).filter(p => p.caja_id === selectedCaja.id_caja).map(p => p.id);
       setSelectedPeopleIds(new Set(inBox));
     } catch (e: any) {
       toast.error('Error al cargar personas de la localidad', { description: e.message });
@@ -232,7 +232,7 @@ export default function ArchiveManagement() {
   }, [activeLocalidadFilter]);
 
   const handleTogglePerson = (person: any) => {
-    const isAssignedToOther = person.caja_id && person.caja_id !== selectedCaja?.id;
+    const isAssignedToOther = person.caja_id && person.caja_id !== selectedCaja?.id_caja;
     if (isAssignedToOther) {
       toast.warning('Esta persona ya está asignada a otra caja.');
       return;
@@ -256,12 +256,12 @@ export default function ArchiveManagement() {
     setIsProcessing(true);
     
     try {
-      const originallyInBox = new Set(peopleInLocalidad.filter(p => p.caja_id === selectedCaja.id).map(p => p.id));
+      const originallyInBox = new Set(peopleInLocalidad.filter(p => p.caja_id === selectedCaja.id_caja).map(p => p.id));
       const toAdd = [...selectedPeopleIds].filter(id => !originallyInBox.has(id));
       const toRemove = [...originallyInBox].filter(id => !selectedPeopleIds.has(id));
 
       if (toAdd.length > 0) {
-        const { error: errAdd } = await supabase.from('socio_titulares').update({ caja_id: selectedCaja.id }).in('id', toAdd);
+        const { error: errAdd } = await supabase.from('socio_titulares').update({ caja_id: selectedCaja.id_caja }).in('id', toAdd);
         if (errAdd) throw errAdd;
       }
 
@@ -322,7 +322,7 @@ export default function ArchiveManagement() {
                   <div className="space-y-2">
                     <Label>Seleccionar Caja Existente</Label>
                     <Select onValueChange={(val) => {
-                      const c = cajas.find(c => String(c.id) === val);
+                      const c = cajas.find(c => String(c.id_caja) === val);
                       setSelectedCaja(c);
                     }}>
                       <SelectTrigger>
@@ -330,7 +330,7 @@ export default function ArchiveManagement() {
                       </SelectTrigger>
                       <SelectContent>
                         {cajas.map((c, i) => (
-                          <SelectItem key={c.id || i} value={String(c.id || i)}>
+                          <SelectItem key={c.id_caja || i} value={String(c.id_caja || i)}>
                             {c.codigo_etiqueta} ({c.localidad_codigos?.nombre_localidad})
                           </SelectItem>
                         ))}
@@ -366,7 +366,7 @@ export default function ArchiveManagement() {
                         </SelectTrigger>
                         <SelectContent>
                           {contenedores.map((c, i) => (
-                            <SelectItem key={c.id || i} value={String(c.id || i)}>{c.codigo_contenedor}</SelectItem>
+                            <SelectItem key={c.id_contenedor || i} value={String(c.id_contenedor || i)}>{c.codigo_contenedor}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -409,7 +409,7 @@ export default function ArchiveManagement() {
                     variant="ghost"
                     size="icon"
                     className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => handleDeleteCaja(selectedCaja.id)}
+                    onClick={() => handleDeleteCaja(selectedCaja.id_caja)}
                     title="Eliminar Caja Lógica"
                     disabled={isProcessing}
                   >
@@ -527,7 +527,7 @@ export default function ArchiveManagement() {
                         <tbody className="divide-y">
                           {peopleInLocalidad.map(p => {
                             const isSelected = selectedPeopleIds.has(p.id);
-                            const isAssignedToOther = p.caja_id && p.caja_id !== selectedCaja.id;
+                            const isAssignedToOther = p.caja_id && p.caja_id !== selectedCaja.id_caja;
                             
                             return (
                               <tr 
