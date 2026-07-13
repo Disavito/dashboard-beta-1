@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
-import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Search } from 'lucide-react';
+import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Search, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -156,6 +156,38 @@ export default function ArchiveManagement() {
       setNewContenedorName('');
     } catch (e: any) {
       toast.error('Error al crear contenedor', { description: e.message });
+    }
+  };
+
+  const handleDeleteCaja = async (id: number) => {
+    if (!window.confirm('¿Estás seguro de eliminar esta caja lógica? Esto no borrará los expedientes, solo los dejará "sin caja".')) return;
+    try {
+      setIsProcessing(true);
+      const { error } = await supabase.from('cajas_archivo').delete().eq('id', id);
+      if (error) throw error;
+      toast.success('Caja eliminada');
+      setSelectedCaja(null);
+      loadData();
+    } catch(e: any) {
+      toast.error('Error al eliminar la caja', { description: e.message });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDeleteContenedor = async (id: string) => {
+    if (!window.confirm('¿Estás seguro de eliminar este contenedor físico? Las cajas dentro quedarán "sin contenedor".')) return;
+    try {
+      setIsProcessing(true);
+      const { error } = await supabase.from('contenedores_fisicos').delete().eq('id', parseInt(id));
+      if (error) throw error;
+      toast.success('Contenedor eliminado');
+      setSelectedContenedor('');
+      loadData();
+    } catch(e: any) {
+      toast.error('Error al eliminar el contenedor', { description: e.message });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -338,6 +370,17 @@ export default function ArchiveManagement() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {selectedContenedor && (
+                        <Button 
+                          variant="destructive" 
+                          size="icon"
+                          onClick={() => handleDeleteContenedor(selectedContenedor)}
+                          disabled={isProcessing}
+                          title="Eliminar Contenedor"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
 
@@ -361,8 +404,18 @@ export default function ArchiveManagement() {
               )}
 
               {selectedCaja && (
-                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                  <div className="flex items-start justify-between">
+                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl relative group">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => handleDeleteCaja(selectedCaja.id)}
+                    title="Eliminar Caja Lógica"
+                    disabled={isProcessing}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                  <div className="flex items-start justify-between pr-8">
                     <div>
                       <h3 className="font-bold text-blue-900 dark:text-blue-200 text-sm mb-1">Caja Seleccionada:</h3>
                       <p className="text-2xl font-black text-[#00468c] dark:text-blue-400">{selectedCaja.codigo_etiqueta}</p>
