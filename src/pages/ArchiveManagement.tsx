@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
-import { Box, FileText, Upload, RefreshCcw, Printer, Plus } from 'lucide-react';
+import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import { generateBoxPDF, CajaLogica } from '@/components/archive/BoxPDFGenerator';
 
 export default function ArchiveManagement() {
@@ -20,8 +20,9 @@ export default function ArchiveManagement() {
   const [selectedContenedor, setSelectedContenedor] = useState('');
   const [selectedCaja, setSelectedCaja] = useState<any>(null);
 
-  const [inputReceipts, setInputReceipts] = useState('');
-  const [inputDnis, setInputDnis] = useState('');
+  const [peopleInLocalidad, setPeopleInLocalidad] = useState<any[]>([]);
+  const [selectedPeopleIds, setSelectedPeopleIds] = useState<Set<string>>(new Set());
+  const [isLoadingPeople, setIsLoadingPeople] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // New Caja Form
@@ -89,80 +90,86 @@ export default function ArchiveManagement() {
     }
   };
 
-  const processAssignation = async (type: 'receipts' | 'dnis') => {
-    if (!selectedCaja) {
-      toast.error('Selecciona una caja lógica de destino primero.');
+  const fetchPeople = async () => {
+    if (!selectedCaja?.localidad_codigos?.nombre_localidad) {
+      setPeopleInLocalidad([]);
+      setSelectedPeopleIds(new Set());
       return;
     }
-
-    const textInput = type === 'receipts' ? inputReceipts : inputDnis;
-    const items = textInput.split(/\r?\n|,/).map((i: string) => i.trim()).filter(Boolean);
-
-    if (items.length === 0) {
-      toast.error('Ingresa al menos un dato.');
-      return;
-    }
-
-    setIsProcessing(true);
-    let successCount = 0;
     
+    setIsLoadingPeople(true);
     try {
-      // Check current capacity
-      const { count: currentCount, error: countErr } = await supabase
-        .from('socio_titulares')
-        .select('*', { count: 'exact', head: true })
-        .eq('caja_id', selectedCaja.id);
+      const { data, error } = await supabase
+        .from('vw_socio_titulares_estado')
+        .select('id, nombres, apellidoPaterno, apellidoMaterno, dni, receiptNumber, caja_id')
+        .eq('localidad', selectedCaja.localidad_codigos.nombre_localidad)
+        .order('apellidoPaterno', { ascending: true });
 
-      if (countErr) throw countErr;
-      const count = currentCount || 0;
+      if (error) throw error;
+      setPeopleInLocalidad(data || []);
+      
+      const inBox = (data || []).filter(p => p.caja_id === selectedCaja.id).map(p => p.id);
+      setSelectedPeopleIds(new Set(inBox));
+    } catch (e: any) {
+      toast.error('Error al cargar personas de la localidad', { description: e.message });
+    } finally {
+      setIsLoadingPeople(false);
+    }
+  };
 
-      if (count + items.length > 80) {
-        toast.error(`Límite Excedido (Máx 80). La caja ya contiene ${count} expedientes. Quedan ${80 - count} espacios.`);
-        setIsProcessing(false);
+  useEffect(() => {
+    fetchPeople();
+  }, [selectedCaja]);
+
+  const handleTogglePerson = (person: any) => {
+    const isAssignedToOther = person.caja_id && person.caja_id !== selectedCaja?.id;
+    if (isAssignedToOther) {
+      toast.warning('Esta persona ya está asignada a otra caja.');
+      return;
+    }
+
+    const next = new Set(selectedPeopleIds);
+    if (next.has(person.id)) {
+      next.delete(person.id);
+    } else {
+      if (next.size >= 80) {
+        toast.error('Límite Excedido. Una caja solo puede contener hasta 80 expedientes.');
         return;
       }
+      next.add(person.id);
+    }
+    setSelectedPeopleIds(next);
+  };
 
-      let dnisToUpdate: string[] = [];
+  const handleSaveChanges = async () => {
+    if (!selectedCaja) return;
+    setIsProcessing(true);
+    
+    try {
+      const originallyInBox = new Set(peopleInLocalidad.filter(p => p.caja_id === selectedCaja.id).map(p => p.id));
+      const toAdd = [...selectedPeopleIds].filter(id => !originallyInBox.has(id));
+      const toRemove = [...originallyInBox].filter(id => !selectedPeopleIds.has(id));
 
-      if (type === 'receipts') {
-        // Find DNIs from receipts in `ingresos`
-        const { data: ingresos, error: errIn } = await supabase
-          .from('ingresos')
-          .select('socioTitular_id, receipt_number')
-          .in('receipt_number', items)
-          .eq('status', 'VALIDO');
-          
-        if (errIn) throw errIn;
-        if (!ingresos || ingresos.length === 0) {
-          throw new Error('No se encontraron recibos válidos asociados a socios titulares.');
-        }
-        
-        dnisToUpdate = ingresos.map(i => i.socioTitular_id);
-      } else {
-        dnisToUpdate = items;
+      if (toAdd.length > 0) {
+        const { error: errAdd } = await supabase.from('socio_titulares').update({ caja_id: selectedCaja.id }).in('id', toAdd);
+        if (errAdd) throw errAdd;
       }
 
-      // Update `caja_id` in `socio_titulares`
-      const { data: updated, error: updateErr } = await supabase
-        .from('socio_titulares')
-        .update({ caja_id: selectedCaja.id })
-        .in('dni', dnisToUpdate)
-        .select();
+      if (toRemove.length > 0) {
+        const { error: errRem } = await supabase.from('socio_titulares').update({ caja_id: null }).in('id', toRemove);
+        if (errRem) throw errRem;
+      }
 
-      if (updateErr) throw updateErr;
-      
-      successCount = updated?.length || 0;
-      toast.success(`Se asignaron ${successCount} expedientes a la caja ${selectedCaja.codigo_etiqueta}.`);
-      
-      // Reload boxes to update counts
-      loadData();
-
-      // Clear inputs
-      if (type === 'receipts') setInputReceipts('');
-      else setInputDnis('');
-
-    } catch (e: any) {
-      toast.error('Error en el proceso', { description: e.message });
+      const totalChanges = toAdd.length + toRemove.length;
+      if (totalChanges > 0) {
+        toast.success(`Caja ${selectedCaja.codigo_etiqueta} actualizada correctamente. (${toAdd.length} agregados, ${toRemove.length} removidos)`);
+        loadData(); // actualiza cuentas de cajas
+        fetchPeople(); // recarga lista
+      } else {
+        toast.info('No hay cambios para guardar.');
+      }
+    } catch(e: any) {
+      toast.error('Error al guardar cambios', { description: e.message });
     } finally {
       setIsProcessing(false);
     }
@@ -311,60 +318,115 @@ export default function ArchiveManagement() {
         <div className="lg:col-span-8 space-y-6">
           <Card className="h-full shadow-md border-border/50">
             <CardHeader>
-              <CardTitle>Asignación de Expedientes</CardTitle>
-              <CardDescription>
-                Vincula expedientes físicos a la caja <strong>{selectedCaja ? selectedCaja.codigo_etiqueta : '(Ninguna)'}</strong>
-              </CardDescription>
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div>
+                  <CardTitle>Asignación de Expedientes</CardTitle>
+                  <CardDescription>
+                    {selectedCaja 
+                      ? `Personas de la Localidad: ${selectedCaja.localidad_codigos?.nombre_localidad}`
+                      : 'Selecciona una caja para ver los expedientes disponibles.'}
+                  </CardDescription>
+                </div>
+                {selectedCaja && (
+                  <div className="text-right">
+                    <span className="text-sm font-bold text-muted-foreground mr-2">Capacidad: </span>
+                    <Badge variant={selectedPeopleIds.size === 80 ? "destructive" : "default"} className="text-sm px-3 py-1">
+                      {selectedPeopleIds.size} / 80
+                    </Badge>
+                  </div>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="receipts" className="w-full">
-                <TabsList className="w-full grid grid-cols-2 mb-6">
-                  <TabsTrigger value="receipts" className="font-bold"><FileText className="w-4 h-4 mr-2"/> Vía A: Por Recibos</TabsTrigger>
-                  <TabsTrigger value="dnis" className="font-bold"><FileText className="w-4 h-4 mr-2"/> Vía B: Por DNIs</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="receipts" className="space-y-4">
-                  <div className="p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl text-amber-800 dark:text-amber-400 text-sm">
-                    <strong>¿Cómo funciona?</strong> Pega aquí una lista de números de recibo (uno por línea o separados por comas). El sistema buscará el DNI asociado a cada recibo válido y moverá esos expedientes a la caja seleccionada.
+              {!selectedCaja ? (
+                <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed rounded-xl border-muted bg-slate-50 dark:bg-slate-900/50">
+                  <FileText className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
+                  <p className="text-muted-foreground">Selecciona una caja en el panel izquierdo para comenzar.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-center bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800 gap-4">
+                    <p className="text-sm text-blue-800 dark:text-blue-300">
+                      Marca las personas cuyos expedientes guardarás físicamente en <strong>{selectedCaja.codigo_etiqueta}</strong>.
+                    </p>
+                    <Button 
+                      onClick={handleSaveChanges} 
+                      disabled={isProcessing}
+                      className="bg-[#00468c] hover:bg-[#003366] shrink-0"
+                    >
+                      {isProcessing ? <RefreshCcw className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                      Guardar Cambios
+                    </Button>
                   </div>
-                  <Textarea 
-                    placeholder="Ejemplo:&#10;500&#10;R-001050&#10;B-001"
-                    className="min-h-[250px] font-mono"
-                    value={inputReceipts}
-                    onChange={(e) => setInputReceipts(e.target.value)}
-                  />
-                  <Button 
-                    className="w-full bg-[#00468c] hover:bg-[#003366] text-white" 
-                    size="lg"
-                    disabled={isProcessing || !inputReceipts.trim() || !selectedCaja}
-                    onClick={() => processAssignation('receipts')}
-                  >
-                    {isProcessing ? <RefreshCcw className="w-5 h-5 mr-2 animate-spin" /> : <Upload className="w-5 h-5 mr-2" />}
-                    Vincular Expedientes por Recibo
-                  </Button>
-                </TabsContent>
 
-                <TabsContent value="dnis" className="space-y-4">
-                  <div className="p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-blue-800 dark:text-blue-400 text-sm">
-                    <strong>¿Cómo funciona?</strong> Pega aquí una lista de DNIs (uno por línea o separados por comas). El sistema actualizará directamente la ubicación física de estos socios a la caja actual.
-                  </div>
-                  <Textarea 
-                    placeholder="Ejemplo:&#10;72345678&#10;45678912"
-                    className="min-h-[250px] font-mono"
-                    value={inputDnis}
-                    onChange={(e) => setInputDnis(e.target.value)}
-                  />
-                  <Button 
-                    className="w-full bg-[#00468c] hover:bg-[#003366] text-white" 
-                    size="lg"
-                    disabled={isProcessing || !inputDnis.trim() || !selectedCaja}
-                    onClick={() => processAssignation('dnis')}
-                  >
-                    {isProcessing ? <RefreshCcw className="w-5 h-5 mr-2 animate-spin" /> : <Upload className="w-5 h-5 mr-2" />}
-                    Vincular Expedientes por DNI
-                  </Button>
-                </TabsContent>
-              </Tabs>
+                  {isLoadingPeople ? (
+                    <div className="flex justify-center p-12">
+                      <RefreshCcw className="w-8 h-8 animate-spin text-[#00468c]" />
+                    </div>
+                  ) : peopleInLocalidad.length === 0 ? (
+                    <div className="text-center p-12 border rounded-xl bg-slate-50 dark:bg-slate-900/50 text-muted-foreground">
+                      No se encontraron socios registrados para la localidad {selectedCaja.localidad_codigos?.nombre_localidad}.
+                    </div>
+                  ) : (
+                    <div className="border rounded-md max-h-[500px] overflow-y-auto bg-white dark:bg-background">
+                      <table className="w-full text-sm text-left">
+                        <thead className="text-xs uppercase bg-slate-100 dark:bg-slate-900 sticky top-0 z-10 shadow-sm border-b">
+                          <tr>
+                            <th className="px-4 py-3 w-16 text-center">En Caja</th>
+                            <th className="px-4 py-3">Socio Titular</th>
+                            <th className="px-4 py-3 w-28">DNI</th>
+                            <th className="px-4 py-3 w-32">Recibo</th>
+                            <th className="px-4 py-3 w-32">Estado actual</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {peopleInLocalidad.map(p => {
+                            const isSelected = selectedPeopleIds.has(p.id);
+                            const isAssignedToOther = p.caja_id && p.caja_id !== selectedCaja.id;
+                            
+                            return (
+                              <tr 
+                                key={p.id} 
+                                className={`transition-colors ${isSelected ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-900/50'} ${isAssignedToOther ? 'opacity-60' : ''}`}
+                                onClick={() => { if (!isAssignedToOther) handleTogglePerson(p) }}
+                              >
+                                <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
+                                  <Checkbox 
+                                    checked={isSelected}
+                                    disabled={isAssignedToOther || (selectedPeopleIds.size >= 80 && !isSelected) || isProcessing}
+                                    onCheckedChange={() => handleTogglePerson(p)}
+                                    className="cursor-pointer"
+                                  />
+                                </td>
+                                <td className="px-4 py-3 font-medium cursor-pointer">
+                                  {p.apellidoPaterno} {p.apellidoMaterno}, {p.nombres}
+                                </td>
+                                <td className="px-4 py-3 text-muted-foreground">{p.dni}</td>
+                                <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{p.receiptNumber || 'N/A'}</td>
+                                <td className="px-4 py-3">
+                                  {isAssignedToOther ? (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                                      En otra caja
+                                    </span>
+                                  ) : isSelected ? (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                      En esta caja
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300">
+                                      Sin caja
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
