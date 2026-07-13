@@ -21,6 +21,7 @@ const EgresosPage = lazy(() => import('./pages/Expenses'));
 const CuentasPage = lazy(() => import('./pages/Accounts'));
 const AccountDetails = lazy(() => import('./pages/AccountDetails'));
 const PartnerDocuments = lazy(() => import('./pages/PartnerDocuments'));
+const ArchiveManagement = lazy(() => import('./pages/ArchiveManagement'));
 const SettingsPage = lazy(() => import('./pages/Settings'));
 const JornadaPage = lazy(() => import('./pages/JornadaPage'));
 const InventoryPage = lazy(() => import('./pages/Inventory'));
@@ -61,6 +62,10 @@ function App() {
               
               <Route element={<ProtectedRoute resourcePath="/partner-documents" />}>
                 <Route path="partner-documents" element={<PartnerDocuments />} />
+              </Route>
+
+              <Route element={<ProtectedRoute resourcePath="/cajas" />}>
+                <Route path="cajas" element={<ArchiveManagement />} />
               </Route>
 
               <Route element={<ProtectedRoute resourcePath="/invoicing" />}>

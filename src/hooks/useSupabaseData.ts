@@ -367,22 +367,46 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
       if (!old || !old.data) return old;
       
       const exists = old.data.some((item: any) => item.id === id);
-      if (exists) {
-        // UPDATE in place
-        return {
-          ...old,
-          data: old.data.map((item: any) => item.id === id ? record : item)
-        };
+      
+      // Evaluar si el registro cumple con los filtros activos localmente
+      let shouldInclude = true;
+      for (const key in filters) {
+        if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+          if (record[key] !== filters[key]) {
+            shouldInclude = false;
+            break;
+          }
+        }
+      }
+
+      if (shouldInclude) {
+        if (exists) {
+          // UPDATE in place
+          return {
+            ...old,
+            data: old.data.map((item: any) => item.id === id ? record : item)
+          };
+        } else {
+          // INSERT en cache
+          return {
+            ...old,
+            data: [record as T, ...old.data],
+            count: old.count + 1
+          };
+        }
       } else {
-        // INSERT en cache
-        return {
-          ...old,
-          data: [record as T, ...old.data],
-          count: old.count + 1
-        };
+        // Si no cumple los filtros pero estaba en caché (ej. se editó y ya no pertenece a la vista actual)
+        if (exists) {
+          return {
+            ...old,
+            data: old.data.filter((item: any) => item.id !== id),
+            count: Math.max(0, old.count - 1)
+          };
+        }
+        return old;
       }
     });
-  }, [tableName, selectQuery, queryClient, JSON.stringify(queryKey)]);
+  }, [tableName, selectQuery, queryClient, JSON.stringify(queryKey), JSON.stringify(filters)]);
 
   const injectRealtimeEvent = useCallback(async (payload: RealtimePostgresChangesPayload<any>) => {
     const eventType = payload.eventType;
