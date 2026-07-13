@@ -43,7 +43,7 @@ export default function ArchiveManagement() {
       if (!e2) setContenedores(conts || []);
 
       // 3. Fetch Cajas
-      const { data: cjs, error: e3 } = await supabase.from('cajas_archivo').select('*, localidad_codigos(nombre_localidad), contenedores_fisicos(codigo_contenedor)');
+      const { data: cjs, error: e3 } = await supabase.from('cajas_archivo').select('*, localidad_codigos(nombre_localidad), contenedores_fisicos(codigo_contenedor), socio_titulares(count)');
       if (!e3) setCajas(cjs || []);
 
     } catch (error) {
@@ -107,6 +107,21 @@ export default function ArchiveManagement() {
     let successCount = 0;
     
     try {
+      // Check current capacity
+      const { count: currentCount, error: countErr } = await supabase
+        .from('socio_titulares')
+        .select('*', { count: 'exact', head: true })
+        .eq('caja_id', selectedCaja.id);
+
+      if (countErr) throw countErr;
+      const count = currentCount || 0;
+
+      if (count + items.length > 80) {
+        toast.error(`Límite Excedido (Máx 80). La caja ya contiene ${count} expedientes. Quedan ${80 - count} espacios.`);
+        setIsProcessing(false);
+        return;
+      }
+
       let dnisToUpdate: string[] = [];
 
       if (type === 'receipts') {
@@ -139,6 +154,9 @@ export default function ArchiveManagement() {
       successCount = updated?.length || 0;
       toast.success(`Se asignaron ${successCount} expedientes a la caja ${selectedCaja.codigo_etiqueta}.`);
       
+      // Reload boxes to update counts
+      loadData();
+
       // Clear inputs
       if (type === 'receipts') setInputReceipts('');
       else setInputDnis('');
@@ -259,9 +277,19 @@ export default function ArchiveManagement() {
 
               {selectedCaja && (
                 <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                  <h3 className="font-bold text-blue-900 dark:text-blue-200 text-sm mb-1">Caja Seleccionada:</h3>
-                  <p className="text-2xl font-black text-[#00468c] dark:text-blue-400">{selectedCaja.codigo_etiqueta}</p>
-                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-2">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-bold text-blue-900 dark:text-blue-200 text-sm mb-1">Caja Seleccionada:</h3>
+                      <p className="text-2xl font-black text-[#00468c] dark:text-blue-400">{selectedCaja.codigo_etiqueta}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] font-black uppercase text-blue-800/60 dark:text-blue-300/60">Capacidad</span>
+                      <p className="text-xl font-bold text-blue-700 dark:text-blue-300">
+                        {selectedCaja.socio_titulares?.[0]?.count || 0} <span className="text-sm">/ 80</span>
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-3">
                     <strong>Contenedor:</strong> {selectedCaja.contenedores_fisicos?.codigo_contenedor} <br/>
                     <strong>Localidad:</strong> {selectedCaja.localidad_codigos?.nombre_localidad}
                   </p>

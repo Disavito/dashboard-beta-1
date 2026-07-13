@@ -1,24 +1,6 @@
--- Script de Migración: Sistema de Archivo Físico
+-- Script de Migración: Sistema de Archivo Físico (Corregido)
 
--- 1. Tabla: localidad_codigos
-CREATE TABLE IF NOT EXISTS public.localidad_codigos (
-    id SERIAL PRIMARY KEY,
-    nombre_localidad TEXT NOT NULL,
-    codigo_comunidad TEXT NOT NULL,
-    codigo_region TEXT DEFAULT 'AR',
-    codigo_zona TEXT DEFAULT 'CHIG',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
-);
-
--- Insertar algunas localidades por defecto (ejemplo)
-INSERT INTO public.localidad_codigos (nombre_localidad, codigo_comunidad)
-VALUES 
-    ('Los Rosales', 'LSRS'),
-    ('Buena Vista', 'BNV'),
-    ('Casa Huerta La Alameda', 'CHAL')
-ON CONFLICT DO NOTHING;
-
--- 2. Tabla: contenedores_fisicos
+-- 1. Tabla: contenedores_fisicos
 CREATE TABLE IF NOT EXISTS public.contenedores_fisicos (
     id SERIAL PRIMARY KEY,
     codigo_contenedor TEXT UNIQUE NOT NULL,
@@ -26,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.contenedores_fisicos (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
--- 3. Tabla: cajas_archivo (Caja Lógica)
+-- 2. Tabla: cajas_archivo (Caja Lógica)
 CREATE TABLE IF NOT EXISTS public.cajas_archivo (
     id SERIAL PRIMARY KEY,
     codigo_etiqueta TEXT UNIQUE,
@@ -37,10 +19,10 @@ CREATE TABLE IF NOT EXISTS public.cajas_archivo (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
--- 4. Modificar tabla existente: socio_titulares
+-- 3. Modificar tabla existente: socio_titulares
 ALTER TABLE public.socio_titulares ADD COLUMN IF NOT EXISTS caja_id INTEGER REFERENCES public.cajas_archivo(id) ON DELETE SET NULL;
 
--- 5. Función para autogenerar la etiqueta de la caja lógica
+-- 4. Función para autogenerar la etiqueta de la caja lógica
 CREATE OR REPLACE FUNCTION public.generar_etiqueta_caja()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -55,8 +37,11 @@ BEGIN
         RETURN NEW;
     END IF;
 
-    -- Obtener códigos del diccionario de localidades
-    SELECT codigo_region, codigo_zona, codigo_comunidad 
+    -- Obtener códigos del diccionario de localidades existente
+    SELECT 
+        COALESCE(codigo_region, 'AR'), 
+        COALESCE(codigo_zona, 'CHIG'), 
+        COALESCE(codigo_comunidad, 'LOC') 
     INTO v_region, v_zona, v_comunidad
     FROM public.localidad_codigos 
     WHERE id = NEW.localidad_id;
@@ -83,7 +68,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 6. Crear el trigger para que se ejecute ANTES de cada INSERT
+-- 5. Crear el trigger para que se ejecute ANTES de cada INSERT
 DROP TRIGGER IF EXISTS trg_generar_etiqueta_caja ON public.cajas_archivo;
 CREATE TRIGGER trg_generar_etiqueta_caja
 BEFORE INSERT ON public.cajas_archivo
