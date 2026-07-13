@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
-import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Search, Trash2 } from 'lucide-react';
+import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

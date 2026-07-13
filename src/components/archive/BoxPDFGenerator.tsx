@@ -16,7 +16,6 @@ export const generateBoxPDF = async (cajas: CajaLogica[]) => {
       format: 'a4'
     });
 
-    const primaryColor = '#00468c';
     let labelCount = 0;
 
     for (let i = 0; i < cajas.length; i++) {

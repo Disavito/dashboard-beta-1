@@ -372,7 +372,7 @@ export function useSupabaseData<T>(options: UseSupabaseDataOptions) {
       let shouldInclude = true;
       for (const key in filters) {
         if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
-          if (record[key] !== filters[key]) {
+          if ((record as any)[key] !== filters[key]) {
             shouldInclude = false;
             break;
           }
