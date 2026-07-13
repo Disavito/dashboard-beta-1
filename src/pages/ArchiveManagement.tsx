@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 import { Box, FileText, Upload, RefreshCcw, Printer, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -96,7 +96,7 @@ export default function ArchiveManagement() {
     }
 
     const textInput = type === 'receipts' ? inputReceipts : inputDnis;
-    const items = textInput.split(/\r?\n|,/).map(i => i.trim()).filter(Boolean);
+    const items = textInput.split(/\r?\n|,/).map((i: string) => i.trim()).filter(Boolean);
 
     if (items.length === 0) {
       toast.error('Ingresa al menos un dato.');
