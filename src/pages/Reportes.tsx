@@ -170,6 +170,52 @@ const ReportesPage: React.FC = () => {
       };
     },
   });
+  // ── Fetch Observaciones ──
+  const { data: observacionesData, isLoading: loadingObservaciones } = useQuery({
+    queryKey: ['reporteObservaciones'],
+    queryFn: async () => {
+      const { data } = await supabase.from('vw_socio_titulares_estado').select('localidad, isObservado, is_payment_observed');
+      return data || [];
+    },
+  });
+
+  const observacionesStats = useMemo(() => {
+    if (!observacionesData) return null;
+    let totalPersonObs = 0;
+    let totalPaymentObs = 0;
+    const byLocalidad = new Map<string, { personObs: number, paymentObs: number }>();
+    
+    observacionesData.forEach(s => {
+      const loc = s.localidad || 'Sin Localidad';
+      const isPersonObs = s.isObservado ? 1 : 0;
+      const isPaymentObs = s.is_payment_observed ? 1 : 0;
+      
+      totalPersonObs += isPersonObs;
+      totalPaymentObs += isPaymentObs;
+      
+      if (isPersonObs || isPaymentObs) {
+        const entry = byLocalidad.get(loc) || { personObs: 0, paymentObs: 0 };
+        entry.personObs += isPersonObs;
+        entry.paymentObs += isPaymentObs;
+        byLocalidad.set(loc, entry);
+      }
+    });
+
+    const arrByLocalidad = Array.from(byLocalidad.entries()).map(([loc, stats]) => ({
+      localidad: loc,
+      personObs: stats.personObs,
+      paymentObs: stats.paymentObs,
+      total: stats.personObs + stats.paymentObs
+    })).sort((a, b) => b.total - a.total);
+
+    return {
+      totalPersonObs,
+      totalPaymentObs,
+      totalAssociations: arrByLocalidad.length,
+      byLocalidad: arrByLocalidad
+    };
+  }, [observacionesData]);
+
   // ── Categorías únicas ──
   const categories = useMemo(() => {
     if (!financialData) return [];
@@ -412,7 +458,7 @@ const ReportesPage: React.FC = () => {
         </div>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className={cn("bg-muted/50 p-1 rounded-2xl border border-border/50 grid gap-1", isFinanceUser ? "grid-cols-4" : "grid-cols-2")}>
+          <TabsList className={cn("bg-muted/50 p-1 rounded-2xl border border-border/50 grid gap-1", isFinanceUser ? "grid-cols-5" : "grid-cols-3")}>
             {isFinanceUser && (
               <TabsTrigger value="financiero" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm">
                 <DollarSign className="w-3.5 h-3.5 mr-1.5" /> Financiero
@@ -428,6 +474,9 @@ const ReportesPage: React.FC = () => {
             </TabsTrigger>
             <TabsTrigger value="socios" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm">
               <Users className="w-3.5 h-3.5 mr-1.5" /> Socios
+            </TabsTrigger>
+            <TabsTrigger value="observaciones" className="rounded-xl font-bold text-xs uppercase data-[state=active]:bg-card dark:bg-slate-900 data-[state=active]:shadow-sm text-amber-600 dark:text-amber-500">
+              <AlertTriangle className="w-3.5 h-3.5 mr-1.5" /> Observaciones
             </TabsTrigger>
           </TabsList>
 
@@ -1002,6 +1051,96 @@ const ReportesPage: React.FC = () => {
               )}
             </TabsContent>
           )}
+
+          {/* ════════ REPORTE OBSERVACIONES ════════ */}
+          <TabsContent value="observaciones" className="space-y-6">
+            {loadingObservaciones ? (
+              <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-amber-500" /></div>
+            ) : observacionesStats ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card className="rounded-2xl border border-amber-200/50 dark:border-amber-900/30 shadow-sm p-6 bg-amber-50/50 dark:bg-amber-900/10">
+                    <p className="text-xs font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest">Asociaciones Observadas</p>
+                    <p className="text-4xl font-black text-amber-700 dark:text-amber-400 mt-2">{observacionesStats.totalAssociations}</p>
+                    <p className="text-xs font-medium text-muted-foreground mt-1">Con al menos 1 observación</p>
+                  </Card>
+                  <Card className="rounded-2xl border border-border shadow-sm p-6">
+                    <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Obs. de Personas</p>
+                    <p className="text-4xl font-black text-foreground mt-2">{observacionesStats.totalPersonObs}</p>
+                    <p className="text-xs font-medium text-muted-foreground mt-1">Documentos o datos faltantes</p>
+                  </Card>
+                  <Card className="rounded-2xl border border-border shadow-sm p-6">
+                    <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Obs. de Pagos</p>
+                    <p className="text-4xl font-black text-foreground mt-2">{observacionesStats.totalPaymentObs}</p>
+                    <p className="text-xs font-medium text-muted-foreground mt-1">Irregularidades financieras</p>
+                  </Card>
+                </div>
+
+                <Card className="rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <CardHeader className="p-6 border-b border-slate-100 dark:border-slate-800">
+                    <CardTitle className="text-lg font-black text-foreground flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-amber-500" /> Detalle por Asociación
+                    </CardTitle>
+                    <CardDescription>Resumen consolidado de observaciones personales y de pagos.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm text-left">
+                        <thead className="bg-slate-50 dark:bg-slate-900 border-b text-xs uppercase font-bold text-muted-foreground">
+                          <tr>
+                            <th className="px-6 py-4">Asociación / Localidad</th>
+                            <th className="px-6 py-4 text-center">Obs. Persona</th>
+                            <th className="px-6 py-4 text-center">Obs. Pagos</th>
+                            <th className="px-6 py-4 text-center">Total Observaciones</th>
+                            <th className="px-6 py-4">Nivel de Riesgo</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {observacionesStats.byLocalidad.length === 0 ? (
+                            <tr>
+                              <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                                ¡Excelente! No hay observaciones registradas.
+                              </td>
+                            </tr>
+                          ) : (
+                            observacionesStats.byLocalidad.map((loc: any, idx: number) => {
+                              const isHighRisk = loc.total >= 10;
+                              return (
+                                <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors">
+                                  <td className="px-6 py-4 font-bold text-foreground">{loc.localidad}</td>
+                                  <td className="px-6 py-4 text-center">
+                                    {loc.personObs > 0 ? (
+                                      <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/50">{loc.personObs}</Badge>
+                                    ) : <span className="text-muted-foreground/30">-</span>}
+                                  </td>
+                                  <td className="px-6 py-4 text-center">
+                                    {loc.paymentObs > 0 ? (
+                                      <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800/50">{loc.paymentObs}</Badge>
+                                    ) : <span className="text-muted-foreground/30">-</span>}
+                                  </td>
+                                  <td className="px-6 py-4 text-center">
+                                    <span className="font-black text-lg">{loc.total}</span>
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <div className="flex items-center gap-2">
+                                      <div className={cn("w-2 h-2 rounded-full", isHighRisk ? "bg-red-500" : "bg-amber-400")} />
+                                      <span className={cn("text-xs font-bold uppercase", isHighRisk ? "text-red-600 dark:text-red-400" : "text-amber-600 dark:text-amber-500")}>
+                                        {isHighRisk ? 'Alto Riesgo' : 'Atención'}
+                                      </span>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : null}
+          </TabsContent>
         </Tabs>
       )}
     </div>
