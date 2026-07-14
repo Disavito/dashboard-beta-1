@@ -16,7 +16,7 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import { generateBoxPDF, CajaLogica } from '@/components/archive/BoxPDFGenerator';
+import { generateBoxPDF, ContenedorPDFData } from '@/components/archive/BoxPDFGenerator';
 
 const compareArchiveSocios = (a: any, b: any) => {
   const getRank = (receipt: string | null | undefined) => {
@@ -319,12 +319,53 @@ export default function ArchiveManagement() {
 
   const downloadPDF = () => {
     if (!selectedCaja) return;
-    const cajaData: CajaLogica = {
-      codigo_etiqueta: selectedCaja.codigo_etiqueta,
-      localidad: selectedCaja.localidad_codigos?.nombre_localidad || 'Desconocida',
-      codigo_contenedor: selectedCaja.contenedores_fisicos?.codigo_contenedor || 'SIN-CONTENEDOR'
+    const c_id = selectedCaja.contenedor_id;
+    const physicalCont = contenedores.find(c => c.id_contenedor === c_id);
+    const boxesInCont = cajas.filter(c => c.contenedor_id === c_id);
+    
+    const data: ContenedorPDFData = {
+      codigo_contenedor: physicalCont?.codigo_contenedor || 'SIN-CONTENEDOR',
+      cajas_logicas: boxesInCont.map(b => ({
+        codigo_etiqueta: b.codigo_etiqueta,
+        localidad: b.localidad_codigos?.nombre_localidad || 'Desconocida'
+      }))
     };
-    generateBoxPDF([cajaData]);
+    generateBoxPDF([data]);
+  };
+
+  const printViewerContainer = () => {
+    if (!activeViewerContenedor) return;
+    const contObj = contenedores.find(c => String(c.id_contenedor) === activeViewerContenedor);
+    const cajasDelCont = cajas.filter(c => String(c.contenedor_id) === activeViewerContenedor);
+    
+    const data: ContenedorPDFData = {
+      codigo_contenedor: contObj?.codigo_contenedor || 'SIN-CONTENEDOR',
+      cajas_logicas: cajasDelCont.map(c => ({
+        codigo_etiqueta: c.codigo_etiqueta,
+        localidad: c.localidad_codigos?.nombre_localidad || 'Desconocida'
+      }))
+    };
+    generateBoxPDF([data]);
+  };
+
+  const printAllContainers = () => {
+    const data: ContenedorPDFData[] = contenedores.map(contObj => {
+      const cajasDelCont = cajas.filter(c => c.contenedor_id === contObj.id_contenedor);
+      return {
+        codigo_contenedor: contObj.codigo_contenedor,
+        cajas_logicas: cajasDelCont.map(c => ({
+          codigo_etiqueta: c.codigo_etiqueta,
+          localidad: c.localidad_codigos?.nombre_localidad || 'Desconocida'
+        }))
+      };
+    });
+    
+    const validData = data.filter(d => d.cajas_logicas.length > 0);
+    if (validData.length === 0) {
+      toast.error('No hay contenedores con cajas asignadas para imprimir.');
+      return;
+    }
+    generateBoxPDF(validData);
   };
 
   return (
@@ -731,9 +772,15 @@ export default function ArchiveManagement() {
 
         <TabsContent value="visor" className="m-0 focus-visible:outline-none focus-visible:ring-0">
           <Card className="border-t-4 border-t-emerald-600 shadow-md">
-            <CardHeader>
-              <CardTitle>Visor de Contenedores Físicos</CardTitle>
-              <CardDescription>Selecciona un contenedor para explorar su capacidad y las cajas lógicas en su interior.</CardDescription>
+            <CardHeader className="flex flex-row items-start justify-between">
+              <div>
+                <CardTitle>Visor de Contenedores Físicos</CardTitle>
+                <CardDescription>Selecciona un contenedor para explorar su capacidad y las cajas lógicas en su interior.</CardDescription>
+              </div>
+              <Button onClick={printAllContainers} className="bg-emerald-600 hover:bg-emerald-700 h-9">
+                <Printer className="w-4 h-4 mr-2" />
+                Imprimir TODOS (Masivo)
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
@@ -773,7 +820,11 @@ export default function ArchiveManagement() {
                             </div>
                             <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-xl border flex flex-col justify-center">
                               <p className="text-sm font-semibold text-muted-foreground uppercase mb-1">Cajas Lógicas (Archivadores)</p>
-                              <p className="text-3xl font-bold">{boxesInCont.length}</p>
+                              <p className="text-3xl font-bold mb-4">{boxesInCont.length}</p>
+                              <Button onClick={printViewerContainer} variant="outline" className="w-full">
+                                <Printer className="w-4 h-4 mr-2" />
+                                Imprimir Etiqueta
+                              </Button>
                             </div>
                           </div>
 

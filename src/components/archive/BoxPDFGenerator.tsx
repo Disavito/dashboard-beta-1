@@ -2,13 +2,15 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { toast } from 'sonner';
 
-export interface CajaLogica {
-  codigo_etiqueta: string;
-  localidad: string;
-  codigo_contenedor: string; // The parent physical container
+export interface ContenedorPDFData {
+  codigo_contenedor: string;
+  cajas_logicas: {
+    codigo_etiqueta: string;
+    localidad: string;
+  }[];
 }
 
-export const generateBoxPDF = async (cajas: CajaLogica[]) => {
+export const generateBoxPDF = async (contenedores: ContenedorPDFData[]) => {
   try {
     const doc = new jsPDF({
       orientation: 'portrait',
@@ -18,8 +20,8 @@ export const generateBoxPDF = async (cajas: CajaLogica[]) => {
 
     let labelCount = 0;
 
-    for (let i = 0; i < cajas.length; i++) {
-      const caja = cajas[i];
+    for (let i = 0; i < contenedores.length; i++) {
+      const contenedor = contenedores[i];
       
       // If we already placed 2 labels on the page, create a new page
       if (labelCount === 2) {
@@ -52,10 +54,10 @@ export const generateBoxPDF = async (cajas: CajaLogica[]) => {
       doc.text('CONTENEDOR PRINCIPAL:', 20, yOffset + 60);
 
       doc.setFontSize(45);
-      doc.text(caja.codigo_contenedor || 'SIN-ASIGNAR', 20, yOffset + 80);
+      doc.text(contenedor.codigo_contenedor || 'SIN-ASIGNAR', 20, yOffset + 80);
 
       // Right side: QR Code
-      const webhookUrl = `https://n8n-n8n.mv7mvl.easypanel.host/webhook/caja-info?caja=${caja.codigo_contenedor}`;
+      const webhookUrl = `https://n8n-n8n.mv7mvl.easypanel.host/webhook/caja-info?caja=${contenedor.codigo_contenedor}`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(webhookUrl)}`;
       
       try {
@@ -92,9 +94,9 @@ export const generateBoxPDF = async (cajas: CajaLogica[]) => {
         startY: yOffset + 120,
         margin: { left: 20, right: 20 },
         head: [['Código de Caja Lógica', 'Localidad / Proyecto']],
-        body: [
-          [caja.codigo_etiqueta, caja.localidad]
-        ],
+        body: contenedor.cajas_logicas.length > 0
+          ? contenedor.cajas_logicas.map(cl => [cl.codigo_etiqueta, cl.localidad])
+          : [['(Contenedor vacío)', '-']],
         theme: 'grid',
         headStyles: { fillColor: [0, 70, 140], textColor: 255, fontStyle: 'bold', halign: 'center' },
         bodyStyles: { halign: 'center', fontSize: 11 },
