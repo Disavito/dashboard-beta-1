@@ -95,6 +95,7 @@ export default function ArchiveManagement() {
   // Print selection state
   const [printSelectionOpen, setPrintSelectionOpen] = useState(false);
   const [selectedContainersToPrint, setSelectedContainersToPrint] = useState<string[]>([]);
+  const [allowOverflow, setAllowOverflow] = useState(false);
 
   const getContainerCapacity = (testSize?: number) => {
     if (!selectedCaja) return 0;
@@ -278,7 +279,7 @@ export default function ArchiveManagement() {
     if (next.has(person.id)) {
       next.delete(person.id);
     } else {
-      if (getContainerCapacity(next.size + 1) > 80) {
+      if (!allowOverflow && getContainerCapacity(next.size + 1) > 80) {
         toast.error('Límite Excedido. El contenedor físico solo puede almacenar hasta 80 expedientes en total.');
         return;
       }
@@ -739,11 +740,23 @@ export default function ArchiveManagement() {
                   </div>
                 </div>
                 {selectedCaja && (
-                  <div className="text-right">
-                    <span className="text-sm font-bold text-muted-foreground mr-2">Cap. Contenedor: </span>
-                    <Badge variant={getContainerCapacity() === 80 ? "destructive" : "default"} className="text-sm px-3 py-1">
-                      {getContainerCapacity()} / 80
-                    </Badge>
+                  <div className="flex flex-col items-end gap-2 text-right">
+                    <div>
+                      <span className="text-sm font-bold text-muted-foreground mr-2">Cap. Contenedor: </span>
+                      <Badge variant={getContainerCapacity() >= 80 ? "destructive" : "default"} className="text-sm px-3 py-1">
+                        {getContainerCapacity()} / 80
+                      </Badge>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="allow-overflow" 
+                        checked={allowOverflow} 
+                        onCheckedChange={(c) => setAllowOverflow(!!c)} 
+                      />
+                      <label htmlFor="allow-overflow" className="text-xs text-muted-foreground cursor-pointer select-none">
+                        Permitir exceso (excepción)
+                      </label>
+                    </div>
                   </div>
                 )}
               </div>
@@ -805,7 +818,7 @@ export default function ArchiveManagement() {
                                   <Checkbox 
                                     checked={isSelected}
                                     onCheckedChange={() => handleTogglePerson(p)}
-                                    disabled={isAssignedToOther || (getContainerCapacity(selectedPeopleIds.size + 1) > 80 && !isSelected) || isProcessing}
+                                    disabled={isAssignedToOther || (!allowOverflow && getContainerCapacity(selectedPeopleIds.size + 1) > 80 && !isSelected) || isProcessing}
                                     className="cursor-pointer"
                                   />
                                 </td>
