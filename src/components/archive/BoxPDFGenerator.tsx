@@ -35,26 +35,26 @@ export const generateBoxPDF = async (contenedores: ContenedorPDFData[]) => {
       
       // --- HEADER ---
       doc.setFillColor(0, 70, 140); // #00468c
-      doc.rect(10, yOffset + 10, 190, 25, 'F');
+      doc.rect(10, yOffset + 6, 190, 18, 'F');
       
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(22);
+      doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
-      doc.text('FIMAGADI • ARCHIVO CENTRAL', 105, yOffset + 22, { align: 'center' });
+      doc.text('FIMAGADI • ARCHIVO CENTRAL', 105, yOffset + 14, { align: 'center' });
       
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text('ETIQUETA DE CONTROL DE CONTENEDOR FÍSICO', 105, yOffset + 30, { align: 'center' });
+      doc.text('ETIQUETA DE CONTROL DE CONTENEDOR FÍSICO', 105, yOffset + 20, { align: 'center' });
 
       // --- BODY ---
       // Left side: Container Code
       doc.setTextColor(0, 0, 0);
-      doc.setFontSize(14);
+      doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text('CONTENEDOR PRINCIPAL:', 20, yOffset + 60);
+      doc.text('CONTENEDOR PRINCIPAL:', 20, yOffset + 35);
 
-      doc.setFontSize(45);
-      doc.text(contenedor.codigo_contenedor || 'SIN-ASIGNAR', 20, yOffset + 80);
+      doc.setFontSize(38);
+      doc.text(contenedor.codigo_contenedor || 'SIN-ASIGNAR', 20, yOffset + 50);
 
       // Right side: QR Code
       const webhookUrl = `https://n8n-n8n.mv7mvl.easypanel.host/webhook/caja-info?caja=${contenedor.codigo_contenedor}`;
@@ -72,34 +72,44 @@ export const generateBoxPDF = async (contenedores: ContenedorPDFData[]) => {
         });
 
         // Add QR image to PDF
-        doc.addImage(base64, 'PNG', 140, yOffset + 45, 50, 50);
+        doc.addImage(base64, 'PNG', 145, yOffset + 30, 45, 45);
       } catch (e) {
         console.error('Failed to load QR code', e);
         doc.setFontSize(10);
-        doc.text('[Error al cargar QR]', 150, yOffset + 70);
+        doc.text('[Error al cargar QR]', 155, yOffset + 45);
       }
 
       // QR Instruction Text
-      doc.setFontSize(8);
+      doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
-      doc.text('Escanee con un celular para ver el', 165, yOffset + 100, { align: 'center' });
-      doc.text('inventario digital en tiempo real', 165, yOffset + 104, { align: 'center' });
+      doc.text('Escanee con un celular para ver el', 167.5, yOffset + 78, { align: 'center' });
+      doc.text('inventario digital en tiempo real', 167.5, yOffset + 81, { align: 'center' });
 
       // --- FOOTER TABLE ---
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
-      doc.text('CONTENIDO LÓGICO VINCULADO', 105, yOffset + 115, { align: 'center' });
+      doc.text('CONTENIDO LÓGICO VINCULADO', 105, yOffset + 70, { align: 'center' });
+
+      const visibleBoxes = contenedor.cajas_logicas.slice(0, 10);
+      const hasMore = contenedor.cajas_logicas.length > 10;
+      
+      const tableData = visibleBoxes.length > 0
+          ? visibleBoxes.map(cl => [cl.codigo_etiqueta, cl.localidad])
+          : [['(Contenedor vacío)', '-']];
+          
+      if (hasMore) {
+        tableData.push([`... y ${contenedor.cajas_logicas.length - 10} cajas más`, '']);
+      }
 
       autoTable(doc, {
-        startY: yOffset + 120,
-        margin: { left: 20, right: 20 },
+        startY: yOffset + 74,
+        margin: { left: 15, right: 15 },
         head: [['Código de Caja Lógica', 'Localidad / Proyecto']],
-        body: contenedor.cajas_logicas.length > 0
-          ? contenedor.cajas_logicas.map(cl => [cl.codigo_etiqueta, cl.localidad])
-          : [['(Contenedor vacío)', '-']],
+        body: tableData,
         theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 1.5 },
         headStyles: { fillColor: [0, 70, 140], textColor: 255, fontStyle: 'bold', halign: 'center' },
-        bodyStyles: { halign: 'center', fontSize: 11 },
+        bodyStyles: { halign: 'center' },
         alternateRowStyles: { fillColor: [245, 247, 250] }
       });
 
