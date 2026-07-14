@@ -330,7 +330,7 @@ export default function ArchiveManagement() {
     setIsProcessing(true);
     try {
       const { error } = await supabase
-        .from('cajas_logicas')
+        .from('cajas_archivo')
         .update({ contenedor_id: newContId })
         .eq('id_caja', selectedCaja.id_caja);
         
