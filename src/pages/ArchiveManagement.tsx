@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
-import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Trash2 } from 'lucide-react';
+import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Trash2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { generateBoxPDF, CajaLogica } from '@/components/archive/BoxPDFGenerator';
@@ -85,6 +86,18 @@ export default function ArchiveManagement() {
   // Combobox states
   const [openLocalidadSelect, setOpenLocalidadSelect] = useState(false);
   const [openLocalidadFilter, setOpenLocalidadFilter] = useState(false);
+
+  const getContainerCapacity = (testSize?: number) => {
+    if (!selectedCaja) return 0;
+    const otherBoxesInContainer = cajas.filter(c => 
+      c.contenedor_id === selectedCaja.contenedor_id && 
+      c.id_caja !== selectedCaja.id_caja
+    );
+    const otherBoxesCount = otherBoxesInContainer.reduce((acc, box) => 
+      acc + (box.socio_titulares?.[0]?.count || 0), 0
+    );
+    return otherBoxesCount + (testSize !== undefined ? testSize : selectedPeopleIds.size);
+  };
 
   useEffect(() => {
     loadData();
@@ -256,8 +269,8 @@ export default function ArchiveManagement() {
     if (next.has(person.id)) {
       next.delete(person.id);
     } else {
-      if (next.size >= 80) {
-        toast.error('Límite Excedido. Una caja solo puede contener hasta 80 expedientes.');
+      if (getContainerCapacity(next.size + 1) > 80) {
+        toast.error('Límite Excedido. El contenedor físico solo puede almacenar hasta 80 expedientes en total.');
         return;
       }
       next.add(person.id);
@@ -470,16 +483,61 @@ export default function ArchiveManagement() {
                       <p className="text-2xl font-black text-[#00468c] dark:text-blue-400">{selectedCaja.codigo_etiqueta}</p>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] font-black uppercase text-blue-800/60 dark:text-blue-300/60">Capacidad</span>
+                      <span className="text-[10px] font-black uppercase text-blue-800/60 dark:text-blue-300/60">Cap. Contenedor</span>
                       <p className="text-xl font-bold text-blue-700 dark:text-blue-300">
-                        {selectedCaja.socio_titulares?.[0]?.count || 0} <span className="text-sm">/ 80</span>
+                        {getContainerCapacity()} <span className="text-sm">/ 80</span>
                       </p>
                     </div>
                   </div>
-                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-3">
-                    <strong>Contenedor:</strong> {selectedCaja.contenedores_fisicos?.codigo_contenedor} <br/>
-                    <strong>Localidad:</strong> {selectedCaja.localidad_codigos?.nombre_localidad}
-                  </p>
+                  <div className="text-sm text-blue-700 dark:text-blue-300 mt-3 flex flex-col sm:flex-row sm:items-center sm:gap-4 gap-2">
+                    <div className="flex items-center">
+                      <strong>Contenedor:</strong> <span className="ml-1 mr-2">{selectedCaja.contenedores_fisicos?.codigo_contenedor}</span>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-blue-700 hover:bg-blue-200" title="Ver contenido del contenedor">
+                            <Info className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Contenido del {selectedCaja.contenedores_fisicos?.codigo_contenedor}</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4 mt-2">
+                            <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-800 p-3 rounded-lg font-bold">
+                              <span>Capacidad Ocupada:</span>
+                              <span>{getContainerCapacity()} / 80 expedientes</span>
+                            </div>
+                            
+                            <h4 className="font-semibold text-sm text-muted-foreground mt-4 mb-2">Cajas Lógicas (Archivadores):</h4>
+                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                              {cajas
+                                .filter(c => c.contenedor_id === selectedCaja.contenedor_id)
+                                .map(box => {
+                                  const isCurrent = box.id_caja === selectedCaja.id_caja;
+                                  const count = isCurrent ? selectedPeopleIds.size : (box.socio_titulares?.[0]?.count || 0);
+                                  
+                                  return (
+                                    <div key={box.id_caja} className={`flex justify-between items-center p-3 rounded-lg border ${isCurrent ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'bg-white dark:bg-slate-900'}`}>
+                                      <div>
+                                        <p className="font-medium text-sm">
+                                          {box.codigo_etiqueta} 
+                                          {isCurrent && <Badge variant="outline" className="ml-2 text-[10px] bg-blue-100 border-blue-200 text-blue-700">Viendo ahora</Badge>}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">{box.localidad_codigos?.nombre_localidad}</p>
+                                      </div>
+                                      <Badge variant="secondary">{count} exp.</Badge>
+                                    </div>
+                                  );
+                                })}
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <div>
+                      <strong>Localidad:</strong> <span className="ml-1">{selectedCaja.localidad_codigos?.nombre_localidad}</span>
+                    </div>
+                  </div>
                   
                   <Button 
                     className="w-full mt-4 bg-white text-[#00468c] hover:bg-gray-100 border border-[#00468c]"
@@ -552,9 +610,9 @@ export default function ArchiveManagement() {
                 </div>
                 {selectedCaja && (
                   <div className="text-right">
-                    <span className="text-sm font-bold text-muted-foreground mr-2">Capacidad: </span>
-                    <Badge variant={selectedPeopleIds.size === 80 ? "destructive" : "default"} className="text-sm px-3 py-1">
-                      {selectedPeopleIds.size} / 80
+                    <span className="text-sm font-bold text-muted-foreground mr-2">Cap. Contenedor: </span>
+                    <Badge variant={getContainerCapacity() === 80 ? "destructive" : "default"} className="text-sm px-3 py-1">
+                      {getContainerCapacity()} / 80
                     </Badge>
                   </div>
                 )}
@@ -616,8 +674,8 @@ export default function ArchiveManagement() {
                                 <td className="px-4 py-3 text-center" onClick={e => e.stopPropagation()}>
                                   <Checkbox 
                                     checked={isSelected}
-                                    disabled={isAssignedToOther || (selectedPeopleIds.size >= 80 && !isSelected) || isProcessing}
                                     onCheckedChange={() => handleTogglePerson(p)}
+                                    disabled={isAssignedToOther || (getContainerCapacity(selectedPeopleIds.size + 1) > 80 && !isSelected) || isProcessing}
                                     className="cursor-pointer"
                                   />
                                 </td>
