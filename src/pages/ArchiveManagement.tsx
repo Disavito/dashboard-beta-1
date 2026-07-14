@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
-import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Trash2, Info } from 'lucide-react';
+import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Trash2, Info, ArrowRightLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -321,6 +321,42 @@ export default function ArchiveManagement() {
     }
   };
 
+  const handleReassignBox = async (newContenedorIdStr: string) => {
+    if (!selectedCaja) return;
+    const newContId = parseInt(newContenedorIdStr);
+    if (isNaN(newContId)) return;
+    
+    setIsProcessing(true);
+    try {
+      const { error } = await supabase
+        .from('cajas_logicas')
+        .update({ contenedor_id: newContId })
+        .eq('id_caja', selectedCaja.id_caja);
+        
+      if (error) throw error;
+      
+      toast.success("Caja reasignada exitosamente");
+      
+      // Actualizar estado local
+      const newCont = contenedores.find(c => c.id_contenedor === newContId);
+      const updatedCajas = cajas.map(c => 
+        c.id_caja === selectedCaja.id_caja ? { ...c, contenedor_id: newContId } : c
+      );
+      setCajas(updatedCajas);
+      
+      setSelectedCaja({ 
+        ...selectedCaja, 
+        contenedor_id: newContId,
+        contenedores_fisicos: newCont ? { codigo_contenedor: newCont.codigo_contenedor, id_contenedor: newCont.id_contenedor } : undefined
+      });
+      
+    } catch (error: any) {
+      toast.error("Error al reasignar caja", { description: error.message });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const downloadPDF = () => {
     if (!selectedCaja) return;
     const c_id = selectedCaja.contenedor_id;
@@ -556,45 +592,74 @@ export default function ArchiveManagement() {
                   </div>
                   <div className="text-sm text-blue-700 dark:text-blue-300 mt-3 flex flex-col sm:flex-row sm:items-center sm:gap-4 gap-2">
                     <div className="flex items-center">
-                      <strong>Contenedor:</strong> <span className="ml-1 mr-2">{selectedCaja.contenedores_fisicos?.codigo_contenedor}</span>
+                      <strong>Contenedor:</strong> <span className="ml-1 mr-2">{selectedCaja.contenedores_fisicos?.codigo_contenedor || 'SIN ASIGNAR'}</span>
+                      {selectedCaja.contenedor_id && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6 text-blue-700 hover:bg-blue-200" title="Ver contenido del contenedor">
+                              <Info className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Contenido del {selectedCaja.contenedores_fisicos?.codigo_contenedor}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 mt-2">
+                              <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-800 p-3 rounded-lg font-bold">
+                                <span>Capacidad Ocupada:</span>
+                                <span>{getContainerCapacity()} / 80 expedientes</span>
+                              </div>
+                              
+                              <h4 className="font-semibold text-sm text-muted-foreground mt-4 mb-2">Cajas Lógicas (Archivadores):</h4>
+                              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                                {cajas
+                                  .filter(c => c.contenedor_id === selectedCaja.contenedor_id)
+                                  .map(box => {
+                                    const isCurrent = box.id_caja === selectedCaja.id_caja;
+                                    const count = isCurrent ? selectedPeopleIds.size : (box.socio_titulares?.[0]?.count || 0);
+                                    
+                                    return (
+                                      <div key={box.id_caja} className={`flex justify-between items-center p-3 rounded-lg border ${isCurrent ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'bg-white dark:bg-slate-900'}`}>
+                                        <div>
+                                          <p className="font-medium text-sm">
+                                            {box.codigo_etiqueta} 
+                                            {isCurrent && <Badge variant="outline" className="ml-2 text-[10px] bg-blue-100 border-blue-200 text-blue-700">Viendo ahora</Badge>}
+                                          </p>
+                                          <p className="text-xs text-muted-foreground">{box.localidad_codigos?.nombre_localidad}</p>
+                                        </div>
+                                        <Badge variant="secondary">{count} exp.</Badge>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      )}
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-6 w-6 text-blue-700 hover:bg-blue-200" title="Ver contenido del contenedor">
-                            <Info className="h-4 w-4" />
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-blue-700 hover:bg-blue-200" title="Mover a otro contenedor">
+                            <ArrowRightLeft className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle>Contenido del {selectedCaja.contenedores_fisicos?.codigo_contenedor}</DialogTitle>
+                            <DialogTitle>Reasignar Caja Lógica</DialogTitle>
+                            <DialogDescription>Selecciona a qué contenedor físico deseas mover la caja <strong>{selectedCaja.codigo_etiqueta}</strong>.</DialogDescription>
                           </DialogHeader>
-                          <div className="space-y-4 mt-2">
-                            <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-800 p-3 rounded-lg font-bold">
-                              <span>Capacidad Ocupada:</span>
-                              <span>{getContainerCapacity()} / 80 expedientes</span>
-                            </div>
-                            
-                            <h4 className="font-semibold text-sm text-muted-foreground mt-4 mb-2">Cajas Lógicas (Archivadores):</h4>
-                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
-                              {cajas
-                                .filter(c => c.contenedor_id === selectedCaja.contenedor_id)
-                                .map(box => {
-                                  const isCurrent = box.id_caja === selectedCaja.id_caja;
-                                  const count = isCurrent ? selectedPeopleIds.size : (box.socio_titulares?.[0]?.count || 0);
-                                  
-                                  return (
-                                    <div key={box.id_caja} className={`flex justify-between items-center p-3 rounded-lg border ${isCurrent ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'bg-white dark:bg-slate-900'}`}>
-                                      <div>
-                                        <p className="font-medium text-sm">
-                                          {box.codigo_etiqueta} 
-                                          {isCurrent && <Badge variant="outline" className="ml-2 text-[10px] bg-blue-100 border-blue-200 text-blue-700">Viendo ahora</Badge>}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">{box.localidad_codigos?.nombre_localidad}</p>
-                                      </div>
-                                      <Badge variant="secondary">{count} exp.</Badge>
-                                    </div>
-                                  );
-                                })}
-                            </div>
+                          <div className="py-4 space-y-4">
+                             <Select onValueChange={handleReassignBox} defaultValue={selectedCaja.contenedor_id ? String(selectedCaja.contenedor_id) : undefined}>
+                               <SelectTrigger>
+                                 <SelectValue placeholder="Elige un nuevo contenedor..." />
+                               </SelectTrigger>
+                               <SelectContent>
+                                 {contenedores.map(c => (
+                                   <SelectItem key={c.id_contenedor} value={String(c.id_contenedor)}>
+                                     {c.codigo_contenedor}
+                                   </SelectItem>
+                                 ))}
+                               </SelectContent>
+                             </Select>
                           </div>
                         </DialogContent>
                       </Dialog>
