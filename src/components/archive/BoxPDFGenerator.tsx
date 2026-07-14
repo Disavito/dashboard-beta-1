@@ -90,8 +90,9 @@ export const generateBoxPDF = async (contenedores: ContenedorPDFData[]) => {
       doc.setFont('helvetica', 'bold');
       doc.text('CONTENIDO LÓGICO VINCULADO', 105, yOffset + 70, { align: 'center' });
 
-      const visibleBoxes = contenedor.cajas_logicas.slice(0, 10);
-      const hasMore = contenedor.cajas_logicas.length > 10;
+      const sortedBoxes = [...contenedor.cajas_logicas].sort((a: any, b: any) => (a.orden || 0) - (b.orden || 0));
+      const visibleBoxes = sortedBoxes.slice(0, 10);
+      const hasMore = sortedBoxes.length > 10;
       
       const tableData = visibleBoxes.length > 0
           ? visibleBoxes.map(cl => [cl.codigo_etiqueta, cl.localidad])

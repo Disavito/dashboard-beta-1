@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
-import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Trash2, Info, ArrowRightLeft } from 'lucide-react';
+import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Trash2, Info, ArrowRightLeft, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -124,7 +124,7 @@ export default function ArchiveManagement() {
       if (!e2) setContenedores(conts || []);
 
       // 3. Fetch Cajas
-      const { data: cjs, error: e3 } = await supabase.from('cajas_archivo').select('*, localidad_codigos(nombre_localidad), contenedores_fisicos(codigo_contenedor), socio_titulares(count)');
+      const { data: cjs, error: e3 } = await supabase.from('cajas_archivo').select('*, localidad_codigos(nombre_localidad), contenedores_fisicos(codigo_contenedor), socio_titulares(count)').order('orden', { ascending: true, nullsFirst: false }).order('id_caja', { ascending: true });
       if (!e3) setCajas(cjs || []);
 
     } catch (error) {
@@ -355,6 +355,48 @@ export default function ArchiveManagement() {
       toast.error("Error al reasignar caja", { description: error.message });
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleReorderBox = async (cajaId: number, direction: 'up' | 'down') => {
+    if (!selectedCaja?.contenedor_id) return;
+    
+    const containerBoxes = cajas
+      .filter(c => c.contenedor_id === selectedCaja.contenedor_id)
+      .sort((a, b) => (a.orden || 0) - (b.orden || 0));
+      
+    const currentIndex = containerBoxes.findIndex(c => c.id_caja === cajaId);
+    if (currentIndex === -1) return;
+    
+    if (direction === 'up' && currentIndex === 0) return;
+    if (direction === 'down' && currentIndex === containerBoxes.length - 1) return;
+    
+    const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    const currentBox = containerBoxes[currentIndex];
+    const swapBox = containerBoxes[swapIndex];
+    
+    const currentNewOrder = swapBox.orden || swapIndex;
+    const swapNewOrder = currentBox.orden || currentIndex;
+    
+    // Optimistic local update
+    const updatedCajas = cajas.map(c => {
+      if (c.id_caja === currentBox.id_caja) return { ...c, orden: currentNewOrder };
+      if (c.id_caja === swapBox.id_caja) return { ...c, orden: swapNewOrder };
+      return c;
+    });
+    // Resort to maintain state array order for other functions
+    updatedCajas.sort((a, b) => (a.orden || 0) - (b.orden || 0));
+    setCajas(updatedCajas);
+    
+    // DB update
+    try {
+      await Promise.all([
+        supabase.from('cajas_archivo').update({ orden: currentNewOrder }).eq('id_caja', currentBox.id_caja),
+        supabase.from('cajas_archivo').update({ orden: swapNewOrder }).eq('id_caja', swapBox.id_caja)
+      ]);
+    } catch (e) {
+      toast.error("Error al reordenar");
+      loadData(); // Revert on error
     }
   };
 
@@ -615,18 +657,29 @@ export default function ArchiveManagement() {
                               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
                                 {cajas
                                   .filter(c => c.contenedor_id === selectedCaja.contenedor_id)
-                                  .map(box => {
+                                  .sort((a, b) => (a.orden || 0) - (b.orden || 0))
+                                  .map((box, index, arr) => {
                                     const isCurrent = box.id_caja === selectedCaja.id_caja;
                                     const count = isCurrent ? selectedPeopleIds.size : (box.socio_titulares?.[0]?.count || 0);
                                     
                                     return (
                                       <div key={box.id_caja} className={`flex justify-between items-center p-3 rounded-lg border ${isCurrent ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'bg-white dark:bg-slate-900'}`}>
-                                        <div>
-                                          <p className="font-medium text-sm">
-                                            {box.codigo_etiqueta} 
-                                            {isCurrent && <Badge variant="outline" className="ml-2 text-[10px] bg-blue-100 border-blue-200 text-blue-700">Viendo ahora</Badge>}
-                                          </p>
-                                          <p className="text-xs text-muted-foreground">{box.localidad_codigos?.nombre_localidad}</p>
+                                        <div className="flex items-center gap-3">
+                                          <div className="flex flex-col">
+                                            <Button variant="ghost" size="icon" className="h-4 w-4 text-slate-400 hover:text-blue-600 mb-1" disabled={index === 0} onClick={() => handleReorderBox(box.id_caja, 'up')}>
+                                              <ChevronUp className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="h-4 w-4 text-slate-400 hover:text-blue-600" disabled={index === arr.length - 1} onClick={() => handleReorderBox(box.id_caja, 'down')}>
+                                              <ChevronDown className="h-4 w-4" />
+                                            </Button>
+                                          </div>
+                                          <div>
+                                            <p className="font-medium text-sm">
+                                              {box.codigo_etiqueta} 
+                                              {isCurrent && <Badge variant="outline" className="ml-2 text-[10px] bg-blue-100 border-blue-200 text-blue-700">Viendo ahora</Badge>}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">{box.localidad_codigos?.nombre_localidad}</p>
+                                          </div>
                                         </div>
                                         <Badge variant="secondary">{count} exp.</Badge>
                                       </div>
