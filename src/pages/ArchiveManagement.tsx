@@ -13,6 +13,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Check, ChevronsUpDown } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { generateBoxPDF, CajaLogica } from '@/components/archive/BoxPDFGenerator';
 
@@ -86,6 +88,9 @@ export default function ArchiveManagement() {
   // Combobox states
   const [openLocalidadSelect, setOpenLocalidadSelect] = useState(false);
   const [openLocalidadFilter, setOpenLocalidadFilter] = useState(false);
+  
+  // Viewer state
+  const [activeViewerContenedor, setActiveViewerContenedor] = useState<string>('');
 
   const getContainerCapacity = (testSize?: number) => {
     if (!selectedCaja) return 0;
@@ -334,9 +339,18 @@ export default function ArchiveManagement() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <Tabs defaultValue="asignacion" className="space-y-6">
+        <div className="flex justify-start">
+          <TabsList className="bg-slate-100 dark:bg-slate-900 h-auto p-1 rounded-lg">
+            <TabsTrigger value="asignacion" className="px-6 py-2">Asignar Expedientes a Cajas</TabsTrigger>
+            <TabsTrigger value="visor" className="px-6 py-2">Explorar Contenedores Físicos</TabsTrigger>
+          </TabsList>
+        </div>
         
-        {/* PANEL IZQUIERDO: SELECCIÓN DE CAJA */}
+        <TabsContent value="asignacion" className="m-0 focus-visible:outline-none focus-visible:ring-0">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* PANEL IZQUIERDO: SELECCIÓN DE CAJA */}
         <div className="lg:col-span-4 space-y-6">
           <Card className="border-t-4 border-t-[#00468c] shadow-md">
             <CardHeader>
@@ -712,7 +726,102 @@ export default function ArchiveManagement() {
           </Card>
         </div>
 
-      </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="visor" className="m-0 focus-visible:outline-none focus-visible:ring-0">
+          <Card className="border-t-4 border-t-emerald-600 shadow-md">
+            <CardHeader>
+              <CardTitle>Visor de Contenedores Físicos</CardTitle>
+              <CardDescription>Selecciona un contenedor para explorar su capacidad y las cajas lógicas en su interior.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-8">
+                {/* Selector */}
+                <div className="max-w-md space-y-2">
+                  <Label>Seleccionar Contenedor</Label>
+                  <Select value={activeViewerContenedor} onValueChange={setActiveViewerContenedor}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Elige un contenedor..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {contenedores.map(c => (
+                        <SelectItem key={c.id_contenedor} value={String(c.id_contenedor)}>
+                          {c.codigo_contenedor}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {activeViewerContenedor ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    {(() => {
+                      const boxesInCont = cajas.filter(c => String(c.contenedor_id) === activeViewerContenedor);
+                      const totalExpedientes = boxesInCont.reduce((acc, b) => acc + (b.socio_titulares?.[0]?.count || 0), 0);
+                      const percent = Math.min((totalExpedientes / 80) * 100, 100);
+                      
+                      return (
+                        <>
+                          <div className="space-y-4">
+                            <div className="p-6 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
+                              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300 uppercase mb-1">Capacidad Total</p>
+                              <p className="text-4xl font-black text-emerald-600 dark:text-emerald-400">
+                                {totalExpedientes} <span className="text-xl text-emerald-700/50">/ 80</span>
+                              </p>
+                              <Progress value={percent} className="h-2 mt-4 [&>div]:bg-emerald-500" />
+                            </div>
+                            <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-xl border flex flex-col justify-center">
+                              <p className="text-sm font-semibold text-muted-foreground uppercase mb-1">Cajas Lógicas (Archivadores)</p>
+                              <p className="text-3xl font-bold">{boxesInCont.length}</p>
+                            </div>
+                          </div>
+
+                          <div className="lg:col-span-2 border rounded-xl bg-white dark:bg-slate-950 overflow-hidden">
+                            <table className="w-full text-sm text-left">
+                              <thead className="bg-slate-100 dark:bg-slate-900 text-xs uppercase font-semibold text-muted-foreground">
+                                <tr>
+                                  <th className="px-4 py-3">Código Caja</th>
+                                  <th className="px-4 py-3">Asociación / Proyecto</th>
+                                  <th className="px-4 py-3 text-right">Expedientes</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y">
+                                {boxesInCont.length === 0 ? (
+                                  <tr>
+                                    <td colSpan={3} className="px-4 py-12 text-center text-muted-foreground">
+                                      Este contenedor está vacío actualmente.
+                                    </td>
+                                  </tr>
+                                ) : (
+                                  boxesInCont.map(box => (
+                                    <tr key={box.id_caja} className="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
+                                      <td className="px-4 py-3 font-medium text-[#00468c] dark:text-blue-400">{box.codigo_etiqueta}</td>
+                                      <td className="px-4 py-3">{box.localidad_codigos?.nombre_localidad}</td>
+                                      <td className="px-4 py-3 text-right font-semibold">
+                                        <Badge variant="secondary" className="bg-slate-100 text-slate-800 hover:bg-slate-200">{box.socio_titulares?.[0]?.count || 0}</Badge>
+                                      </td>
+                                    </tr>
+                                  ))
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                ) : (
+                   <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed rounded-xl border-muted bg-slate-50 dark:bg-slate-900/50">
+                      <Box className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
+                      <p className="text-muted-foreground">Selecciona un contenedor arriba para explorar lo que tiene dentro.</p>
+                   </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
