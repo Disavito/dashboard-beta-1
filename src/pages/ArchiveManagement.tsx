@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -91,6 +91,10 @@ export default function ArchiveManagement() {
   
   // Viewer state
   const [activeViewerContenedor, setActiveViewerContenedor] = useState<string>('');
+  
+  // Print selection state
+  const [printSelectionOpen, setPrintSelectionOpen] = useState(false);
+  const [selectedContainersToPrint, setSelectedContainersToPrint] = useState<string[]>([]);
 
   const getContainerCapacity = (testSize?: number) => {
     if (!selectedCaja) return 0;
@@ -348,11 +352,16 @@ export default function ArchiveManagement() {
     generateBoxPDF([data]);
   };
 
-  const printAllContainers = () => {
-    const data: ContenedorPDFData[] = contenedores.map(contObj => {
-      const cajasDelCont = cajas.filter(c => c.contenedor_id === contObj.id_contenedor);
+  const handlePrintSelected = () => {
+    if (selectedContainersToPrint.length === 0) {
+      toast.error("Seleccione al menos un contenedor para imprimir.");
+      return;
+    }
+    const data: ContenedorPDFData[] = selectedContainersToPrint.map(id_cont => {
+      const contObj = contenedores.find(c => String(c.id_contenedor) === id_cont);
+      const cajasDelCont = cajas.filter(c => String(c.contenedor_id) === id_cont);
       return {
-        codigo_contenedor: contObj.codigo_contenedor,
+        codigo_contenedor: contObj?.codigo_contenedor || 'SIN-CONTENEDOR',
         cajas_logicas: cajasDelCont.map(c => ({
           codigo_etiqueta: c.codigo_etiqueta,
           localidad: c.localidad_codigos?.nombre_localidad || 'Desconocida'
@@ -366,6 +375,7 @@ export default function ArchiveManagement() {
       return;
     }
     generateBoxPDF(validData);
+    setPrintSelectionOpen(false);
   };
 
   return (
@@ -777,10 +787,52 @@ export default function ArchiveManagement() {
                 <CardTitle>Visor de Contenedores Físicos</CardTitle>
                 <CardDescription>Selecciona un contenedor para explorar su capacidad y las cajas lógicas en su interior.</CardDescription>
               </div>
-              <Button onClick={printAllContainers} className="bg-emerald-600 hover:bg-emerald-700 h-9">
-                <Printer className="w-4 h-4 mr-2" />
-                Imprimir TODOS (Masivo)
-              </Button>
+              <Dialog open={printSelectionOpen} onOpenChange={setPrintSelectionOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    className="bg-emerald-600 hover:bg-emerald-700 h-9" 
+                    onClick={() => {
+                      const validConts = contenedores.filter(c => cajas.some(b => b.contenedor_id === c.id_contenedor));
+                      setSelectedContainersToPrint(validConts.map(c => String(c.id_contenedor)));
+                    }}
+                  >
+                    <Printer className="w-4 h-4 mr-2" />
+                    Impresión por Lotes
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Impresión de Etiquetas</DialogTitle>
+                    <DialogDescription>Selecciona los contenedores que deseas imprimir. Se agruparán automáticamente de 2 en 2 por hoja (A4).</DialogDescription>
+                  </DialogHeader>
+                  <div className="max-h-[300px] overflow-y-auto space-y-2 py-4 px-1">
+                    {contenedores.filter(c => cajas.some(b => b.contenedor_id === c.id_contenedor)).map(c => (
+                      <div key={c.id_contenedor} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+                        <Checkbox 
+                          id={`print-${c.id_contenedor}`} 
+                          checked={selectedContainersToPrint.includes(String(c.id_contenedor))}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedContainersToPrint(prev => [...prev, String(c.id_contenedor)]);
+                            } else {
+                              setSelectedContainersToPrint(prev => prev.filter(id => id !== String(c.id_contenedor)));
+                            }
+                          }}
+                        />
+                        <label htmlFor={`print-${c.id_contenedor}`} className="flex-1 text-sm font-medium leading-none cursor-pointer">
+                          {c.codigo_contenedor} <span className="text-muted-foreground ml-2">({cajas.filter(b => b.contenedor_id === c.id_contenedor).length} cajas)</span>
+                        </label>
+                      </div>
+                    ))}
+                    {contenedores.filter(c => cajas.some(b => b.contenedor_id === c.id_contenedor)).length === 0 && (
+                      <p className="text-sm text-muted-foreground text-center">No hay contenedores con cajas asignadas.</p>
+                    )}
+                  </div>
+                  <Button onClick={handlePrintSelected} className="w-full bg-[#00468c] hover:bg-[#00468c]/90">
+                    <Printer className="w-4 h-4 mr-2" /> Generar PDF ({selectedContainersToPrint.length})
+                  </Button>
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
