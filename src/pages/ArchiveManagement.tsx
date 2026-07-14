@@ -9,6 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { generateBoxPDF, CajaLogica } from '@/components/archive/BoxPDFGenerator';
 
 const compareArchiveSocios = (a: any, b: any) => {
@@ -77,6 +81,10 @@ export default function ArchiveManagement() {
   // New Caja Form
   const [isCreatingCaja, setIsCreatingCaja] = useState(false);
   const [newContenedorName, setNewContenedorName] = useState('');
+  
+  // Combobox states
+  const [openLocalidadSelect, setOpenLocalidadSelect] = useState(false);
+  const [openLocalidadFilter, setOpenLocalidadFilter] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -163,6 +171,9 @@ export default function ArchiveManagement() {
     if (!window.confirm('¿Estás seguro de eliminar esta caja lógica? Esto no borrará los expedientes, solo los dejará "sin caja".')) return;
     try {
       setIsProcessing(true);
+      // Primero desvincular los expedientes manualmente por si no hay ON DELETE SET NULL en la BD
+      await supabase.from('socio_titulares').update({ caja_id: null }).eq('caja_id', id_caja);
+      
       const { error } = await supabase.from('cajas_archivo').delete().eq('id_caja', id_caja);
       if (error) throw error;
       toast.success('Caja eliminada');
@@ -179,6 +190,9 @@ export default function ArchiveManagement() {
     if (!window.confirm('¿Estás seguro de eliminar este contenedor físico? Las cajas dentro quedarán "sin contenedor".')) return;
     try {
       setIsProcessing(true);
+      // Primero desvincular las cajas lógicas manualmente
+      await supabase.from('cajas_archivo').update({ contenedor_id: null }).eq('contenedor_id', parseInt(id_contenedor));
+
       const { error } = await supabase.from('contenedores_fisicos').delete().eq('id_contenedor', parseInt(id_contenedor));
       if (error) throw error;
       toast.success('Contenedor eliminado');
@@ -343,18 +357,53 @@ export default function ArchiveManagement() {
                 </>
               ) : (
                 <div className="space-y-4 border p-4 rounded-xl bg-slate-50 dark:bg-slate-900">
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex flex-col">
                     <Label>Localidad / Proyecto</Label>
-                    <Select onValueChange={setSelectedLocalidad}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleccione..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {localidades.map((l, i) => (
-                          <SelectItem key={l.id || i} value={String(l.id || i)}>{l.nombre_localidad}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Popover open={openLocalidadSelect} onOpenChange={setOpenLocalidadSelect}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openLocalidadSelect}
+                          className="w-full justify-between font-normal"
+                        >
+                          {selectedLocalidad
+                            ? localidades.find((l) => String(l.id) === selectedLocalidad)?.nombre_localidad
+                            : "Seleccione una localidad..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[300px] p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Buscar localidad..." />
+                          <CommandList>
+                            <CommandEmpty>No se encontraron resultados.</CommandEmpty>
+                            <CommandGroup>
+                              {localidades
+                                .sort((a, b) => a.nombre_localidad.localeCompare(b.nombre_localidad))
+                                .map((l) => (
+                                <CommandItem
+                                  key={l.id}
+                                  value={l.nombre_localidad}
+                                  onSelect={() => {
+                                    setSelectedLocalidad(String(l.id));
+                                    setOpenLocalidadSelect(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      selectedLocalidad === String(l.id) ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {l.nombre_localidad}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
 
                   <div className="space-y-2">
@@ -456,20 +505,49 @@ export default function ArchiveManagement() {
                     <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
                       Viendo asociación:
                     </span>
-                    <Select 
-                      disabled={!selectedCaja || isProcessing}
-                      value={activeLocalidadFilter} 
-                      onValueChange={setActiveLocalidadFilter}
-                    >
-                      <SelectTrigger className="w-full max-w-[300px] h-9 text-sm">
-                        <SelectValue placeholder="Seleccionar asociación" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {localidades.map((l, i) => (
-                          <SelectItem key={l.id || i} value={l.nombre_localidad}>{l.nombre_localidad}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Popover open={openLocalidadFilter} onOpenChange={setOpenLocalidadFilter}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openLocalidadFilter}
+                        className="w-[300px] justify-between font-normal"
+                      >
+                        {activeLocalidadFilter || "Viendo asociación..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0" align="start">
+                      <Command>
+                        <CommandInput placeholder="Buscar asociación..." />
+                        <CommandList>
+                          <CommandEmpty>No se encontró ninguna.</CommandEmpty>
+                          <CommandGroup>
+                            {localidades
+                              .sort((a, b) => a.nombre_localidad.localeCompare(b.nombre_localidad))
+                              .map((l) => (
+                              <CommandItem
+                                key={l.id}
+                                value={l.nombre_localidad}
+                                onSelect={() => {
+                                  setActiveLocalidadFilter(l.nombre_localidad);
+                                  setOpenLocalidadFilter(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    activeLocalidadFilter === l.nombre_localidad ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {l.nombre_localidad}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   </div>
                 </div>
                 {selectedCaja && (
