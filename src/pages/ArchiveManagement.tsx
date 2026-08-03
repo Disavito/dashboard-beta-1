@@ -369,9 +369,18 @@ export default function ArchiveManagement() {
     const targetContainerId = containerIdOverride || selectedCaja?.contenedor_id;
     if (!targetContainerId) return;
     
-    const containerBoxes = cajas
+    // 1. Get all boxes in this container, sorted by their explicit order or fallback to ID
+    let containerBoxes = cajas
       .filter(c => c.contenedor_id === targetContainerId)
-      .sort((a, b) => (a.orden || 0) - (b.orden || 0));
+      .sort((a, b) => {
+        if (a.orden !== null && a.orden !== undefined && b.orden !== null && b.orden !== undefined) {
+           return a.orden - b.orden;
+        }
+        return (a.orden ?? a.id_caja) - (b.orden ?? b.id_caja);
+      });
+
+    // 2. Normalize orders to be strict sequence (1, 2, 3...) to prevent gaps/nulls issues
+    containerBoxes = containerBoxes.map((c, idx) => ({ ...c, orden: idx + 1 }));
       
     const currentIndex = containerBoxes.findIndex(c => c.id_caja === cajaId);
     if (currentIndex === -1) return;
@@ -383,25 +392,33 @@ export default function ArchiveManagement() {
     const currentBox = containerBoxes[currentIndex];
     const swapBox = containerBoxes[swapIndex];
     
-    const currentNewOrder = swapBox.orden || swapIndex;
-    const swapNewOrder = currentBox.orden || currentIndex;
+    const currentNewOrder = swapBox.orden!;
+    const swapNewOrder = currentBox.orden!;
     
-    // Optimistic local update
+    // Prepare updates for ALL boxes in this container (to persist normalization)
+    const updatesForDb = containerBoxes.map(c => {
+      if (c.id_caja === currentBox.id_caja) return { id_caja: c.id_caja, orden: currentNewOrder };
+      if (c.id_caja === swapBox.id_caja) return { id_caja: c.id_caja, orden: swapNewOrder };
+      return { id_caja: c.id_caja, orden: c.orden! };
+    });
+
+    // Update state optimistically
     const updatedCajas = cajas.map(c => {
-      if (c.id_caja === currentBox.id_caja) return { ...c, orden: currentNewOrder };
-      if (c.id_caja === swapBox.id_caja) return { ...c, orden: swapNewOrder };
+      const update = updatesForDb.find(u => u.id_caja === c.id_caja);
+      if (update) return { ...c, orden: update.orden };
       return c;
     });
-    // Resort to maintain state array order for other functions
-    updatedCajas.sort((a, b) => (a.orden || 0) - (b.orden || 0));
+    // Sort the state so the UI reflects immediately
+    updatedCajas.sort((a, b) => (a.orden ?? a.id_caja) - (b.orden ?? b.id_caja));
     setCajas(updatedCajas);
     
-    // DB update
+    // Update DB
     try {
-      await Promise.all([
-        supabase.from('cajas_archivo').update({ orden: currentNewOrder }).eq('id_caja', currentBox.id_caja),
-        supabase.from('cajas_archivo').update({ orden: swapNewOrder }).eq('id_caja', swapBox.id_caja)
-      ]);
+      await Promise.all(
+        updatesForDb.map(update => 
+          supabase.from('cajas_archivo').update({ orden: update.orden }).eq('id_caja', update.id_caja)
+        )
+      );
     } catch (e) {
       toast.error("Error al reordenar");
       loadData(); // Revert on error
@@ -1061,7 +1078,7 @@ export default function ArchiveManagement() {
                                     </td>
                                   </tr>
                                 ) : (
-                                  boxesInCont.sort((a, b) => (a.orden || 0) - (b.orden || 0)).map((box, index, arr) => (
+                                  boxesInCont.sort((a, b) => (a.orden ?? a.id_caja) - (b.orden ?? b.id_caja)).map((box, index, arr) => (
                                     <tr key={box.id_caja} className="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
                                       <td className="px-4 py-3 font-medium text-[#00468c] dark:text-blue-400">
                                         <div className="flex items-center gap-3">
