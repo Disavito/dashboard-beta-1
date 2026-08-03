@@ -43,7 +43,6 @@ export const getJornadaByDate = async (colaboradorId: string, date: Date): Promi
 
 export const getCurrentJornadasState = async (colaboradorId: string, targetDate: Date) => {
   const today = format(targetDate, 'yyyy-MM-dd');
-  const yesterday = format(new Date(targetDate.getTime() - 24 * 60 * 60 * 1000), 'yyyy-MM-dd');
 
   const { data, error } = await supabase
     .from('registros_jornada')
