@@ -96,6 +96,13 @@ export default function ArchiveManagement() {
   const [printSelectionOpen, setPrintSelectionOpen] = useState(false);
   const [selectedContainersToPrint, setSelectedContainersToPrint] = useState<string[]>([]);
   const [allowOverflow, setAllowOverflow] = useState(false);
+  
+  // New states for features
+  const [openCajaSelect, setOpenCajaSelect] = useState(false);
+  const [isExpedientesModalOpen, setIsExpedientesModalOpen] = useState(false);
+  const [selectedBoxExpedientes, setSelectedBoxExpedientes] = useState<any[]>([]);
+  const [loadingExpedientes, setLoadingExpedientes] = useState(false);
+  const [selectedBoxForModal, setSelectedBoxForModal] = useState<any>(null);
 
   const getContainerCapacity = (testSize?: number) => {
     if (!selectedCaja) return 0;
@@ -120,7 +127,7 @@ export default function ArchiveManagement() {
       if (!e1) setLocalidades(locs || []);
       
       // 2. Fetch Contenedores
-      const { data: conts, error: e2 } = await supabase.from('contenedores_fisicos').select('*');
+      const { data: conts, error: e2 } = await supabase.from('contenedores_fisicos').select('*').order('codigo_contenedor', { ascending: true });
       if (!e2) setContenedores(conts || []);
 
       // 3. Fetch Cajas
@@ -358,11 +365,12 @@ export default function ArchiveManagement() {
     }
   };
 
-  const handleReorderBox = async (cajaId: number, direction: 'up' | 'down') => {
-    if (!selectedCaja?.contenedor_id) return;
+  const handleReorderBox = async (cajaId: number, direction: 'up' | 'down', containerIdOverride?: number) => {
+    const targetContainerId = containerIdOverride || selectedCaja?.contenedor_id;
+    if (!targetContainerId) return;
     
     const containerBoxes = cajas
-      .filter(c => c.contenedor_id === selectedCaja.contenedor_id)
+      .filter(c => c.contenedor_id === targetContainerId)
       .sort((a, b) => (a.orden || 0) - (b.orden || 0));
       
     const currentIndex = containerBoxes.findIndex(c => c.id_caja === cajaId);
@@ -398,6 +406,15 @@ export default function ArchiveManagement() {
       toast.error("Error al reordenar");
       loadData(); // Revert on error
     }
+  };
+
+  const handleViewBoxExpedientes = async (box: any) => {
+    setSelectedBoxForModal(box);
+    setIsExpedientesModalOpen(true);
+    setLoadingExpedientes(true);
+    const { data } = await supabase.from('socio_titulares').select('dni, nombres, apellidoPaterno, apellidoMaterno').eq('caja_id', box.id_caja).order('apellidoPaterno');
+    setSelectedBoxExpedientes(data || []);
+    setLoadingExpedientes(false);
   };
 
   const downloadPDF = () => {
@@ -492,21 +509,37 @@ export default function ArchiveManagement() {
                 <>
                   <div className="space-y-2">
                     <Label>Seleccionar Caja Existente</Label>
-                    <Select onValueChange={(val) => {
-                      const c = cajas.find(c => String(c.id_caja) === val);
-                      setSelectedCaja(c);
-                    }}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Elige una caja..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cajas.map((c, i) => (
-                          <SelectItem key={c.id_caja || i} value={String(c.id_caja || i)}>
-                            {c.codigo_etiqueta} ({c.localidad_codigos?.nombre_localidad})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Popover open={openCajaSelect} onOpenChange={setOpenCajaSelect}>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" role="combobox" aria-expanded={openCajaSelect} className="justify-between w-full font-normal">
+                          {selectedCaja ? `${selectedCaja.codigo_etiqueta} (${selectedCaja.localidad_codigos?.nombre_localidad})` : "Buscar caja por código o localidad..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[400px] p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Escribe para buscar..." />
+                          <CommandList>
+                            <CommandEmpty>No se encontraron cajas.</CommandEmpty>
+                            <CommandGroup>
+                              {cajas.map((c) => (
+                                <CommandItem
+                                  key={c.id_caja}
+                                  value={`${c.codigo_etiqueta} ${c.localidad_codigos?.nombre_localidad}`}
+                                  onSelect={() => {
+                                    setSelectedCaja(c);
+                                    setOpenCajaSelect(false);
+                                  }}
+                                >
+                                  <Check className={cn("mr-2 h-4 w-4", selectedCaja?.id_caja === c.id_caja ? "opacity-100" : "opacity-0")} />
+                                  {c.codigo_etiqueta} <span className="text-muted-foreground ml-2">({c.localidad_codigos?.nombre_localidad})</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <Button variant="outline" className="w-full" onClick={() => setIsCreatingCaja(true)}>
                     <Plus className="w-4 h-4 mr-2" /> Crear Nueva Caja Lógica
@@ -1028,12 +1061,26 @@ export default function ArchiveManagement() {
                                     </td>
                                   </tr>
                                 ) : (
-                                  boxesInCont.map(box => (
+                                  boxesInCont.sort((a, b) => (a.orden || 0) - (b.orden || 0)).map((box, index, arr) => (
                                     <tr key={box.id_caja} className="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
-                                      <td className="px-4 py-3 font-medium text-[#00468c] dark:text-blue-400">{box.codigo_etiqueta}</td>
+                                      <td className="px-4 py-3 font-medium text-[#00468c] dark:text-blue-400">
+                                        <div className="flex items-center gap-3">
+                                          <div className="flex flex-col">
+                                            <Button variant="ghost" size="icon" className="h-4 w-4 text-slate-400 hover:text-blue-600 mb-1" disabled={index === 0} onClick={() => handleReorderBox(box.id_caja, 'up', box.contenedor_id)}>
+                                              <ChevronUp className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="h-4 w-4 text-slate-400 hover:text-blue-600" disabled={index === arr.length - 1} onClick={() => handleReorderBox(box.id_caja, 'down', box.contenedor_id)}>
+                                              <ChevronDown className="h-4 w-4" />
+                                            </Button>
+                                          </div>
+                                          <span className="cursor-pointer hover:underline" onClick={() => handleViewBoxExpedientes(box)}>{box.codigo_etiqueta}</span>
+                                        </div>
+                                      </td>
                                       <td className="px-4 py-3">{box.localidad_codigos?.nombre_localidad}</td>
                                       <td className="px-4 py-3 text-right font-semibold">
-                                        <Badge variant="secondary" className="bg-slate-100 text-slate-800 hover:bg-slate-200">{box.socio_titulares?.[0]?.count || 0}</Badge>
+                                        <Badge variant="secondary" className="bg-slate-100 text-slate-800 hover:bg-slate-200 cursor-pointer" onClick={() => handleViewBoxExpedientes(box)}>
+                                          {box.socio_titulares?.[0]?.count || 0} exp.
+                                        </Badge>
                                       </td>
                                     </tr>
                                   ))
@@ -1056,6 +1103,42 @@ export default function ArchiveManagement() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Expedientes Modal */}
+      <Dialog open={isExpedientesModalOpen} onOpenChange={setIsExpedientesModalOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Expedientes en la Caja</DialogTitle>
+            <DialogDescription>
+              {selectedBoxForModal ? `Listado de socios en ${selectedBoxForModal.codigo_etiqueta} (${selectedBoxForModal.localidad_codigos?.nombre_localidad})` : ''}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto">
+            {loadingExpedientes ? (
+              <div className="flex justify-center p-8 text-muted-foreground">Cargando expedientes...</div>
+            ) : selectedBoxExpedientes.length === 0 ? (
+              <div className="flex justify-center p-8 text-muted-foreground">Esta caja no tiene expedientes asignados.</div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 dark:bg-slate-900 text-muted-foreground text-xs uppercase">
+                  <tr>
+                    <th className="px-4 py-2 text-left">DNI</th>
+                    <th className="px-4 py-2 text-left">Socio</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {selectedBoxExpedientes.map(exp => (
+                    <tr key={exp.dni} className="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                      <td className="px-4 py-2 font-mono">{exp.dni}</td>
+                      <td className="px-4 py-2 font-medium">{exp.apellidoPaterno} {exp.apellidoMaterno}, {exp.nombres}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
