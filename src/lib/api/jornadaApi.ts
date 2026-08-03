@@ -49,7 +49,7 @@ export const getCurrentJornadasState = async (colaboradorId: string, targetDate:
     .from('registros_jornada')
     .select('*')
     .eq('colaborador_id', colaboradorId)
-    .in('fecha', [yesterday, today])
+    .or(`fecha.eq.${today},hora_fin_jornada.is.null`)
     .order('created_at', { ascending: false });
 
   if (error) throw error;

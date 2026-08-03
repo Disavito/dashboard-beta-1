@@ -77,6 +77,14 @@ const JUSTIFICATION_OPTIONS_CLOCK_OUT_LATE = [
   "Error del sistema",
 ];
 
+const JUSTIFICATION_OPTIONS_FORGOT_CLOCK_OUT = [
+  "Olvido de marcado de salida el día anterior",
+  "Problemas de conexión a internet el día anterior",
+  "Salida urgente por emergencia el día anterior",
+  "Error del sistema al intentar cerrar ayer",
+  "Cierre de jornada en campo sin acceso",
+];
+
 const ClockManager: React.FC<ClockManagerProps> = ({ 
   colaborador, 
   targetDate = new Date(),
@@ -233,6 +241,11 @@ const ClockManager: React.FC<ClockManagerProps> = ({
     if (action === 'clock-in' && !jornada && completedJornadasToday.length > 0) {
       needsJustification = true;
     }
+    
+    // Forzar justificación si intenta cerrar una jornada de un día anterior
+    if (action === 'clock-out' && jornada && jornada.fecha !== format(targetDate, 'yyyy-MM-dd')) {
+      needsJustification = true;
+    }
 
     if (needsJustification && !bypassTimeRestrictions) {
       setPendingAction(action);
@@ -274,6 +287,16 @@ const ClockManager: React.FC<ClockManagerProps> = ({
         };
       }
     } else {
+      const isNextDay = jornada && jornada.fecha !== format(targetDate, 'yyyy-MM-dd');
+      
+      if (isNextDay) {
+        return {
+          options: JUSTIFICATION_OPTIONS_FORGOT_CLOCK_OUT,
+          title: 'Cierre de Jornada Atrasado',
+          description: 'Estás cerrando una jornada de un día anterior. Justifica tu falta de marcado.',
+        };
+      }
+
       const exitStart = 18 * 60 + 20; // 18:20
       if (totalMinutes < exitStart) {
         return {
