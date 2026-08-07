@@ -18,8 +18,7 @@ import {
   Users,
   FileSpreadsheet,
   FileText,
-  Settings2,
-  BarChart
+  Settings2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { exportToExcel, exportToCSV } from '@/lib/exportUtils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabaseClient';
 import { SocioTitular } from '@/lib/types';

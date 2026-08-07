@@ -14,7 +14,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Map } from 'lucide-react';
+
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { generateBoxPDF, ContenedorPDFData } from '@/components/archive/BoxPDFGenerator';
