@@ -46,11 +46,16 @@ const compareArchiveSocios = (a: any, b: any) => {
     return rankA.group - rankB.group;
   }
 
-  // Si están en el grupo de 'sin recibo', ordenar por DNI numéricamente
+  // Si están en el grupo de fallback (grupo 6)
   if (rankA.group === 6) {
-    const dniA = Number(a.dni) || 0;
-    const dniB = Number(b.dni) || 0;
-    return dniA - dniB;
+    // Si realmente NO tienen recibo, ordenar por DNI numéricamente
+    if (!rankA.val && !rankB.val) {
+      const dniA = Number(a.dni) || 0;
+      const dniB = Number(b.dni) || 0;
+      return dniA - dniB;
+    }
+    // Si tienen algún texto fallback, ordenarlos alfanuméricamente
+    return String(rankA.val).localeCompare(String(rankB.val), undefined, { numeric: true });
   }
 
   // Grupos numéricos (30000, 50000, 1-1300) -> ordenar de menor a mayor
