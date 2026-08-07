@@ -442,8 +442,13 @@ export default function ArchiveManagement() {
     setSelectedBoxForModal(box);
     setIsExpedientesModalOpen(true);
     setLoadingExpedientes(true);
-    const { data } = await supabase.from('vw_socio_titulares_estado').select('dni, nombres, apellidoPaterno, apellidoMaterno').eq('caja_id', box.id_caja).eq('status', 'Activo').order('apellidoPaterno');
-    setSelectedBoxExpedientes(data || []);
+    const { data } = await supabase.from('vw_socio_titulares_estado')
+      .select('dni, nombres, apellidoPaterno, apellidoMaterno, receiptNumber')
+      .eq('caja_id', box.id_caja)
+      .eq('status', 'Activo');
+      
+    const sortedData = (data || []).sort(compareArchiveSocios);
+    setSelectedBoxExpedientes(sortedData);
     setLoadingExpedientes(false);
   };
 
