@@ -97,6 +97,7 @@ export default function ArchiveManagement() {
   
   // Viewer state
   const [activeViewerContenedor, setActiveViewerContenedor] = useState<string>('');
+  const [viewerSearchLocality, setViewerSearchLocality] = useState<string>('all');
   
   // Print selection state
   const [printSelectionOpen, setPrintSelectionOpen] = useState(false);
@@ -527,31 +528,6 @@ export default function ArchiveManagement() {
         </p>
       </div>
 
-      <div className="bg-slate-50 dark:bg-slate-900 border border-border/50 rounded-2xl p-5 shadow-sm">
-        <h3 className="font-black text-sm text-[#00468c] mb-3 uppercase tracking-wider flex items-center gap-2">
-          <Map className="w-4 h-4" /> Resumen: Localidades en Contenedores
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {Object.entries(
-            cajas.reduce((acc, caja) => {
-              const loc = caja.localidad_codigos?.nombre_localidad || 'Desconocida';
-              const cont = caja.contenedores_fisicos?.codigo_contenedor || 'Sin asignar';
-              if (!acc[loc]) acc[loc] = new Set<string>();
-              acc[loc].add(cont);
-              return acc;
-            }, {} as Record<string, Set<string>>)
-          )
-            .sort(([locA], [locB]) => locA.localeCompare(locB))
-            .map(([loc, conts]) => (
-              <div key={loc} className="text-sm bg-background p-3 rounded-xl border border-border/50 shadow-sm flex flex-col gap-1">
-                <span className="font-bold text-foreground text-xs uppercase tracking-tight">{loc}</span>
-                <span className="text-muted-foreground text-xs">
-                  {Array.from(conts as Set<string>).sort().join(', ')}
-                </span>
-              </div>
-            ))}
-        </div>
-      </div>
 
       <Tabs defaultValue="asignacion" className="space-y-6">
         <div className="flex justify-start">
@@ -1067,21 +1043,55 @@ export default function ArchiveManagement() {
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
-                {/* Selector */}
-                <div className="max-w-md space-y-2">
-                  <Label>Seleccionar Contenedor</Label>
-                  <Select value={activeViewerContenedor} onValueChange={setActiveViewerContenedor}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Elige un contenedor..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {contenedores.map(c => (
-                        <SelectItem key={c.id_contenedor} value={String(c.id_contenedor)}>
-                          {c.codigo_contenedor}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                {/* Selectores */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-border/50 shadow-sm">
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground font-bold">1. Buscar por Asociación / Localidad</Label>
+                    <Select value={viewerSearchLocality} onValueChange={(val) => {
+                      setViewerSearchLocality(val);
+                      setActiveViewerContenedor(''); // Limpiar contenedor activo al cambiar de localidad
+                    }}>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Todas las asociaciones..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas las asociaciones</SelectItem>
+                        {localidades.map(l => (
+                          <SelectItem key={l.codigo_localidad} value={l.nombre_localidad}>{l.nombre_localidad}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground font-bold">2. Seleccionar Contenedor</Label>
+                    <Select value={activeViewerContenedor} onValueChange={setActiveViewerContenedor}>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Elige un contenedor..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {contenedores
+                          .filter(c => {
+                            if (viewerSearchLocality === 'all') return true;
+                            // Mostrar solo si este contenedor tiene alguna caja de esta localidad
+                            return cajas.some(b => b.contenedor_id === c.id_contenedor && b.localidad_codigos?.nombre_localidad === viewerSearchLocality);
+                          })
+                          .map(c => (
+                            <SelectItem key={c.id_contenedor} value={String(c.id_contenedor)}>
+                              {c.codigo_contenedor}
+                            </SelectItem>
+                        ))}
+                        {contenedores.filter(c => {
+                            if (viewerSearchLocality === 'all') return true;
+                            return cajas.some(b => b.contenedor_id === c.id_contenedor && b.localidad_codigos?.nombre_localidad === viewerSearchLocality);
+                          }).length === 0 && (
+                            <div className="p-3 text-sm text-muted-foreground text-center">
+                              No hay contenedores con esta asociación.
+                            </div>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 {activeViewerContenedor ? (
