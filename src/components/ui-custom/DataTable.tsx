@@ -23,7 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Loader2, LucideIcon, Database } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, LucideIcon, Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DataTableProps<TData, TValue> {
@@ -67,7 +67,7 @@ export function DataTable<TData, TValue>({
   manualPagination = false,
   pageCount,
   totalCount,
-  pagination,
+  pagination: controlledPagination,
   onPaginationChange,
   enableVirtualization = false,
   rowClassName,
