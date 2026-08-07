@@ -114,27 +114,32 @@ function People() {
   const deleteMutation = useMutation<any, Error, { tableName: string; id: string | number; isSoftDelete: boolean }>({ mutationKey: ['deleteRecord'] });
 
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 });
-  const [summaryOpen, setSummaryOpen] = useState(false);
-  const [summaryData, setSummaryData] = useState<Record<string, number>>({});
-  const [loadingSummary, setLoadingSummary] = useState(false);
+  const [localityStats, setLocalityStats] = useState<{activos: number, retirados: number, inactivos: number, observados: number} | null>(null);
 
-  const loadSummary = async () => {
-    setLoadingSummary(true);
-    const { data, error } = await supabase
-      .from('vw_socio_titulares_estado')
-      .select('localidad')
-      .eq('status', 'Activo');
-    if (!error && data) {
-      const counts = data.reduce((acc, row) => {
-        const loc = row.localidad || 'Desconocida';
-        acc[loc] = (acc[loc] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      setSummaryData(counts);
+  useEffect(() => {
+    if (selectedLocalidad === 'all') {
+      setLocalityStats(null);
+      return;
     }
-    setLoadingSummary(false);
-  };
-  
+    const fetchStats = async () => {
+      const { data, error } = await supabase
+        .from('vw_socio_titulares_estado')
+        .select('status, isObservado')
+        .eq('localidad', selectedLocalidad);
+        
+      if (!error && data) {
+        const stats = { activos: 0, retirados: 0, inactivos: 0, observados: 0 };
+        data.forEach((row: any) => {
+          if (row.status === 'Activo') stats.activos++;
+          else if (row.status === 'Retirado') stats.retirados++;
+          else if (row.status === 'Inactivo') stats.inactivos++;
+          if (row.isObservado) stats.observados++;
+        });
+        setLocalityStats(stats);
+      }
+    };
+    fetchStats();
+  }, [selectedLocalidad]);
   const serverFilters = useMemo(() => {
     const filters: Record<string, any> = {};
     if (selectedLocalidad !== 'all') filters['localidad'] = selectedLocalidad;
@@ -441,36 +446,7 @@ function People() {
 
   return (
     <div className="min-h-screen bg-background page-enter pb-10">
-      <Dialog open={summaryOpen} onOpenChange={setSummaryOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black text-[#00468c] flex items-center gap-2">
-              <BarChart className="w-5 h-5" /> Socios Activos por Localidad
-            </DialogTitle>
-            <DialogDescription>
-              Conteo total de socios activos asignados a cada localidad.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="max-h-[60vh] overflow-y-auto pr-2 mt-4 space-y-2">
-            {loadingSummary ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : Object.keys(summaryData).length === 0 ? (
-              <p className="text-sm text-center text-muted-foreground py-4">No hay datos disponibles.</p>
-            ) : (
-              Object.entries(summaryData)
-                .sort((a, b) => b[1] - a[1]) // Mayor a menor
-                .map(([loc, count]) => (
-                  <div key={loc} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900 border rounded-lg">
-                    <span className="font-bold text-sm uppercase tracking-tight">{loc}</span>
-                    <Badge variant="secondary" className="font-mono">{count} socios</Badge>
-                  </div>
-                ))
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+
       <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#4892CC]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div className="max-w-7xl mx-auto relative z-10">
@@ -548,15 +524,6 @@ function People() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
-              variant="outline" 
-              className="h-11 border-border text-[#00468c] font-bold gap-2 rounded-xl px-4 hover:bg-muted shadow-sm w-full lg:w-auto shrink-0"
-              onClick={() => { setSummaryOpen(true); loadSummary(); }}
-            >
-              <BarChart className="w-4 h-4" /> 
-              <span className="hidden sm:inline">Resumen Localidades</span>
-            </Button>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -597,6 +564,27 @@ function People() {
           </DropdownMenu>
         </div>
       </div>
+
+      {selectedLocalidad !== 'all' && localityStats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-xl p-4 flex flex-col justify-center">
+            <span className="text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">Activos</span>
+            <span className="text-2xl font-black text-emerald-900 dark:text-emerald-300">{localityStats.activos}</span>
+          </div>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-xl p-4 flex flex-col justify-center">
+            <span className="text-red-700 dark:text-red-400 text-xs font-bold uppercase tracking-wider">Retirados</span>
+            <span className="text-2xl font-black text-red-900 dark:text-red-300">{localityStats.retirados}</span>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex flex-col justify-center">
+            <span className="text-slate-700 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Inactivos</span>
+            <span className="text-2xl font-black text-slate-900 dark:text-slate-300">{localityStats.inactivos}</span>
+          </div>
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl p-4 flex flex-col justify-center">
+            <span className="text-amber-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">Observados</span>
+            <span className="text-2xl font-black text-amber-900 dark:text-amber-300">{localityStats.observados}</span>
+          </div>
+        </div>
+      )}
 
       {/* Vista Escritorio */}
       {!isMobile && (
