@@ -1046,26 +1046,6 @@ export default function ArchiveManagement() {
                 {/* Selectores */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-border/50 shadow-sm">
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground font-bold">1. Buscar por Asociación / Localidad</Label>
-                    <Select value={viewerSearchLocality} onValueChange={(val) => {
-                      setViewerSearchLocality(val);
-                      setActiveViewerContenedor(''); // Limpiar contenedor activo al cambiar de localidad
-                    }}>
-                      <SelectTrigger className="bg-background">
-                        <SelectValue placeholder="Todas las asociaciones..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todas las asociaciones</SelectItem>
-                        {localidades.map(l => (
-                          <SelectItem key={l.codigo_localidad} value={l.nombre_localidad}>{l.nombre_localidad}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                {/* Selectores */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-border/50 shadow-sm">
-                  <div className="space-y-2">
                     <Label className="text-muted-foreground font-bold">Buscar por Asociación / Localidad</Label>
                     <Select value={viewerSearchLocality} onValueChange={(val) => {
                       setViewerSearchLocality(val);
