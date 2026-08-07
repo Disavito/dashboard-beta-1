@@ -14,6 +14,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Map } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { generateBoxPDF, ContenedorPDFData } from '@/components/archive/BoxPDFGenerator';
@@ -524,6 +525,32 @@ export default function ArchiveManagement() {
         <p className="text-muted-foreground mt-2">
           Gestiona las cajas de archivo, contenedores, asignación masiva de expedientes y generación de códigos QR.
         </p>
+      </div>
+
+      <div className="bg-slate-50 dark:bg-slate-900 border border-border/50 rounded-2xl p-5 shadow-sm">
+        <h3 className="font-black text-sm text-[#00468c] mb-3 uppercase tracking-wider flex items-center gap-2">
+          <Map className="w-4 h-4" /> Resumen: Localidades en Contenedores
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {Object.entries(
+            cajas.reduce((acc, caja) => {
+              const loc = caja.localidad_codigos?.nombre_localidad || 'Desconocida';
+              const cont = caja.contenedores_fisicos?.codigo_contenedor || 'Sin asignar';
+              if (!acc[loc]) acc[loc] = new Set<string>();
+              acc[loc].add(cont);
+              return acc;
+            }, {} as Record<string, Set<string>>)
+          )
+            .sort(([locA], [locB]) => locA.localeCompare(locB))
+            .map(([loc, conts]) => (
+              <div key={loc} className="text-sm bg-background p-3 rounded-xl border border-border/50 shadow-sm flex flex-col gap-1">
+                <span className="font-bold text-foreground text-xs uppercase tracking-tight">{loc}</span>
+                <span className="text-muted-foreground text-xs">
+                  {Array.from(conts as Set<string>).sort().join(', ')}
+                </span>
+              </div>
+            ))}
+        </div>
       </div>
 
       <Tabs defaultValue="asignacion" className="space-y-6">

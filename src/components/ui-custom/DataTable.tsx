@@ -43,6 +43,7 @@ interface DataTableProps<TData, TValue> {
   // Propiedades para paginación manual (servidor)
   manualPagination?: boolean;
   pageCount?: number;
+  totalCount?: number;
   pagination?: PaginationState;
   onPaginationChange?: (updaterOrValue: any) => void;
   // Propiedades para virtualización
@@ -61,11 +62,12 @@ export function DataTable<TData, TValue>({
   rowSelection,
   onRowSelectionChange,
   emptyTitle = "No hay resultados",
-  emptyDescription = "No se encontraron datos para mostrar.",
-  EmptyIcon = Database,
+  emptyDescription = 'No se encontraron resultados para los filtros actuales.',
+  EmptyIcon = Inbox,
   manualPagination = false,
   pageCount,
-  pagination: controlledPagination,
+  totalCount,
+  pagination,
   onPaginationChange,
   enableVirtualization = false,
   rowClassName,
@@ -214,8 +216,35 @@ export function DataTable<TData, TValue>({
 
       {!enableVirtualization && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-2">
-          <div className="text-xs font-bold text-muted-foreground/70 uppercase tracking-widest">
-            Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
+          <div className="flex items-center gap-4">
+            <div className="text-xs font-bold text-muted-foreground/70 tracking-widest">
+              {(() => {
+                const pIndex = table.getState().pagination.pageIndex;
+                const pSize = table.getState().pagination.pageSize;
+                const start = pIndex * pSize + 1;
+                const end = totalCount !== undefined ? Math.min(start + pSize - 1, totalCount) : (pIndex + 1) * pSize;
+                
+                if (totalCount === 0) return "Mostrando 0 registros";
+                return `Mostrando ${start} al ${end} de ${totalCount ?? '...'} socios`;
+              })()}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">Mostrar</span>
+              <select
+                className="h-8 w-16 rounded-md border border-input bg-transparent px-1 py-1 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring dark:bg-slate-900"
+                value={table.getState().pagination.pageSize}
+                onChange={(e) => {
+                  table.setPageSize(Number(e.target.value));
+                }}
+              >
+                {[10, 25, 50, 100].map(pageSize => (
+                  <option key={pageSize} value={pageSize}>
+                    {pageSize}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button

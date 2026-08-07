@@ -30,7 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { exportToExcel, exportToCSV } from '@/lib/exportUtils';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabaseClient';
 import { SocioTitular } from '@/lib/types';
@@ -113,6 +113,26 @@ function People() {
   const deleteMutation = useMutation<any, Error, { tableName: string; id: string | number; isSoftDelete: boolean }>({ mutationKey: ['deleteRecord'] });
 
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 });
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [summaryData, setSummaryData] = useState<Record<string, number>>({});
+  const [loadingSummary, setLoadingSummary] = useState(false);
+
+  const loadSummary = async () => {
+    setLoadingSummary(true);
+    const { data, error } = await supabase
+      .from('vw_socio_titulares_estado')
+      .select('localidad')
+      .eq('status', 'Activo');
+    if (!error && data) {
+      const counts = data.reduce((acc, row) => {
+        const loc = row.localidad || 'Desconocida';
+        acc[loc] = (acc[loc] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      setSummaryData(counts);
+    }
+    setLoadingSummary(false);
+  };
   
   const serverFilters = useMemo(() => {
     const filters: Record<string, any> = {};
@@ -388,6 +408,7 @@ function People() {
 
   if ((loading && socios.length === 0) || userLoading) return (
     <div className="min-h-screen bg-background page-enter pb-10">
+      
       <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8">
         <div className="max-w-7xl mx-auto">
           <div className="h-8 w-64 bg-slate-200 rounded-xl animate-pulse mb-3" />
@@ -419,6 +440,36 @@ function People() {
 
   return (
     <div className="min-h-screen bg-background page-enter pb-10">
+      <Dialog open={summaryOpen} onOpenChange={setSummaryOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black text-[#00468c] flex items-center gap-2">
+              <BarChart className="w-5 h-5" /> Socios Activos por Localidad
+            </DialogTitle>
+            <DialogDescription>
+              Conteo total de socios activos asignados a cada localidad.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto pr-2 mt-4 space-y-2">
+            {loadingSummary ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : Object.keys(summaryData).length === 0 ? (
+              <p className="text-sm text-center text-muted-foreground py-4">No hay datos disponibles.</p>
+            ) : (
+              Object.entries(summaryData)
+                .sort((a, b) => b[1] - a[1]) // Mayor a menor
+                .map(([loc, count]) => (
+                  <div key={loc} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900 border rounded-lg">
+                    <span className="font-bold text-sm uppercase tracking-tight">{loc}</span>
+                    <Badge variant="secondary" className="font-mono">{count} socios</Badge>
+                  </div>
+                ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
       <div className="w-full bg-card dark:bg-slate-900 border-b border-border/50 py-12 px-8 shadow-sm mb-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#4892CC]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div className="max-w-7xl mx-auto relative z-10">
@@ -495,17 +546,27 @@ function People() {
             </div>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="outline" 
-                className="h-11 border-border text-muted-foreground font-bold gap-2 rounded-xl px-4 hover:bg-muted shadow-sm w-full lg:w-auto shrink-0"
-                disabled={isExporting}
-              >
-                {isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />} 
-                <span className="hidden sm:inline">{isExporting ? 'Procesando...' : 'Exportar'}</span>
-              </Button>
-            </DropdownMenuTrigger>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              variant="outline" 
+              className="h-11 border-border text-[#00468c] font-bold gap-2 rounded-xl px-4 hover:bg-muted shadow-sm w-full lg:w-auto shrink-0"
+              onClick={() => { setSummaryOpen(true); loadSummary(); }}
+            >
+              <BarChart className="w-4 h-4" /> 
+              <span className="hidden sm:inline">Resumen Localidades</span>
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="h-11 border-border text-muted-foreground font-bold gap-2 rounded-xl px-4 hover:bg-muted shadow-sm w-full lg:w-auto shrink-0"
+                  disabled={isExporting}
+                >
+                  {isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />} 
+                  <span className="hidden sm:inline">{isExporting ? 'Procesando...' : 'Exportar'}</span>
+                </Button>
+              </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="rounded-xl shadow-lg w-56">
               <DropdownMenuItem
                 className="gap-2 font-medium cursor-pointer"
@@ -546,6 +607,7 @@ function People() {
                     isLoading={loading}
                     manualPagination={true}
                     pageCount={Math.ceil(totalCount / pagination.pageSize)}
+                    totalCount={totalCount}
                     pagination={pagination}
                     onPaginationChange={setPagination}
                     rowClassName={(row) => {
