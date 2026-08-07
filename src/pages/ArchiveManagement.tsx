@@ -1063,32 +1063,45 @@ export default function ArchiveManagement() {
                     </Select>
                   </div>
 
+                {/* Selectores */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-border/50 shadow-sm">
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground font-bold">2. Seleccionar Contenedor</Label>
-                    <Select value={activeViewerContenedor} onValueChange={setActiveViewerContenedor}>
+                    <Label className="text-muted-foreground font-bold">Buscar por Asociación / Localidad</Label>
+                    <Select value={viewerSearchLocality} onValueChange={(val) => {
+                      setViewerSearchLocality(val);
+                      if (val !== 'all') {
+                        setActiveViewerContenedor(''); // Limpiar contenedor activo al cambiar de localidad
+                      }
+                    }}>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Todas las asociaciones..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas las asociaciones</SelectItem>
+                        {localidades.map(l => (
+                          <SelectItem key={l.codigo_localidad} value={l.nombre_localidad}>{l.nombre_localidad}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground font-bold">Buscar por Contenedor Físico</Label>
+                    <Select value={activeViewerContenedor} onValueChange={(val) => {
+                      setActiveViewerContenedor(val);
+                      if (val) {
+                        setViewerSearchLocality('all'); // Limpiar localidad al buscar contenedor
+                      }
+                    }}>
                       <SelectTrigger className="bg-background">
                         <SelectValue placeholder="Elige un contenedor..." />
                       </SelectTrigger>
                       <SelectContent>
-                        {contenedores
-                          .filter(c => {
-                            if (viewerSearchLocality === 'all') return true;
-                            // Mostrar solo si este contenedor tiene alguna caja de esta localidad
-                            return cajas.some(b => b.contenedor_id === c.id_contenedor && b.localidad_codigos?.nombre_localidad === viewerSearchLocality);
-                          })
-                          .map(c => (
-                            <SelectItem key={c.id_contenedor} value={String(c.id_contenedor)}>
-                              {c.codigo_contenedor}
-                            </SelectItem>
+                        {contenedores.map(c => (
+                          <SelectItem key={c.id_contenedor} value={String(c.id_contenedor)}>
+                            {c.codigo_contenedor}
+                          </SelectItem>
                         ))}
-                        {contenedores.filter(c => {
-                            if (viewerSearchLocality === 'all') return true;
-                            return cajas.some(b => b.contenedor_id === c.id_contenedor && b.localidad_codigos?.nombre_localidad === viewerSearchLocality);
-                          }).length === 0 && (
-                            <div className="p-3 text-sm text-muted-foreground text-center">
-                              No hay contenedores con esta asociación.
-                            </div>
-                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -1169,10 +1182,66 @@ export default function ArchiveManagement() {
                       );
                     })()}
                   </div>
+                ) : viewerSearchLocality !== 'all' ? (
+                  <div className="border rounded-xl bg-white dark:bg-slate-950 overflow-hidden animate-in fade-in duration-300">
+                    {(() => {
+                      const boxesForLocality = cajas.filter(c => c.localidad_codigos?.nombre_localidad === viewerSearchLocality);
+                      return (
+                        <>
+                          <div className="p-5 bg-slate-50 dark:bg-slate-900 border-b flex items-center justify-between">
+                            <h3 className="font-bold text-[#00468c] dark:text-blue-400">
+                              Cajas de la Asociación: {viewerSearchLocality}
+                            </h3>
+                            <Badge variant="secondary" className="text-sm">{boxesForLocality.length} cajas encontradas</Badge>
+                          </div>
+                          <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-100 dark:bg-slate-900 text-xs uppercase font-semibold text-muted-foreground">
+                              <tr>
+                                <th className="px-4 py-3">Código Caja</th>
+                                <th className="px-4 py-3">Contenedor</th>
+                                <th className="px-4 py-3 text-right">Expedientes</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y">
+                              {boxesForLocality.length === 0 ? (
+                                <tr>
+                                  <td colSpan={3} className="px-4 py-12 text-center text-muted-foreground">
+                                    No se encontraron cajas para esta asociación.
+                                  </td>
+                                </tr>
+                              ) : (
+                                boxesForLocality.sort((a, b) => (a.orden ?? a.id_caja) - (b.orden ?? b.id_caja)).map((box) => (
+                                  <tr key={box.id_caja} className="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
+                                    <td className="px-4 py-3 font-medium text-[#00468c] dark:text-blue-400">
+                                      <span className="cursor-pointer hover:underline" onClick={() => handleViewBoxExpedientes(box)}>
+                                        {box.codigo_etiqueta}
+                                      </span>
+                                    </td>
+                                    <td className="px-4 py-3 font-semibold">
+                                      {box.contenedores_fisicos?.codigo_contenedor ? (
+                                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">{box.contenedores_fisicos.codigo_contenedor}</Badge>
+                                      ) : (
+                                        <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">Sin asignar</Badge>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                      <Badge variant="secondary" className="bg-slate-100 text-slate-800 hover:bg-slate-200 cursor-pointer" onClick={() => handleViewBoxExpedientes(box)}>
+                                        {box.socio_titulares?.[0]?.count || 0} exp.
+                                      </Badge>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </>
+                      );
+                    })()}
+                  </div>
                 ) : (
                    <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed rounded-xl border-muted bg-slate-50 dark:bg-slate-900/50">
                       <Box className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
-                      <p className="text-muted-foreground">Selecciona un contenedor arriba para explorar lo que tiene dentro.</p>
+                      <p className="text-muted-foreground">Selecciona una asociación o un contenedor arriba para explorar lo que tiene dentro.</p>
                    </div>
                 )}
               </div>
