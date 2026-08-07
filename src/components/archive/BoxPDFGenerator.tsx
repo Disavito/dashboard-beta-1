@@ -90,25 +90,38 @@ export const generateBoxPDF = async (contenedores: ContenedorPDFData[]) => {
       doc.setFont('helvetica', 'bold');
       doc.text('CONTENIDO LÓGICO VINCULADO', 105, yOffset + 70, { align: 'center' });
 
+      const maxBoxes = 16;
       const sortedBoxes = [...contenedor.cajas_logicas].sort((a: any, b: any) => (a.orden || 0) - (b.orden || 0));
-      const visibleBoxes = sortedBoxes.slice(0, 10);
-      const hasMore = sortedBoxes.length > 10;
+      const visibleBoxes = sortedBoxes.slice(0, maxBoxes);
+      const hasMore = sortedBoxes.length > maxBoxes;
       
-      const tableData = visibleBoxes.length > 0
-          ? visibleBoxes.map(cl => [cl.codigo_etiqueta, cl.localidad])
-          : [['(Contenedor vacío)', '-']];
+      const tableData = [];
+      if (visibleBoxes.length === 0) {
+        tableData.push(['(Contenedor vacío)', '-', '', '']);
+      } else {
+        for (let j = 0; j < visibleBoxes.length; j += 2) {
+          const row = [];
+          row.push(visibleBoxes[j].codigo_etiqueta, visibleBoxes[j].localidad);
+          if (j + 1 < visibleBoxes.length) {
+            row.push(visibleBoxes[j + 1].codigo_etiqueta, visibleBoxes[j + 1].localidad);
+          } else {
+            row.push('', '');
+          }
+          tableData.push(row);
+        }
+      }
           
       if (hasMore) {
-        tableData.push([`... y ${contenedor.cajas_logicas.length - 10} cajas más`, '']);
+        tableData.push([`... y ${contenedor.cajas_logicas.length - maxBoxes} cajas más`, '', '', '']);
       }
 
       autoTable(doc, {
         startY: yOffset + 74,
         margin: { left: 15, right: 15 },
-        head: [['Código de Caja Lógica', 'Localidad / Proyecto']],
+        head: [['Caja Lógica', 'Localidad / Proy.', 'Caja Lógica', 'Localidad / Proy.']],
         body: tableData,
         theme: 'grid',
-        styles: { fontSize: 8, cellPadding: 1.5 },
+        styles: { fontSize: 7, cellPadding: 1 },
         headStyles: { fillColor: [0, 70, 140], textColor: 255, fontStyle: 'bold', halign: 'center' },
         bodyStyles: { halign: 'center' },
         alternateRowStyles: { fillColor: [245, 247, 250] }
