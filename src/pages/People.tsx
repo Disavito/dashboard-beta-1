@@ -595,9 +595,10 @@ function People() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </div>
 
-        {/* Vista Escritorio */}
-        {!isMobile && (
+      {/* Vista Escritorio */}
+      {!isMobile && (
           <Card className="rounded-2xl border border-border/50 shadow-sm bg-card dark:bg-slate-900 overflow-hidden">
             <CardContent className="p-0">
               <div className="hidden md:block">
