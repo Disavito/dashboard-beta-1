@@ -131,8 +131,20 @@ export default function ArchiveManagement() {
       if (!e2) setContenedores(conts || []);
 
       // 3. Fetch Cajas
-      const { data: cjs, error: e3 } = await supabase.from('cajas_archivo').select('*, localidad_codigos(nombre_localidad), contenedores_fisicos(codigo_contenedor), socio_titulares(count)').order('orden', { ascending: true, nullsFirst: false }).order('id_caja', { ascending: true });
-      if (!e3) setCajas(cjs || []);
+      const { data: cjs, error: e3 } = await supabase.from('cajas_archivo').select('*, localidad_codigos(nombre_localidad), contenedores_fisicos(codigo_contenedor)').order('orden', { ascending: true, nullsFirst: false }).order('id_caja', { ascending: true });
+      
+      // 4. Fetch Active Box Counts
+      const { data: activeMembers } = await supabase.from('vw_socio_titulares_estado').select('caja_id').eq('status', 'Activo').not('caja_id', 'is', null);
+      const countMap: Record<number, number> = {};
+      activeMembers?.forEach(m => {
+        if (m.caja_id) countMap[m.caja_id] = (countMap[m.caja_id] || 0) + 1;
+      });
+      const cajasWithCounts = cjs?.map(c => ({
+        ...c,
+        socio_titulares: [{ count: countMap[c.id_caja] || 0 }]
+      })) || [];
+
+      if (!e3) setCajas(cajasWithCounts);
 
     } catch (error) {
       console.warn("Tablas de archivo no existen aún. Ejecute la migración SQL.");
@@ -247,7 +259,8 @@ export default function ArchiveManagement() {
       const { data, error } = await supabase
         .from('vw_socio_titulares_estado')
         .select('id, nombres, apellidoPaterno, apellidoMaterno, dni, receiptNumber, caja_id')
-        .eq('localidad', activeLocalidadFilter);
+        .eq('localidad', activeLocalidadFilter)
+        .eq('status', 'Activo');
 
       if (error) throw error;
       
@@ -429,7 +442,7 @@ export default function ArchiveManagement() {
     setSelectedBoxForModal(box);
     setIsExpedientesModalOpen(true);
     setLoadingExpedientes(true);
-    const { data } = await supabase.from('socio_titulares').select('dni, nombres, apellidoPaterno, apellidoMaterno').eq('caja_id', box.id_caja).order('apellidoPaterno');
+    const { data } = await supabase.from('vw_socio_titulares_estado').select('dni, nombres, apellidoPaterno, apellidoMaterno').eq('caja_id', box.id_caja).eq('status', 'Activo').order('apellidoPaterno');
     setSelectedBoxExpedientes(data || []);
     setLoadingExpedientes(false);
   };
