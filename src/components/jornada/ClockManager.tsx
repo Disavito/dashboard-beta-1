@@ -124,6 +124,7 @@ const ClockManager: React.FC<ClockManagerProps> = ({
     const hours = currentTime.getHours();
     const minutes = currentTime.getMinutes();
     const totalMinutes = hours * 60 + minutes;
+    const reminderKey = `jornada-push-sent-${format(currentTime, 'yyyy-MM-dd-HH')}`;
 
     // Pasadas las 18:30 (1110 mins)
     if (totalMinutes >= 18 * 60 + 30) {
@@ -132,8 +133,40 @@ const ClockManager: React.FC<ClockManagerProps> = ({
         id: `jornada-reminder-${format(currentTime, 'yyyy-MM-dd-HH')}`,
         duration: 10000
       });
+
+      // Disparar Notificación Push del sistema si no se ha enviado en la última hora
+      if (!sessionStorage.getItem(reminderKey)) {
+        sessionStorage.setItem(reminderKey, 'true');
+
+        // 1. Notificación local del navegador
+        if ('Notification' in window && Notification.permission === 'granted') {
+          try {
+            new Notification('⏰ Recordatorio de Cierre de Jornada', {
+              body: 'Han pasado las 18:30. Recuerda finalizar tu turno laboral en FIMAGADI.',
+              icon: '/vite.svg',
+              tag: 'jornada-clockout'
+            });
+          } catch (e) {
+            console.warn('Native notification error:', e);
+          }
+        }
+
+        // 2. Notificación Push a través del servidor WebPush VAPID
+        if (colaborador.user_id) {
+          fetch('/api/send-push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_id: colaborador.user_id,
+              title: '⏰ Recordatorio de Cierre de Jornada',
+              message: 'Han pasado las 18:30. Por favor finaliza tu turno laboral en FIMAGADI.',
+              link: '/jornada'
+            })
+          }).catch(err => console.warn('Push notification send error:', err));
+        }
+      }
     }
-  }, [currentTime, jornada]);
+  }, [currentTime, jornada, colaborador.user_id]);
 
   const mutation = useMutation({
     mutationFn: async ({ action, just, obs, jornadaId }: { action: string, just?: string, obs?: string, jornadaId?: number | string }) => {
