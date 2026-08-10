@@ -117,6 +117,24 @@ const ClockManager: React.FC<ClockManagerProps> = ({
   const jornada = jornadasState?.activeJornada;
   const completedJornadasToday = jornadasState?.completedJornadasToday || [];
 
+  // Alertas de recordatorio cuando han pasado las 18:30 y el usuario sigue en actividad
+  useEffect(() => {
+    if (!jornada || jornada.hora_fin_jornada) return;
+
+    const hours = currentTime.getHours();
+    const minutes = currentTime.getMinutes();
+    const totalMinutes = hours * 60 + minutes;
+
+    // Pasadas las 18:30 (1110 mins)
+    if (totalMinutes >= 18 * 60 + 30) {
+      toast.warning('⚠️ Recordatorio de Cierre de Jornada', {
+        description: 'Han pasado las 18:30. Por favor recuerda finalizar tu turno laboral.',
+        id: `jornada-reminder-${format(currentTime, 'yyyy-MM-dd-HH')}`,
+        duration: 10000
+      });
+    }
+  }, [currentTime, jornada]);
+
   const mutation = useMutation({
     mutationFn: async ({ action, just, obs, jornadaId }: { action: string, just?: string, obs?: string, jornadaId?: number | string }) => {
       const dateToSend = bypassTimeRestrictions ? targetDate : undefined;
@@ -347,12 +365,17 @@ const ClockManager: React.FC<ClockManagerProps> = ({
                 <Badge className="bg-emerald-400 text-emerald-950 border-none px-4 py-1 rounded-full flex items-center gap-2 w-fit font-bold">
                   <span className="w-2 h-2 bg-emerald-900 rounded-full animate-pulse" /> EN ACTIVIDAD
                 </Badge>
-                {jornada?.fecha !== format(targetDate, 'yyyy-MM-dd') && (
-                  <div className="bg-red-50 dark:bg-red-500/10 dark:text-red-4000/20 border border-red-400/50 text-white text-xs px-3 py-2 rounded-lg mt-2 flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-200" />
-                    <p>Tienes un turno pendiente por finalizar de un <b>día anterior ({jornada?.fecha})</b>. Por favor, finaliza esa jornada antes de continuar.</p>
+                {jornada?.fecha !== format(targetDate, 'yyyy-MM-dd') ? (
+                  <div className="bg-amber-500/20 border border-amber-400/50 text-white text-xs px-3 py-2 rounded-lg mt-2 flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-200" />
+                    <p>Tienes una jornada abierta del <b>{jornada?.fecha}</b>. Al presionar <b>"Iniciar Jornada"</b> hoy en tu horario habitual (a partir de las 09:20), la jornada anterior se auto-cerrará automáticamente a las 18:30.</p>
                   </div>
-                )}
+                ) : (currentTime.getHours() * 60 + currentTime.getMinutes()) >= (18 * 60 + 30) && !hasEnded ? (
+                  <div className="bg-amber-500/20 border border-amber-400/50 text-white text-xs px-3 py-2 rounded-lg mt-2 flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-200" />
+                    <p>🔔 <b>¡Alerta de Cierre!</b> Han pasado las 18:30. Recuerda hacer clic en <b>"Finalizar Jornada"</b> para registrar tu salida del día.</p>
+                  </div>
+                ) : null}
               </div>
             ) : completedJornadasToday.length > 0 ? (
               <Badge className="bg-card dark:bg-slate-900/20 text-inherit border-none px-4 py-1 rounded-full flex items-center gap-2 w-fit font-bold">
