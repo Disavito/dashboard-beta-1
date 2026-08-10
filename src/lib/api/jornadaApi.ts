@@ -54,18 +54,26 @@ export const getCurrentJornadasState = async (colaboradorId: string, targetDate:
   if (error) throw error;
 
   const records = data || [];
-  
-  // Find active jornada specifically for TODAY, or most recent stale active
+
+  // Auto-cerrar jornadas pendientes de días anteriores de forma transparente
+  const staleActive = records.filter(r => r.fecha < today && !r.hora_fin_jornada);
+  if (staleActive.length > 0) {
+    for (const stale of staleActive) {
+      const autoEndTime = `${stale.fecha}T18:30:00.000Z`;
+      await supabase.from('registros_jornada').update({
+        hora_fin_jornada: autoEndTime,
+        justificacion_fin: 'Cierre automático por cambio de día',
+        observaciones_fin: 'El sistema cerró el turno del día anterior automáticamente al abrir nuevo día'
+      }).eq('id', stale.id);
+    }
+  }
+
+  // Obviar jornadas de días anteriores: Buscar únicamente la jornada activa del DÍA ACTUAL
   const activeJornadaToday = records.find(r => r.fecha === today && !r.hora_fin_jornada);
-  const staleActiveJornada = records.find(r => r.fecha < today && !r.hora_fin_jornada);
-  const activeJornada = activeJornadaToday || staleActiveJornada || null;
-  
-  // Find completed ones strictly for today (targetDate)
   const completedJornadasToday = records.filter(r => r.fecha === today && !!r.hora_fin_jornada);
 
   return {
-    activeJornada,
-    staleActiveJornada: staleActiveJornada || null,
+    activeJornada: activeJornadaToday || null,
     completedJornadasToday
   };
 };
@@ -117,7 +125,7 @@ export const clockIn = async (
   const timestamp = customDate || new Date();
   const todayStr = format(timestamp, 'yyyy-MM-dd');
 
-  // Auto-cerrar jornadas inconclusas de días anteriores para no bloquear al usuario
+  // Auto-cerrar jornadas inconclusas de días anteriores para dar paso al nuevo día sin bloqueos
   const { data: staleActive } = await supabase
     .from('registros_jornada')
     .select('*')
@@ -126,13 +134,12 @@ export const clockIn = async (
 
   if (staleActive && staleActive.length > 0) {
     for (const stale of staleActive) {
-      if (stale.fecha !== todayStr) {
-        // Cierre automático razonable para la jornada del día anterior (19:00 de su fecha)
-        const autoEndTime = `${stale.fecha}T19:00:00.000Z`;
+      if (stale.fecha < todayStr) {
+        const autoEndTime = `${stale.fecha}T18:30:00.000Z`;
         await supabase.from('registros_jornada').update({
           hora_fin_jornada: autoEndTime,
-          justificacion_fin: 'Cierre automático de jornada inconclusa de día anterior',
-          observaciones_fin: 'Sistema cerró automáticamente al iniciar nuevo día'
+          justificacion_fin: 'Cierre automático por cambio de día',
+          observaciones_fin: 'El sistema cerró la jornada anterior automáticamente al iniciar nuevo día'
         }).eq('id', stale.id);
       } else {
         throw new Error("Ya tienes una jornada activa en curso el día de hoy.");
@@ -162,7 +169,6 @@ export const clockOut = async (
   const timestamp = customDate || new Date();
   const todayStr = format(timestamp, 'yyyy-MM-dd');
 
-  // Obtener la jornada para verificar su fecha original
   const { data: targetJornada } = await supabase
     .from('registros_jornada')
     .select('fecha, hora_inicio_jornada')
@@ -174,10 +180,9 @@ export const clockOut = async (
   let defaultObs = observaciones || null;
 
   if (targetJornada && targetJornada.fecha < todayStr) {
-    // Si se cierra hoy una jornada de un día anterior, fijar hora de fin razonable en la fecha original
-    finalClockOutTime = `${targetJornada.fecha}T19:00:00.000Z`;
+    finalClockOutTime = `${targetJornada.fecha}T18:30:00.000Z`;
     if (!defaultJustification) {
-      defaultJustification = 'Cierre de jornada olvidada de día anterior';
+      defaultJustification = 'Cierre automático por cambio de día';
     }
     defaultObs = `${defaultObs || ''} (Cerrado el ${todayStr})`.trim();
   }
