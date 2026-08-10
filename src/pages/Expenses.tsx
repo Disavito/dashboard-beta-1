@@ -498,10 +498,10 @@ export default function Expenses() {
 
   // Estado para eliminar con diálogo de confirmación
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [deletingExpenseId, setDeletingExpenseId] = useState<number | null>(null);
+  const [deletingExpenseId, setDeletingExpenseId] = useState<number | string | null>(null);
   const [isDeletingExpense, setIsDeletingExpense] = useState(false);
 
-  const handleDeleteClick = (id: number) => {
+  const handleDeleteClick = (id: string | number) => {
     setDeletingExpenseId(id);
     setIsDeleteConfirmOpen(true);
   };

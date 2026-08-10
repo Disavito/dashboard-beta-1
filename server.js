@@ -635,14 +635,40 @@ app.post('/api/webhook/generate-ficha', requireWebhookSecret, async (req, res) =
       
       console.log(`Processing DELETE webhook for socio: ${record.id}`);
       
-      // 1. Get all associated documents for files deletion
+      // 1. Check pending_file_deletions table (populated by DB trigger BEFORE DELETE)
+      const { data: pendingDeletions } = await supabase
+        .from('pending_file_deletions')
+        .select('*')
+        .eq('socio_id', record.id)
+        .eq('status', 'pending');
+
+      const filePaths = [];
+      if (pendingDeletions && pendingDeletions.length > 0) {
+        for (const item of pendingDeletions) {
+          if (item.file_path) {
+            filePaths.push(item.file_path);
+          } else if (item.link_documento) {
+            try {
+              const url = new URL(item.link_documento);
+              const parts = url.pathname.split('/');
+              const bucketIndex = parts.indexOf('documentos');
+              if (bucketIndex !== -1) {
+                filePaths.push(parts.slice(bucketIndex + 1).join('/'));
+              }
+            } catch (err) {
+              console.warn('Could not parse pending document link:', item.link_documento);
+            }
+          }
+        }
+      }
+
+      // 2. Fallback: check socio_documentos directly in case rows are not cascade deleted yet
       const { data: docs } = await supabase
         .from('socio_documentos')
         .select('link_documento')
         .eq('socio_id', record.id);
         
       if (docs && docs.length > 0) {
-        const filePaths = [];
         for (const doc of docs) {
           if (doc.link_documento) {
             try {
@@ -650,21 +676,31 @@ app.post('/api/webhook/generate-ficha', requireWebhookSecret, async (req, res) =
               const parts = url.pathname.split('/');
               const bucketIndex = parts.indexOf('documentos');
               if (bucketIndex !== -1) {
-                filePaths.push(parts.slice(bucketIndex + 1).join('/'));
+                const pathStr = parts.slice(bucketIndex + 1).join('/');
+                if (!filePaths.includes(pathStr)) filePaths.push(pathStr);
               }
             } catch (err) {
               console.warn('Could not parse document link for deletion:', doc.link_documento);
             }
           }
         }
-        
-        if (filePaths.length > 0) {
-          console.log(`Deleting storage files: ${JSON.stringify(filePaths)}`);
-          await supabase.storage.from('documentos').remove(filePaths);
-        }
+      }
+
+      if (filePaths.length > 0) {
+        console.log(`Deleting storage files: ${JSON.stringify(filePaths)}`);
+        await supabase.storage.from('documentos').remove(filePaths);
+      }
+
+      // Mark pending deletions as processed
+      if (pendingDeletions && pendingDeletions.length > 0) {
+        const pendingIds = pendingDeletions.map(p => p.id);
+        await supabase
+          .from('pending_file_deletions')
+          .update({ status: 'processed', processed_at: new Date().toISOString() })
+          .in('id', pendingIds);
       }
       
-      // 2. Delete rows in socio_documentos (although DB might cascade delete)
+      // Delete rows in socio_documentos (if any remaining)
       await supabase.from('socio_documentos').delete().eq('socio_id', record.id);
       
       return res.status(200).json({ success: true, message: 'Socio documents deleted successfully' });

@@ -61,7 +61,7 @@ const ManualClockForm: React.FC<ManualClockFormProps> = ({ colaborador, date }) 
       };
 
       if (existing && existing.length > 0) {
-        return adminUpdateJornada(existing[0].id, payload);
+        return adminUpdateJornada(existing[0].id as any, payload);
       } else {
         return createManualJornada(payload);
       }

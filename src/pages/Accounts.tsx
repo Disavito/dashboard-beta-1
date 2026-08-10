@@ -145,8 +145,8 @@ const Accounts: React.FC = () => {
 
     return combined
       .filter(t => {
-        const matchesAccount = selectedAccount === 'all' || t.account === selectedAccount;
-        const matchesTipo = !validAccountNames || validAccountNames.has(t.account);
+        const matchesAccount = selectedAccount === 'all' || (t.account as any) === selectedAccount;
+        const matchesTipo = !validAccountNames || validAccountNames.has((t.account || '') as string);
         const matchesSearch = smartSearch(debouncedSearchTerm, [t.description, t.ref]);
         return matchesAccount && matchesTipo && matchesSearch;
       })
@@ -164,12 +164,12 @@ const Accounts: React.FC = () => {
 
     const filteredInc = ingresos.filter(i => {
       const matchesAccount = selectedAccount === 'all' || i.account === selectedAccount;
-      const matchesTipo = !validAccountNames || validAccountNames.has(i.account);
+      const matchesTipo = !validAccountNames || validAccountNames.has(i.account || '');
       return matchesAccount && matchesTipo;
     });
     const filteredGas = gastos.filter(g => {
-      const matchesAccount = selectedAccount === 'all' || g.account === selectedAccount;
-      const matchesTipo = !validAccountNames || validAccountNames.has(g.account);
+      const matchesAccount = selectedAccount === 'all' || (g as any).account === selectedAccount;
+      const matchesTipo = !validAccountNames || validAccountNames.has((g as any).account || '');
       return matchesAccount && matchesTipo;
     });
 
@@ -216,15 +216,15 @@ const Accounts: React.FC = () => {
     ingresos
       .filter(i => {
         const matchesAccount = selectedAccount === 'all' || i.account === selectedAccount;
-        const matchesTipo = !validAccountNames || validAccountNames.has(i.account);
+        const matchesTipo = !validAccountNames || validAccountNames.has(i.account || '');
         return matchesAccount && matchesTipo;
       })
       .forEach(i => processItem(i.date, i.transaction_type === 'Anulación' ? -i.amount : i.amount, 'ingresos'));
     
     gastos
       .filter(g => {
-        const matchesAccount = selectedAccount === 'all' || g.account === selectedAccount;
-        const matchesTipo = !validAccountNames || validAccountNames.has(g.account);
+        const matchesAccount = selectedAccount === 'all' || (g as any).account === selectedAccount;
+        const matchesTipo = !validAccountNames || validAccountNames.has((g as any).account || '');
         return matchesAccount && matchesTipo;
       })
       .forEach(g => processItem(g.date, g.amount, 'gastos'));

@@ -75,6 +75,7 @@ export const offlineSync = {
     let syncedCount = 0;
 
     for (const job of pendingJobs) {
+      let createdFilePath: string | null = null;
       try {
         await this.updateJobStatus(job.id, 'syncing');
 
@@ -82,30 +83,30 @@ export const offlineSync = {
 
         // 1. Si hay archivo, subirlo primero a Storage
         if (job.file && job.fileName) {
-          const filePath = `receipts/${Date.now()}_${job.fileName}`;
+          createdFilePath = `receipts/${Date.now()}_${job.fileName}`;
           const { error: uploadError } = await supabase.storage
-            .from('documentos') // Asegurarse de tener un bucket 'documentos' configurado o cambiarlo
-            .upload(filePath, job.file);
+            .from('documentos')
+            .upload(createdFilePath, job.file);
 
           if (uploadError) throw uploadError;
 
-          // Obtener URL pública
           const { data: publicUrlData } = supabase.storage
             .from('documentos')
-            .getPublicUrl(filePath);
+            .getPublicUrl(createdFilePath);
             
           fileUrl = publicUrlData.publicUrl;
         }
 
         const finalPayload = { ...job.payload };
         if (fileUrl) {
-          // Inyectar URL directamente en la descripción en lugar de receipt_url
           if (finalPayload.payload) { // expense_approval
              finalPayload.payload.description = `${finalPayload.payload.description || ''}\n\nComprobante: ${fileUrl}`;
           } else if (job.type === 'direct_expense') {
              finalPayload.description = `${finalPayload.description || ''}\n\nComprobante: ${fileUrl}`;
           }
         }
+
+        const nowIso = new Date().toISOString();
 
         if (job.type === 'expense_approval') {
           const { error } = await supabase.from('approval_requests').insert(finalPayload);
@@ -114,10 +115,14 @@ export const offlineSync = {
           const { error } = await supabase.from('gastos').insert(finalPayload);
           if (error) throw error;
         } else if (job.type === 'update_lote_medido') {
-          const { error } = await supabase.from('socio_titulares').update({ is_lote_medido: finalPayload.is_lote_medido }).eq('id', finalPayload.id);
+          const { error } = await supabase.from('socio_titulares')
+            .update({ is_lote_medido: finalPayload.is_lote_medido, updated_at: nowIso })
+            .eq('id', finalPayload.id);
           if (error) throw error;
         } else if (job.type === 'bulk_update_lote_medido') {
-          const { error } = await supabase.from('socio_titulares').update({ is_lote_medido: finalPayload.is_lote_medido }).in('id', finalPayload.ids);
+          const { error } = await supabase.from('socio_titulares')
+            .update({ is_lote_medido: finalPayload.is_lote_medido, updated_at: nowIso })
+            .in('id', finalPayload.ids);
           if (error) throw error;
         }
 
@@ -127,6 +132,16 @@ export const offlineSync = {
 
       } catch (error: any) {
         console.error('Error sincronizando job offline:', error);
+        
+        // Clean up uploaded file if DB operation failed
+        if (createdFilePath) {
+          try {
+            await supabase.storage.from('documentos').remove([createdFilePath]);
+          } catch (cleanErr) {
+            console.warn('Could not clean up orphaned file on sync failure:', cleanErr);
+          }
+        }
+
         await this.updateJobStatus(job.id, 'error', error.message);
         
         // Toast error notification

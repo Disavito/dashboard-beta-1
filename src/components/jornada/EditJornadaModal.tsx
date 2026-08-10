@@ -35,7 +35,7 @@ const EditJornadaModal: React.FC<EditJornadaModalProps> = ({ isOpen, onClose, jo
 
   useEffect(() => {
     if (jornada) {
-      const formatToTimeInput = (isoString: string | null) => 
+      const formatToTimeInput = (isoString?: string | null) => 
         isoString ? format(parseISO(isoString), 'HH:mm') : '';
       
       setTimes({
@@ -49,7 +49,7 @@ const EditJornadaModal: React.FC<EditJornadaModalProps> = ({ isOpen, onClose, jo
 
   const mutation = useMutation({
     mutationFn: (updatedTimes: Parameters<typeof adminUpdateJornada>[1]) => 
-      adminUpdateJornada(jornada.id, updatedTimes),
+      adminUpdateJornada(jornada.id as any, updatedTimes),
     onMutate: async (updatedData) => {
       await queryClient.cancelQueries({ queryKey: ['adminJornadas'] });
       const previousData = queryClient.getQueryData(['adminJornadas']);

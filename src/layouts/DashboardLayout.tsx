@@ -40,7 +40,7 @@ import Breadcrumbs from '@/components/ui-custom/Breadcrumbs';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigationAccess } from '@/hooks/useNavigationAccess';
 
-// Helper prefetching functions
+// Helper prefetching functions (Optimized to avoid unbounded full-db loops)
 const prefetchSocioStatus = async (queryClient: any) => {
   const queryKey = ['supabaseData', 'vw_socio_titulares_estado', '*', '{}', '{"column":"apellidoPaterno","ascending":true}'];
   const state = queryClient.getQueryState(queryKey);
@@ -49,37 +49,17 @@ const prefetchSocioStatus = async (queryClient: any) => {
   await queryClient.prefetchQuery({
     queryKey,
     queryFn: async () => {
-      let query = supabase.from('vw_socio_titulares_estado')
+      const PREFETCH_LIMIT = 500;
+      const { data, error, count } = await supabase
+        .from('vw_socio_titulares_estado')
         .select('*', { count: 'exact' })
-        .order('apellidoPaterno', { ascending: true });
+        .order('apellidoPaterno', { ascending: true })
+        .range(0, PREFETCH_LIMIT - 1);
       
-      const BATCH_SIZE = 1000;
-      const { data: firstBatch, error, count } = await query.range(0, BATCH_SIZE - 1);
       if (error) throw error;
-      
-      let allData = firstBatch || [];
-      if (count && count > BATCH_SIZE) {
-        const remainingBatches = Math.ceil((count - BATCH_SIZE) / BATCH_SIZE);
-        const promises = [];
-        for (let i = 1; i <= remainingBatches; i++) {
-          const from = i * BATCH_SIZE;
-          const to = from + BATCH_SIZE - 1;
-          promises.push(
-            supabase.from('vw_socio_titulares_estado')
-              .select('*')
-              .order('apellidoPaterno', { ascending: true })
-              .range(from, to)
-          );
-        }
-        const results = await Promise.all(promises);
-        results.forEach(({ data, error }) => {
-          if (error) throw error;
-          if (data) allData.push(...data);
-        });
-      }
-      return { data: allData, totalCount: count || allData.length };
+      return { data: data || [], totalCount: count || (data?.length || 0) };
     },
-    staleTime: 1000 * 30, // 30 segundos (suficiente para navegacion SPA sin secuestrar la cache)
+    staleTime: 1000 * 60, // 60 segundos
   });
 };
 
@@ -91,37 +71,17 @@ const prefetchSocioDocuments = async (queryClient: any) => {
   await queryClient.prefetchQuery({
     queryKey,
     queryFn: async () => {
-      let query = supabase.from('socio_documentos')
+      const PREFETCH_LIMIT = 500;
+      const { data, error, count } = await supabase
+        .from('socio_documentos')
         .select('id, socio_id, tipo_documento, link_documento', { count: 'exact' })
-        .is('deleted_at', null);
+        .is('deleted_at', null)
+        .range(0, PREFETCH_LIMIT - 1);
       
-      const BATCH_SIZE = 1000;
-      const { data: firstBatch, error, count } = await query.range(0, BATCH_SIZE - 1);
       if (error) throw error;
-      
-      let allData = firstBatch || [];
-      if (count && count > BATCH_SIZE) {
-        const remainingBatches = Math.ceil((count - BATCH_SIZE) / BATCH_SIZE);
-        const promises = [];
-        for (let i = 1; i <= remainingBatches; i++) {
-          const from = i * BATCH_SIZE;
-          const to = from + BATCH_SIZE - 1;
-          promises.push(
-            supabase.from('socio_documentos')
-              .select('id, socio_id, tipo_documento, link_documento')
-              .is('deleted_at', null)
-              .range(from, to)
-          );
-        }
-        const results = await Promise.all(promises);
-        results.forEach(({ data, error }) => {
-          if (error) throw error;
-          if (data) allData.push(...data);
-        });
-      }
-      return { data: allData, totalCount: count || allData.length };
+      return { data: data || [], totalCount: count || (data?.length || 0) };
     },
-    staleTime: 1000 * 30, // 30 segundos
+    staleTime: 1000 * 60, // 60 segundos
   });
 };
 

@@ -9,298 +9,192 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      colaboradores: {
-        Row: {
-          id: string
-          created_at: string
-          name: string
-          apellidos: string
-          dni: string
-          user_id: string | null
-          role: string
-          cargo: string | null
-        }
-        Insert: {
-          id?: string
-          created_at?: string
-          name: string
-          apellidos: string
-          dni: string
-          user_id?: string | null
-          role?: string
-          cargo?: string | null
-        }
-        Update: {
-          id?: string
-          created_at?: string
-          name?: string
-          apellidos?: string
-          dni?: string
-          user_id?: string | null
-          role?: string
-          cargo?: string | null
-        }
-      }
-      registros_jornada: {
-        Row: {
-          id: number
-          created_at: string
-          colaborador_id: string
-          fecha: string
-          hora_inicio_jornada: string | null
-          hora_inicio_almuerzo: string | null
-          hora_fin_almuerzo: string | null
-          hora_fin_jornada: string | null
-          justificacion_inicio: string | null
-          observaciones_inicio: string | null
-          justificacion_fin: string | null
-          observaciones_fin: string | null
-        }
-        Insert: {
-          id?: number
-          created_at?: string
-          colaborador_id: string
-          fecha: string
-          hora_inicio_jornada?: string | null
-          hora_inicio_almuerzo?: string | null
-          hora_fin_almuerzo?: string | null
-          hora_fin_jornada?: string | null
-          justificacion_inicio?: string | null
-          observaciones_inicio?: string | null
-          justificacion_fin?: string | null
-          observaciones_fin?: string | null
-        }
-        Update: {
-          id?: number
-          created_at?: string
-          colaborador_id?: string
-          fecha?: string
-          hora_inicio_jornada?: string | null
-          hora_inicio_almuerzo?: string | null
-          hora_fin_almuerzo?: string | null
-          hora_fin_jornada?: string | null
-          justificacion_inicio?: string | null
-          observaciones_inicio?: string | null
-          justificacion_fin?: string | null
-          observaciones_fin?: string | null
-        }
-      }
       socio_titulares: {
         Row: {
           id: string
-          created_at: string
           dni: string
           nombres: string
           apellidoPaterno: string
           apellidoMaterno: string
-          celular: string | null
           localidad: string
-          mz: string | null
-          lote: string | null
-          is_payment_observed: boolean
-          payment_observation_detail: string | null
-          is_lote_medido: boolean
-          isObservado: boolean
-          observacion: string | null
-        }
-        Insert: {
-          id?: string
-          created_at?: string
-          dni: string
-          nombres: string
-          apellidoPaterno: string
-          apellidoMaterno: string
+          distritoVivienda?: string | null
+          direccionVivienda?: string | null
+          distritoDNI?: string | null
+          direccionDNI?: string | null
           celular?: string | null
-          localidad: string
+          fechaNacimiento?: string | null
+          situacionEconomica?: string | null
           mz?: string | null
           lote?: string | null
-          is_payment_observed?: boolean
-          payment_observation_detail?: string | null
           is_lote_medido?: boolean
           isObservado?: boolean
+          is_payment_observed?: boolean
           observacion?: string | null
-        }
-        Update: {
-          id?: string
+          payment_observation_detail?: string | null
+          status?: string
           created_at?: string
-          dni?: string
-          nombres?: string
-          apellidoPaterno?: string
-          apellidoMaterno?: string
-          celular?: string | null
-          localidad?: string
-          mz?: string | null
-          lote?: string | null
-          is_payment_observed?: boolean
-          payment_observation_detail?: string | null
-          is_lote_medido?: boolean
-          isObservado?: boolean
-          observacion?: string | null
+          updated_at?: string
         }
+        Insert: Partial<Database['public']['Tables']['socio_titulares']['Row']>
+        Update: Partial<Database['public']['Tables']['socio_titulares']['Row']>
       }
       ingresos: {
         Row: {
-          id: number
-          created_at: string
-          receipt_number: string
-          dni: string | null
-          full_name: string | null
-          amount: number
-          account: string
+          id: string
           date: string
-          transaction_type: string | null
-          numeroOperacion: number | null
-          is_payment_observed: boolean
-          payment_observation_detail: string | null
-        }
-        Insert: {
-          id?: number
-          created_at?: string
           receipt_number: string
-          dni?: string | null
-          full_name?: string | null
+          dni: string
+          full_name: string
           amount: number
-          account: string
-          date: string
-          transaction_type?: string | null
-          numeroOperacion?: number | null
-          is_payment_observed?: boolean
-          payment_observation_detail?: string | null
-        }
-        Update: {
-          id?: number
+          concept: string
+          account?: string | null
+          operation_number?: string | null
+          numeroOperacion?: string | null
+          transaction_type?: string
           created_at?: string
-          receipt_number?: string
-          dni?: string | null
-          full_name?: string | null
-          amount?: number
-          account?: string
-          date?: string
-          transaction_type?: string | null
-          numeroOperacion?: number | null
-          is_payment_observed?: boolean
-          payment_observation_detail?: string | null
         }
+        Insert: Partial<Database['public']['Tables']['ingresos']['Row']>
+        Update: Partial<Database['public']['Tables']['ingresos']['Row']>
+      }
+      gastos: {
+        Row: {
+          id: string
+          numero_gasto: string
+          date: string
+          amount: number
+          category: string
+          sub_category?: string | null
+          description?: string | null
+          receipt_type?: string | null
+          receipt_number?: string | null
+          presupuesto_id?: string | null
+          colaborador_id?: string | null
+          account?: string | null
+          status?: string
+          created_at?: string
+        }
+        Insert: Partial<Database['public']['Tables']['gastos']['Row']>
+        Update: Partial<Database['public']['Tables']['gastos']['Row']>
       }
       cuentas: {
         Row: {
           id: string
           name: string
           tipo: string
-          saldo: number
-          created_at: string
+          account_number?: string | null
+          cci?: string | null
+          balance?: number
+          created_at?: string
         }
-        Insert: {
-          id?: string
+        Insert: Partial<Database['public']['Tables']['cuentas']['Row']>
+        Update: Partial<Database['public']['Tables']['cuentas']['Row']>
+      }
+      colaboradores: {
+        Row: {
+          id: string
+          user_id: string
           name: string
-          tipo: string
-          saldo?: number
+          apellidos?: string | null
+          role?: string | null
+          cargo?: string | null
+          custom_permissions?: Record<string, boolean> | null
           created_at?: string
         }
-        Update: {
-          id?: string
-          name?: string
-          tipo?: string
-          saldo?: number
-          created_at?: string
-        }
+        Insert: Partial<Database['public']['Tables']['colaboradores']['Row']>
+        Update: Partial<Database['public']['Tables']['colaboradores']['Row']>
       }
-      gastos: {
+      jornadas: {
         Row: {
-          id: number
+          id: string
+          user_id: string
+          fecha: string
+          hora_entrada?: string | null
+          hora_salida?: string | null
+          hora_inicio_jornada?: string | null
+          hora_fin_jornada?: string | null
+          hora_inicio_almuerzo?: string | null
+          hora_fin_almuerzo?: string | null
+          justificacion_inicio?: string | null
+          justificacion_almuerzo?: string | null
+          justificacion_fin?: string | null
+          observaciones_inicio?: string | null
+          observaciones_almuerzo?: string | null
+          observaciones_fin?: string | null
+          estado?: string | null
+          justificacion?: string | null
+          created_at?: string
+        }
+        Insert: Partial<Database['public']['Tables']['jornadas']['Row']>
+        Update: Partial<Database['public']['Tables']['jornadas']['Row']>
+      }
+      registros_jornada: {
+        Row: {
+          id: string
+          colaborador_id: string
+          fecha: string
+          hora_entrada?: string | null
+          hora_salida?: string | null
+          hora_inicio_jornada?: string | null
+          hora_fin_jornada?: string | null
+          hora_inicio_almuerzo?: string | null
+          hora_fin_almuerzo?: string | null
+          justificacion_inicio?: string | null
+          justificacion_almuerzo?: string | null
+          justificacion_fin?: string | null
+          observaciones_inicio?: string | null
+          observaciones_almuerzo?: string | null
+          observaciones_fin?: string | null
+          tipo_registro?: string | null
+          estado?: string | null
+          justificacion?: string | null
+          created_at?: string
+        }
+        Insert: Partial<Database['public']['Tables']['registros_jornada']['Row']>
+        Update: Partial<Database['public']['Tables']['registros_jornada']['Row']>
+      }
+      approval_requests: {
+        Row: {
+          id: string
+          request_type: string
+          amount?: number | null
+          requested_by: string
+          requested_by_name?: string | null
+          reason?: string | null
+          payload?: Json | null
+          status: 'pending' | 'approved' | 'rejected'
           created_at: string
-          description: string
-          amount: number
-          category: string
-          sub_category: string | null
-          date: string
-          account: string
-          numero_gasto: string | null
-          colaborador_id: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
         }
-        Insert: {
-          id?: number
-          created_at?: string
-          description: string
-          amount: number
-          category: string
-          sub_category?: string | null
-          date: string
-          account: string
-          numero_gasto?: string | null
-          colaborador_id?: string | null
-        }
-        Update: {
-          id?: number
-          created_at?: string
-          description?: string
-          amount?: number
-          category?: string
-          sub_category?: string | null
-          date?: string
-          account?: string
-          numero_gasto?: string | null
-          colaborador_id?: string | null
-        }
+        Insert: Partial<Database['public']['Tables']['approval_requests']['Row']>
+        Update: Partial<Database['public']['Tables']['approval_requests']['Row']>
       }
-      resumenes_diarios: {
+      socio_documentos: {
         Row: {
-          id: number
+          id: string
+          socio_id: string
+          tipo_documento: string
+          link_documento: string
+          deleted_at?: string | null
+          created_at?: string
+        }
+        Insert: Partial<Database['public']['Tables']['socio_documentos']['Row']>
+        Update: Partial<Database['public']['Tables']['socio_documentos']['Row']>
+      }
+      pending_file_deletions: {
+        Row: {
+          id: string
+          socio_id?: string | null
+          tipo_documento?: string | null
+          link_documento: string
+          file_path?: string | null
+          status: 'pending' | 'processed' | 'failed'
           created_at: string
-          fecha_resumen: string
-          numero_completo: string
-          correlativo: string
-          ticket: string | null
-          estado_sunat: string | null
-          summary_api_id: number | null
+          processed_at?: string | null
         }
-        Insert: {
-          id?: number
-          created_at?: string
-          fecha_resumen: string
-          numero_completo: string
-          correlativo: string
-          ticket?: string | null
-          estado_sunat?: string | null
-          summary_api_id?: number | null
-        }
-        Update: {
-          id?: number
-          created_at?: string
-          fecha_resumen?: string
-          numero_completo?: string
-          correlativo?: string
-          ticket?: string | null
-          estado_sunat?: string | null
-          summary_api_id?: number | null
-        }
+        Insert: Partial<Database['public']['Tables']['pending_file_deletions']['Row']>
+        Update: Partial<Database['public']['Tables']['pending_file_deletions']['Row']>
       }
-      resumen_diario_boletas: {
-        Row: {
-          id: number
-          resumen_id: number
-          serie_numero: string
-        }
-        Insert: {
-          id?: number
-          resumen_id: number
-          serie_numero: string
-        }
-        Update: {
-          id?: number
-          resumen_id?: number
-          serie_numero?: string
-        }
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      [_ in never]: never
     }
   }
 }
@@ -308,3 +202,11 @@ export interface Database {
 export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
 export type TablesInsert<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
 export type TablesUpdate<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
+
+export type SocioTitular = Tables<'socio_titulares'>
+export type Ingreso = Tables<'ingresos'>
+export type Gasto = Tables<'gastos'>
+export type Cuenta = Tables<'cuentas'>
+export type Colaborador = Tables<'colaboradores'>
+export type ApprovalRequest = Tables<'approval_requests'>
+export type SocioDocumento = Tables<'socio_documentos'>

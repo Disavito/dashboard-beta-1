@@ -87,7 +87,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
   const addMutation = useMutation<any, Error, { tableName: string; record: any }>({ mutationKey: ['addRecord'] });
   const updateMutation = useMutation<any, Error, { tableName: string; id: string | number; record: any }>({ mutationKey: ['updateRecord'] });
 
-  const form = useForm<TransactionFormValues>({
+  const form = useForm<any>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       date: initialData?.date || new Date().toISOString().split('T')[0],
@@ -418,7 +418,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
           isObserved ? "bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20" : "bg-muted/50/50 border-transparent"
         )}>
           <FormField
-            control={form.control}
+            control={form.control as any}
             name="is_payment_observed"
             render={({ field }) => (
               <FormItem className="flex flex-row items-center space-x-3 space-y-0">
@@ -441,7 +441,7 @@ export default function TransactionForm({ initialData, onClose, onSuccess }: Tra
 
           {isObserved && (
             <FormField
-              control={form.control}
+              control={form.control as any}
               name="payment_observation_detail"
               render={({ field }) => (
                 <FormItem className="mt-4 animate-in zoom-in-95 duration-200">
