@@ -86,6 +86,98 @@ const requireAuth = async (req, res, next) => {
   next();
 };
 
+// Endpoint de administración: Crear nuevo usuario en Supabase Auth y asignarle rol/colaborador
+app.post('/api/admin/create-user', requireAuth, async (req, res) => {
+  if (!supabase) return res.status(500).json({ error: 'Supabase no está configurado en el servidor' });
+
+  try {
+    const { email, password, name, apellidos, role_name, cargo, custom_permissions } = req.body;
+
+    if (!email || !password || !name) {
+      return res.status(400).json({ error: 'Correo, contraseña y nombre son campos obligatorios.' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
+    }
+
+    // 1. Verificar que el usuario que realiza la petición sea Administrador
+    const { data: reqRoles } = await supabase
+      .from('user_roles')
+      .select('roles(role_name)')
+      .eq('user_id', req.user.id);
+
+    const isAdmin = reqRoles?.some(r => r.roles?.role_name?.toLowerCase() === 'admin');
+    if (!isAdmin) {
+      return res.status(403).json({ error: 'Acceso denegado. Solo un Administrador puede crear usuarios.' });
+    }
+
+    // 2. Crear usuario en Supabase Auth con privilegios de admin (Auto-confirmado)
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email: email.trim().toLowerCase(),
+      password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: `${name} ${apellidos || ''}`.trim()
+      }
+    });
+
+    if (authError) {
+      console.error('Error creando usuario en Supabase Auth:', authError);
+      return res.status(400).json({ error: authError.message || 'Error al crear la cuenta en Supabase Auth.' });
+    }
+
+    const newUserId = authData.user.id;
+    const targetRoleName = role_name || 'engineer';
+
+    // 3. Obtener ID del rol desde la tabla roles
+    const { data: roleData } = await supabase
+      .from('roles')
+      .select('id')
+      .ilike('role_name', targetRoleName)
+      .maybeSingle();
+
+    if (roleData) {
+      await supabase.from('user_roles').insert({
+        user_id: newUserId,
+        role_id: roleData.id
+      });
+    }
+
+    // 4. Crear registro en la tabla colaboradores
+    const { data: colabData, error: colabError } = await supabase
+      .from('colaboradores')
+      .insert({
+        user_id: newUserId,
+        name: name.trim(),
+        apellidos: (apellidos || '').trim(),
+        cargo: cargo || targetRoleName,
+        custom_permissions: custom_permissions || {}
+      })
+      .select()
+      .single();
+
+    if (colabError) {
+      console.error('Error asociando registro de colaborador:', colabError);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Usuario creado exitosamente',
+      user: {
+        id: newUserId,
+        email: authData.user.email,
+        name,
+        apellidos,
+        role_name: targetRoleName
+      }
+    });
+  } catch (error) {
+    console.error('Error interno al crear usuario:', error);
+    res.status(500).json({ error: 'Error interno del servidor al procesar la creación del usuario.' });
+  }
+});
+
 // Verifica el webhook_secret para endpoints llamados desde Supabase Database Webhooks
 const requireWebhookSecret = (req, res, next) => {
   const secret = process.env.PUSH_WEBHOOK_SECRET;

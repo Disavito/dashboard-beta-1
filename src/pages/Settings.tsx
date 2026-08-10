@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
+import { CreateUserModal } from '@/components/custom/CreateUserModal';
 
 // ─────── Tipos ────────
 interface Localidad {
@@ -562,13 +563,16 @@ const EquipoSection: React.FC = () => {
 
   return (
     <Card className="border border-border/50 shadow-sm rounded-2xl">
-      <CardHeader>
-        <CardTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
-          <Users className="w-5 h-5 text-[#4892CC]" /> Equipo y Permisos Especiales
-        </CardTitle>
-        <CardDescription>
-          Otorga permisos especiales a los colaboradores para realizar acciones restringidas.
-        </CardDescription>
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <CardTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+            <Users className="w-5 h-5 text-[#00468c]" /> Equipo y Permisos Especiales
+          </CardTitle>
+          <CardDescription>
+            Crea cuentas de usuario en el sistema y administra permisos especiales para colaboradores.
+          </CardDescription>
+        </div>
+        <CreateUserModal onUserCreated={fetchEquipo} />
       </CardHeader>
       <CardContent>
         {loading ? (
