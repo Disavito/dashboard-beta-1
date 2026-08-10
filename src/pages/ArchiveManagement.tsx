@@ -202,7 +202,49 @@ export default function ArchiveManagement() {
     try {
       // 1. Fetch Localidades
       const { data: locs, error: e1 } = await supabase.from('localidad_codigos').select('*');
-      if (!e1) setLocalidades(locs || []);
+      
+      // Auto-discover distinct localidades from socio_titulares
+      const { data: sociosLocs } = await supabase
+        .from('socio_titulares')
+        .select('localidad')
+        .not('localidad', 'is', null);
+
+      const locMap = new Map<string, any>();
+      locs?.forEach(l => {
+        if (l.nombre_localidad) locMap.set(l.nombre_localidad.trim().toUpperCase(), l);
+      });
+
+      const distinctSociosLocs = [...new Set(sociosLocs?.map(s => s.localidad?.trim()).filter(Boolean))];
+      const missingLocs = distinctSociosLocs.filter(l => l && !locMap.has(l.toUpperCase()));
+
+      if (missingLocs.length > 0) {
+        const toInsert = missingLocs.map(rawName => {
+          const cleanName = rawName!.toUpperCase();
+          const parts = cleanName.split('-');
+          const zonaName = parts.length > 1 ? parts[parts.length - 1].trim() : 'GENERAL';
+          const locPart = parts[0].trim();
+          const codZona = (zonaName.replace(/[^A-Z]/g, '') + 'XXXX').slice(0, 4);
+          let words = locPart.replace(/[^A-Z\s]/g, '').split(/\s+/).filter(Boolean);
+          let codCom = words.length >= 4 ? words.map((w: string) => w[0]).join('').slice(0, 4) : (words[0]?.slice(0, 2) + (words[1] || 'XX').slice(0, 2)).slice(0, 4);
+          return {
+            nombre_region: 'AREQUIPA',
+            codigo_region: 'AR',
+            nombre_zona: zonaName,
+            codigo_zona: codZona,
+            nombre_localidad: rawName,
+            codigo_comunidad: codCom,
+            codigo_completo: `AR-${codZona}-${codCom}`
+          };
+        });
+
+        const { data: newlyInserted } = await supabase.from('localidad_codigos').insert(toInsert).select();
+        if (newlyInserted) {
+          newlyInserted.forEach(l => locMap.set(l.nombre_localidad.trim().toUpperCase(), l));
+        }
+      }
+
+      const allLocs = Array.from(locMap.values());
+      if (!e1) setLocalidades(allLocs);
       
       // 2. Fetch Contenedores
       const { data: conts, error: e2 } = await supabase.from('contenedores_fisicos').select('*').order('codigo_contenedor', { ascending: true });
