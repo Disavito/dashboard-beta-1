@@ -124,6 +124,26 @@ export const offlineSync = {
             .update({ is_lote_medido: finalPayload.is_lote_medido, updated_at: nowIso })
             .in('id', finalPayload.ids);
           if (error) throw error;
+        } else if (job.type === 'jornada_clock_in') {
+          const { error } = await supabase.from('registros_jornada').insert(finalPayload);
+          if (error) throw error;
+        } else if (job.type === 'jornada_clock_out') {
+          const { error } = await supabase.from('registros_jornada').update({
+            hora_fin_jornada: finalPayload.hora_fin_jornada,
+            justificacion_fin: finalPayload.justificacion_fin || null,
+            observaciones_fin: finalPayload.observaciones_fin || null
+          }).eq('id', finalPayload.id);
+          if (error) throw error;
+        } else if (job.type === 'jornada_start_lunch') {
+          const { error } = await supabase.from('registros_jornada').update({
+            hora_inicio_almuerzo: finalPayload.hora_inicio_almuerzo
+          }).eq('id', finalPayload.id);
+          if (error) throw error;
+        } else if (job.type === 'jornada_end_lunch') {
+          const { error } = await supabase.from('registros_jornada').update({
+            hora_fin_almuerzo: finalPayload.hora_fin_almuerzo
+          }).eq('id', finalPayload.id);
+          if (error) throw error;
         }
 
         // 3. Éxito: Eliminar de la cola

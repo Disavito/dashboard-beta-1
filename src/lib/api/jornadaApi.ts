@@ -55,14 +55,17 @@ export const getCurrentJornadasState = async (colaboradorId: string, targetDate:
 
   const records = data || [];
   
-  // Find the active one (no hora_fin_jornada)
-  const activeJornada = records.find(r => !r.hora_fin_jornada);
+  // Find active jornada specifically for TODAY, or most recent stale active
+  const activeJornadaToday = records.find(r => r.fecha === today && !r.hora_fin_jornada);
+  const staleActiveJornada = records.find(r => r.fecha < today && !r.hora_fin_jornada);
+  const activeJornada = activeJornadaToday || staleActiveJornada || null;
   
   // Find completed ones strictly for today (targetDate)
   const completedJornadasToday = records.filter(r => r.fecha === today && !!r.hora_fin_jornada);
 
   return {
     activeJornada,
+    staleActiveJornada: staleActiveJornada || null,
     completedJornadasToday
   };
 };
@@ -111,22 +114,35 @@ export const clockIn = async (
   observaciones?: string,
   customDate?: Date
 ): Promise<Jornada> => {
-  // Evitar duplicación de jornadas activas (Bugfix)
-  const { data: existingActive } = await supabase
+  const timestamp = customDate || new Date();
+  const todayStr = format(timestamp, 'yyyy-MM-dd');
+
+  // Auto-cerrar jornadas inconclusas de días anteriores para no bloquear al usuario
+  const { data: staleActive } = await supabase
     .from('registros_jornada')
-    .select('id')
+    .select('*')
     .eq('colaborador_id', colaboradorId)
-    .is('hora_fin_jornada', null)
-    .limit(1);
-    
-  if (existingActive && existingActive.length > 0) {
-    throw new Error("Ya tienes una jornada activa en curso. Si acabas de iniciar una, espera un momento.");
+    .is('hora_fin_jornada', null);
+
+  if (staleActive && staleActive.length > 0) {
+    for (const stale of staleActive) {
+      if (stale.fecha !== todayStr) {
+        // Cierre automático razonable para la jornada del día anterior (19:00 de su fecha)
+        const autoEndTime = `${stale.fecha}T19:00:00.000Z`;
+        await supabase.from('registros_jornada').update({
+          hora_fin_jornada: autoEndTime,
+          justificacion_fin: 'Cierre automático de jornada inconclusa de día anterior',
+          observaciones_fin: 'Sistema cerró automáticamente al iniciar nuevo día'
+        }).eq('id', stale.id);
+      } else {
+        throw new Error("Ya tienes una jornada activa en curso el día de hoy.");
+      }
+    }
   }
 
-  const timestamp = customDate || new Date();
   const newJornada: TablesInsert<'registros_jornada'> = {
     colaborador_id: colaboradorId,
-    fecha: format(timestamp, 'yyyy-MM-dd'),
+    fecha: todayStr,
     hora_inicio_jornada: timestamp.toISOString(),
     justificacion_inicio: justificacion || null,
     observaciones_inicio: observaciones || null,
@@ -138,23 +154,45 @@ export const clockIn = async (
 };
 
 export const clockOut = async (
-  jornadaId: number, 
+  jornadaId: number | string, 
   justificacion?: string, 
   observaciones?: string,
   customDate?: Date
 ): Promise<Jornada> => {
   const timestamp = customDate || new Date();
+  const todayStr = format(timestamp, 'yyyy-MM-dd');
+
+  // Obtener la jornada para verificar su fecha original
+  const { data: targetJornada } = await supabase
+    .from('registros_jornada')
+    .select('fecha, hora_inicio_jornada')
+    .eq('id', jornadaId)
+    .maybeSingle();
+
+  let finalClockOutTime = timestamp.toISOString();
+  let defaultJustification = justificacion || null;
+  let defaultObs = observaciones || null;
+
+  if (targetJornada && targetJornada.fecha < todayStr) {
+    // Si se cierra hoy una jornada de un día anterior, fijar hora de fin razonable en la fecha original
+    finalClockOutTime = `${targetJornada.fecha}T19:00:00.000Z`;
+    if (!defaultJustification) {
+      defaultJustification = 'Cierre de jornada olvidada de día anterior';
+    }
+    defaultObs = `${defaultObs || ''} (Cerrado el ${todayStr})`.trim();
+  }
+
   const { data, error } = await supabase.from('registros_jornada').update({ 
-    hora_fin_jornada: timestamp.toISOString(),
-    justificacion_fin: justificacion || null,
-    observaciones_fin: observaciones || null
+    hora_fin_jornada: finalClockOutTime,
+    justificacion_fin: defaultJustification,
+    observaciones_fin: defaultObs
   }).eq('id', jornadaId).select().single();
   
   if (error || !data) throw new Error(error?.message || "Error al finalizar jornada");
   return data;
 };
 
-export const startLunch = async (jornadaId: number, customDate?: Date) => {
+export const startLunch = async (jornadaId: number | string, customDate?: Date) => {
   const timestamp = customDate || new Date();
   const { data, error } = await supabase.from('registros_jornada').update({ 
     hora_inicio_almuerzo: timestamp.toISOString() 
@@ -163,7 +201,7 @@ export const startLunch = async (jornadaId: number, customDate?: Date) => {
   return data;
 };
 
-export const endLunch = async (jornadaId: number, customDate?: Date) => {
+export const endLunch = async (jornadaId: number | string, customDate?: Date) => {
   const timestamp = customDate || new Date();
   const { data, error } = await supabase.from('registros_jornada').update({ 
     hora_fin_almuerzo: timestamp.toISOString() 
@@ -173,7 +211,7 @@ export const endLunch = async (jornadaId: number, customDate?: Date) => {
 };
 
 export const adminUpdateJornada = async (
-  jornadaId: number, 
+  jornadaId: number | string, 
   updates: Partial<TablesUpdate<'registros_jornada'>>
 ): Promise<Jornada> => {
   const { data, error } = await supabase
