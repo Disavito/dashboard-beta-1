@@ -25,15 +25,18 @@ export const openDocumentDirectly = async (socioId: string, tipoDocumento: strin
   }
 
   try {
-    toast.loading(`Buscando o regenerando ${tipoDocumento}...`, { id: 'open-doc' });
+    const typeKeyword = tipoDocumento.split(' ')[0];
     const { data } = await supabase
       .from('socio_documentos')
       .select('link_documento')
       .eq('socio_id', socioId)
-      .eq('tipo_documento', tipoDocumento)
+      .ilike('tipo_documento', `%${typeKeyword}%`)
+      .not('link_documento', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
     
-    if (data?.link_documento) {
+    if (data?.link_documento && data.link_documento.trim() !== '') {
       toast.dismiss('open-doc');
       if (newWindow) newWindow.location.href = data.link_documento;
       else window.open(data.link_documento, '_blank');
