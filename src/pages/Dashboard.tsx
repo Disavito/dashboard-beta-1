@@ -132,12 +132,6 @@ function AnimatedNumber({ value, duration = 800, isCurrency = false }: { value: 
     };
   }, [value, duration]);
 
-  useEffect(() => {
-    return () => {
-      prevValueRef.current = value;
-    };
-  }, [value]);
-
   if (isCurrency) {
     return <span>{formatCurrency(count)}</span>;
   }

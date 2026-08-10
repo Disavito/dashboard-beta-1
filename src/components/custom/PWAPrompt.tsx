@@ -6,41 +6,40 @@ export function PWAPrompt() {
     if (!('serviceWorker' in navigator)) return;
 
     let refreshing = false;
+    let cleanups: Array<() => void> = [];
 
-    // Escuchar cuando el nuevo SW toma el control para forzar la recarga
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
+    const handleControllerChange = () => {
       if (!refreshing) {
         refreshing = true;
-        
-        // Limpiar la caché persistente (Offline First) para evitar que
-        // la nueva versión lea datos corruptos o antiguos de versiones previas.
         window.indexedDB.deleteDatabase('dashboard-offline-db');
-        
         window.location.reload();
       }
-    });
+    };
+    navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
+    cleanups.push(() => navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange));
 
     const checkUpdate = async () => {
       try {
         const reg = await navigator.serviceWorker.register('/sw.js');
         
-        // Si ya hay un SW esperando en cola
         if (reg.waiting) {
           promptUserToUpdate(reg);
         }
 
-        // Si se detecta la llegada de un nuevo SW
-        reg.addEventListener('updatefound', () => {
+        const handleUpdateFound = () => {
           const newWorker = reg.installing;
           if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
-              // Si terminó de instalarse y hay un controlador anterior (es decir, es una actualización)
+            const handleStateChange = () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                 promptUserToUpdate(reg);
               }
-            });
+            };
+            newWorker.addEventListener('statechange', handleStateChange);
+            cleanups.push(() => newWorker.removeEventListener('statechange', handleStateChange));
           }
-        });
+        };
+        reg.addEventListener('updatefound', handleUpdateFound);
+        cleanups.push(() => reg.removeEventListener('updatefound', handleUpdateFound));
 
       } catch (err) {
         console.error('PWA Registration Error:', err);
@@ -49,15 +48,17 @@ export function PWAPrompt() {
 
     checkUpdate();
 
-    // Forzar chequeo a la nube cada vez que el usuario vuelve a abrir la pestaña
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
         navigator.serviceWorker.getRegistration().then(reg => reg?.update());
       }
     };
     window.addEventListener('visibilitychange', handleVisibility);
+    cleanups.push(() => window.removeEventListener('visibilitychange', handleVisibility));
 
-    return () => window.removeEventListener('visibilitychange', handleVisibility);
+    return () => {
+      cleanups.forEach(fn => fn());
+    };
   }, []);
 
   const promptUserToUpdate = (reg: ServiceWorkerRegistration) => {

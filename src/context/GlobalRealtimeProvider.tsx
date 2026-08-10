@@ -14,87 +14,28 @@ export const GlobalRealtimeProvider: React.FC<{ children: React.ReactNode }> = (
         (payload) => {
           const tableName = payload.table;
           
-          // --- CORRECCIÓN DE RENDIMIENTO EXTREMO ---
-          if (tableName === 'socio_titulares' && payload.eventType === 'UPDATE' && payload.new) {
-            // Buscamos todas las cachés que referencien a esta vista (incluyendo las paginadas/filtradas)
-            const viewQueries = queryClient.getQueriesData({ queryKey: ['supabaseData', 'vw_socio_titulares_estado'] });
-            console.log('⚡ [REALTIME MEMORY] Actualizando cachés de vista encontradas:', viewQueries.length);
-            
-            viewQueries.forEach(([qKey, oldData]: [any, any]) => {
-              if (oldData && oldData.data) {
-                const newData = oldData.data.map((item: any) => 
-                  item.id === payload.new.id ? { ...item, ...payload.new } : item
-                );
-                queryClient.setQueryData(qKey, { ...oldData, data: newData });
-              }
-            });
-          } else if (['socio_titulares', 'ingresos', 'socio_documentos'].includes(tableName)) {
-            // Solo invalidamos la caché silenciosamente en background para los INSERTs grandes o eliminaciones.
+          // Invalidación limpia y robusta de React Query en lugar de parsing manual frágil
+          if (tableName) {
+            queryClient.invalidateQueries({ queryKey: ['supabaseData', tableName] });
+          }
+
+          // Invalidar vistas dependientes cuando cambian las tablas base
+          if (['socio_titulares', 'ingresos', 'socio_documentos'].includes(tableName)) {
             queryClient.invalidateQueries({ queryKey: ['supabaseData', 'vw_socio_titulares_estado'] });
           }
 
-          if (['ingresos', 'socio_titulares'].includes(tableName) && payload.eventType !== 'UPDATE') {
+          if (['ingresos', 'socio_titulares'].includes(tableName)) {
             queryClient.invalidateQueries({ queryKey: ['supabaseData', 'vw_ingresos_localidad'] });
           }
-          
-          // Buscar todas las cachés de React Query activas que pertenezcan a esta tabla
-          const queries = queryClient.getQueriesData({ queryKey: ['supabaseData', tableName] });
-          
-          queries.forEach(([queryKey, oldData]: [any, any]) => {
-            if (!oldData) return;
-            
-            // Extraemos los filtros exactos de esta query específica
-            // El formato es: ['supabaseData', tableName, selectQuery, JSON.stringify(filters), ...]
-            const filtersStr = queryKey[3];
-            let filters = {};
-            try {
-              filters = JSON.parse(filtersStr as string);
-            } catch (e) {
-              // Ignore parse errors
-            }
 
-            const matchesFilters = (item: any) => {
-              if (!filters || Object.keys(filters).length === 0) return true;
-              return Object.entries(filters).every(([key, value]) => {
-                if (item[key] === undefined) return true; 
-                return item[key] === value;
-              });
-            };
+          if (tableName === 'approval_requests') {
+            queryClient.invalidateQueries({ queryKey: ['approvalRequests'] });
+          }
 
-            let newData = [...(oldData.data || [])];
-            let updated = false;
-
-            if (payload.eventType === 'DELETE' && payload.old) {
-              newData = newData.filter((item: any) => item.id !== payload.old.id);
-              updated = true;
-            } else if (payload.eventType === 'INSERT' && payload.new) {
-              if (matchesFilters(payload.new)) {
-                newData = [payload.new, ...newData];
-                updated = true;
-              }
-            } else if (payload.eventType === 'UPDATE' && payload.new) {
-              if (matchesFilters(payload.new)) {
-                const exists = newData.some((item: any) => item.id === payload.new.id);
-                if (exists) {
-                  newData = newData.map((item: any) => item.id === payload.new.id ? { ...item, ...payload.new } : item);
-                } else {
-                  newData = [payload.new, ...newData];
-                }
-                updated = true;
-              } else {
-                const exists = newData.some((item: any) => item.id === payload.new.id);
-                if (exists) {
-                  newData = newData.filter((item: any) => item.id !== payload.new.id);
-                  updated = true;
-                }
-              }
-            }
-
-            if (updated) {
-              // Actualizamos la caché de React Query para esta consulta exacta
-              queryClient.setQueryData(queryKey, { ...oldData, data: newData });
-            }
-          });
+          if (['jornadas', 'registros_jornada'].includes(tableName)) {
+            queryClient.invalidateQueries({ queryKey: ['adminJornadas'] });
+            queryClient.invalidateQueries({ queryKey: ['jornada'] });
+          }
         }
       )
       .subscribe();

@@ -157,8 +157,8 @@ export const offlineSync = {
         }
 
         toast.error(`Fallo en sincronización offline: ${jobLabel}`, {
-          description: error.message || 'Error desconocido al procesar la cola.',
-          duration: 8000,
+          description: `${error.message || 'Error desconocido'}. La cola de sincronización se ha detenido para evitar corrupción de datos.`,
+          duration: 6000
         });
 
         // Insertar notificación persistente en la BD
@@ -173,6 +173,9 @@ export const offlineSync = {
             link: job.type.includes('lote_medido') ? '/partner-documents' : '/aprobaciones'
           });
         }
+
+        // Detener procesamiento de cola si hay un fallo en un trabajo dependiente
+        break;
       }
     }
 
