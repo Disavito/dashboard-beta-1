@@ -22,6 +22,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import ConfirmationDialog from '@/components/ui-custom/ConfirmationDialog';
 import { DialogFooter } from '@/components/ui/dialog';
 import axios from 'axios';
+import { ensureLocalidadCodigo } from '@/lib/localidadUtils';
 import {
   Command,
   CommandInput,
@@ -601,6 +602,10 @@ function SocioTitularRegistrationForm({ socioId, onClose, onSuccess }: SocioTitu
         payment_observation_detail: isPaymentObserved ? paymentObservationDetail : null,
         observacion: dataToConfirm.isObservado ? dataToConfirm.observacion : null,
       };
+
+      if (dataToSave.localidad) {
+        ensureLocalidadCodigo(dataToSave.localidad);
+      }
       
       if (socioId !== undefined) {
         // Optimistic UI Update via global mutation
