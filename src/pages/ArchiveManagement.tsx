@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
-import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Trash2, Info, ArrowRightLeft, ChevronUp, ChevronDown } from 'lucide-react';
+import { Box, FileText, Upload, RefreshCcw, Printer, Plus, Trash2, Info, ArrowRightLeft, ChevronUp, ChevronDown, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -110,6 +110,77 @@ export default function ArchiveManagement() {
   const [selectedBoxExpedientes, setSelectedBoxExpedientes] = useState<any[]>([]);
   const [loadingExpedientes, setLoadingExpedientes] = useState(false);
   const [selectedBoxForModal, setSelectedBoxForModal] = useState<any>(null);
+
+  // Container Shift feature state
+  const [shiftModalOpen, setShiftModalOpen] = useState(false);
+  const [shiftStartNum, setShiftStartNum] = useState<number>(13);
+
+  const previewShiftList = useMemo(() => {
+    if (!contenedores || contenedores.length === 0) return [];
+    return contenedores
+      .map(c => {
+        const match = c.codigo_contenedor.match(/CONT-(\d+)/i);
+        const num = match ? parseInt(match[1], 10) : null;
+        return { ...c, num };
+      })
+      .filter(c => c.num !== null && c.num >= shiftStartNum)
+      .sort((a, b) => a.num - b.num)
+      .map(c => {
+        const newNum = c.num + 1;
+        const newCode = `CONT-${String(newNum).padStart(3, '0')}`;
+        const boxCount = cajas.filter(b => b.contenedor_id === c.id_contenedor).length;
+        return {
+          ...c,
+          newCode,
+          boxCount
+        };
+      });
+  }, [contenedores, cajas, shiftStartNum]);
+
+  const handleExecuteShift = async () => {
+    if (previewShiftList.length === 0) return;
+    try {
+      setIsProcessing(true);
+      toast.loading('Desplazando códigos de contenedor...', { id: 'shift-conts' });
+
+      // Ordenar de mayor a menor número para evitar colisiones UNIQUE
+      const sortedTargets = [...previewShiftList].sort((a, b) => b.num - a.num);
+
+      for (const target of sortedTargets) {
+        const { error } = await supabase
+          .from('contenedores_fisicos')
+          .update({ codigo_contenedor: target.newCode })
+          .eq('id_contenedor', target.id_contenedor);
+
+        if (error) throw error;
+      }
+
+      // Si el contenedor inicial no existe en la BD, crearlo para dejarlo libre
+      const startCode = `CONT-${String(shiftStartNum).padStart(3, '0')}`;
+      const { data: existingStart } = await supabase
+        .from('contenedores_fisicos')
+        .select('id_contenedor')
+        .eq('codigo_contenedor', startCode)
+        .maybeSingle();
+
+      if (!existingStart) {
+        await supabase
+          .from('contenedores_fisicos')
+          .insert({ codigo_contenedor: startCode, descripcion: 'Contenedor físico libre' });
+      }
+
+      toast.dismiss('shift-conts');
+      toast.success(`Desplazamiento completado. Se renombraron ${sortedTargets.length} contenedores.`);
+      setShiftModalOpen(false);
+      loadData();
+    } catch (e: any) {
+      console.error('Error shifting containers:', e);
+      toast.dismiss('shift-conts');
+      toast.error('Error al desplazar contenedores', { description: e.message });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const getContainerCapacity = (testSize?: number) => {
     if (!selectedCaja) return 0;
@@ -994,52 +1065,63 @@ export default function ArchiveManagement() {
                 <CardTitle>Visor de Contenedores Físicos</CardTitle>
                 <CardDescription>Selecciona un contenedor para explorar su capacidad y las cajas lógicas en su interior.</CardDescription>
               </div>
-              <Dialog open={printSelectionOpen} onOpenChange={setPrintSelectionOpen}>
-                <DialogTrigger asChild>
-                  <Button 
-                    className="bg-emerald-600 hover:bg-emerald-700 h-9" 
-                    onClick={() => {
-                      const validConts = contenedores.filter(c => cajas.some(b => b.contenedor_id === c.id_contenedor));
-                      setSelectedContainersToPrint(validConts.map(c => String(c.id_contenedor)));
-                    }}
-                  >
-                    <Printer className="w-4 h-4 mr-2" />
-                    Impresión por Lotes
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Impresión de Etiquetas</DialogTitle>
-                    <DialogDescription>Selecciona los contenedores que deseas imprimir. Se agruparán automáticamente de 2 en 2 por hoja (A4).</DialogDescription>
-                  </DialogHeader>
-                  <div className="max-h-[300px] overflow-y-auto space-y-2 py-4 px-1">
-                    {contenedores.filter(c => cajas.some(b => b.contenedor_id === c.id_contenedor)).map(c => (
-                      <div key={c.id_contenedor} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
-                        <Checkbox 
-                          id={`print-${c.id_contenedor}`} 
-                          checked={selectedContainersToPrint.includes(String(c.id_contenedor))}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedContainersToPrint(prev => [...prev, String(c.id_contenedor)]);
-                            } else {
-                              setSelectedContainersToPrint(prev => prev.filter(id => id !== String(c.id_contenedor)));
-                            }
-                          }}
-                        />
-                        <label htmlFor={`print-${c.id_contenedor}`} className="flex-1 text-sm font-medium leading-none cursor-pointer">
-                          {c.codigo_contenedor} <span className="text-muted-foreground ml-2">({cajas.filter(b => b.contenedor_id === c.id_contenedor).length} cajas)</span>
-                        </label>
-                      </div>
-                    ))}
-                    {contenedores.filter(c => cajas.some(b => b.contenedor_id === c.id_contenedor)).length === 0 && (
-                      <p className="text-sm text-muted-foreground text-center">No hay contenedores con cajas asignadas.</p>
-                    )}
-                  </div>
-                  <Button onClick={handlePrintSelected} className="w-full bg-[#00468c] hover:bg-[#00468c]/90">
-                    <Printer className="w-4 h-4 mr-2" /> Generar PDF ({selectedContainersToPrint.length})
-                  </Button>
-                </DialogContent>
-              </Dialog>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  className="h-9 border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 font-bold"
+                  onClick={() => setShiftModalOpen(true)}
+                >
+                  <ArrowRightLeft className="w-4 h-4 mr-2" />
+                  Desplazar (+1)
+                </Button>
+
+                <Dialog open={printSelectionOpen} onOpenChange={setPrintSelectionOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      className="bg-emerald-600 hover:bg-emerald-700 h-9" 
+                      onClick={() => {
+                        const validConts = contenedores.filter(c => cajas.some(b => b.contenedor_id === c.id_contenedor));
+                        setSelectedContainersToPrint(validConts.map(c => String(c.id_contenedor)));
+                      }}
+                    >
+                      <Printer className="w-4 h-4 mr-2" />
+                      Impresión por Lotes
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Impresión de Etiquetas</DialogTitle>
+                      <DialogDescription>Selecciona los contenedores que deseas imprimir. Se agruparán automáticamente de 2 en 2 por hoja (A4).</DialogDescription>
+                    </DialogHeader>
+                    <div className="max-h-[300px] overflow-y-auto space-y-2 py-4 px-1">
+                      {contenedores.filter(c => cajas.some(b => b.contenedor_id === c.id_contenedor)).map(c => (
+                        <div key={c.id_contenedor} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+                          <Checkbox 
+                            id={`print-${c.id_contenedor}`} 
+                            checked={selectedContainersToPrint.includes(String(c.id_contenedor))}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedContainersToPrint(prev => [...prev, String(c.id_contenedor)]);
+                              } else {
+                                setSelectedContainersToPrint(prev => prev.filter(id => id !== String(c.id_contenedor)));
+                              }
+                            }}
+                          />
+                          <label htmlFor={`print-${c.id_contenedor}`} className="flex-1 text-sm font-medium leading-none cursor-pointer">
+                            {c.codigo_contenedor} <span className="text-muted-foreground ml-2">({cajas.filter(b => b.contenedor_id === c.id_contenedor).length} cajas)</span>
+                          </label>
+                        </div>
+                      ))}
+                      {contenedores.filter(c => cajas.some(b => b.contenedor_id === c.id_contenedor)).length === 0 && (
+                        <p className="text-sm text-muted-foreground text-center">No hay contenedores con cajas asignadas.</p>
+                      )}
+                    </div>
+                    <Button onClick={handlePrintSelected} className="w-full bg-[#00468c] hover:bg-[#00468c]/90">
+                      <Printer className="w-4 h-4 mr-2" /> Generar PDF ({selectedContainersToPrint.length})
+                    </Button>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
@@ -1263,6 +1345,75 @@ export default function ArchiveManagement() {
               </table>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal para Desplazamiento Masivo de Contenedores */}
+      <Dialog open={shiftModalOpen} onOpenChange={setShiftModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-[#00468c]">
+              <ArrowRightLeft className="w-5 h-5 text-blue-600" />
+              Desplazar Nombres de Contenedor (+1)
+            </DialogTitle>
+            <DialogDescription>
+              Re-númera automáticamente los contenedores (ej: CONT-013 pasa a CONT-014, CONT-014 a CONT-015) conservando intactas todas sus cajas asignadas.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label className="font-bold text-sm">Desplazar desde el contenedor número:</Label>
+              <div className="flex gap-2 items-center">
+                <span className="text-sm font-mono font-bold text-muted-foreground bg-muted px-2.5 py-1.5 rounded-md">CONT-</span>
+                <Input 
+                  type="number" 
+                  min={1} 
+                  value={shiftStartNum} 
+                  onChange={e => setShiftStartNum(parseInt(e.target.value) || 1)} 
+                  className="w-24 font-bold text-center text-base"
+                />
+                <span className="text-sm text-muted-foreground">en adelante</span>
+              </div>
+            </div>
+
+            <div className="border rounded-xl p-4 bg-slate-50 dark:bg-slate-900/50 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] font-black uppercase text-muted-foreground tracking-wider">Vista Previa de Cambios:</p>
+                <Badge variant="outline" className="text-[10px] font-mono">{previewShiftList.length} contenedores</Badge>
+              </div>
+              <div className="max-h-[200px] overflow-y-auto space-y-1.5 text-xs font-mono pr-1">
+                {previewShiftList.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-6 font-sans text-xs">No hay contenedores mayores o iguales a CONT-{String(shiftStartNum).padStart(3, '0')}</p>
+                ) : (
+                  previewShiftList.map((item: any) => (
+                    <div key={item.id_contenedor} className="flex justify-between items-center bg-white dark:bg-slate-950 p-2.5 rounded-lg border border-border/60 shadow-xs">
+                      <span className="font-bold text-red-500 line-through">{item.codigo_contenedor}</span>
+                      <span className="text-muted-foreground font-sans">➔</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">{item.newCode}</span>
+                      <span className="text-[10px] text-muted-foreground font-sans bg-muted/60 px-1.5 py-0.5 rounded">
+                        {item.boxCount} {item.boxCount === 1 ? 'caja' : 'cajas'}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="ghost" onClick={() => setShiftModalOpen(false)} disabled={isProcessing}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleExecuteShift} 
+              disabled={isProcessing || previewShiftList.length === 0} 
+              className="bg-[#00468c] hover:bg-[#003366] font-bold"
+            >
+              {isProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+              Aplicar Desplazamiento
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
