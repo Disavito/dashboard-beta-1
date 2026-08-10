@@ -277,7 +277,7 @@ function PartnerDocuments() {
         const chunk = ids.slice(i, i + chunkSize);
         const { data } = await supabase
           .from('socio_documentos')
-          .select('socio_id, tipo_documento')
+          .select('socio_id, tipo_documento, link_documento')
           .in('socio_id', chunk)
           .is('deleted_at', null); // <-- FILTRO ANTI-FANTASMAS
         
@@ -288,8 +288,10 @@ function PartnerDocuments() {
       
       const docMap = new Map<string, Set<string>>();
       allData.forEach(d => {
-        if (!docMap.has(d.socio_id)) docMap.set(d.socio_id, new Set());
-        docMap.get(d.socio_id)?.add(d.tipo_documento);
+        if (d.link_documento && typeof d.link_documento === 'string' && d.link_documento.trim() !== '') {
+          if (!docMap.has(d.socio_id)) docMap.set(d.socio_id, new Set());
+          docMap.get(d.socio_id)?.add(d.tipo_documento);
+        }
       });
       return docMap;
     }
@@ -303,13 +305,18 @@ function PartnerDocuments() {
     return rawSocios.map(socio => {
       if (socio.status === 'Retirado') return null;
 
-      // Como hemos optimizado la Vista de PostgreSQL con validaciones estrictas, ahora es la 
-      // única y verdadera fuente de la verdad.
-      const hasPlanos = socio.has_planos ?? false;
-      const hasMemoria = socio.has_memoria ?? false;
-      const hasFicha = socio.has_ficha ?? false;
-      const hasContrato = socio.has_contrato ?? false;
-      const hasComprobante = socio.has_comprobante ?? false;
+      const docSet = docsExistData?.get(socio.id);
+      const checkDoc = (typeKeyword: string, fallbackView?: boolean) => {
+        if (fallbackView === true) return true;
+        if (!docSet) return false;
+        return Array.from(docSet).some((t: string) => t.toLowerCase().includes(typeKeyword.toLowerCase()));
+      };
+
+      const hasPlanos = checkDoc('plano', socio.has_planos);
+      const hasMemoria = checkDoc('memoria', socio.has_memoria);
+      const hasFicha = checkDoc('ficha', socio.has_ficha);
+      const hasContrato = checkDoc('contrato', socio.has_contrato);
+      const hasComprobante = checkDoc('comprobante', socio.has_comprobante);
 
       // DESCONEXIÓN DE PRUEBA: Solo confiar en el valor puro de la Base de Datos.
       const finalIsLoteMedido = socio.is_lote_medido ?? false;

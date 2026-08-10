@@ -296,7 +296,7 @@ export function KanbanBoard({ data, onOpenUploadModal }: KanbanBoardProps) {
         .from('socio_documentos')
         .select('socio_id, tipo_documento, link_documento')
         .in('socio_id', socioIds)
-        .in('tipo_documento', ['Planos de ubicación', 'Memoria descriptiva']);
+        .in('tipo_documento', ['Planos de ubicación', 'Memoria descriptiva', 'Plano', 'Memoria Descriptiva', 'planos', 'memoria']);
 
       if (error) throw error;
 
