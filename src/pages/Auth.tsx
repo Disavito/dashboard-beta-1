@@ -37,15 +37,17 @@ const AuthPage: React.FC = () => {
     setError(null);
     setMessage(null);
 
+    const cleanEmail = email.trim().toLowerCase();
+
     if (isSignIn) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
       if (error) {
         setError(error.message);
       } else {
         setMessage('Inicio de sesión exitoso. Redirigiendo...');
       }
     } else {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await supabase.auth.signUp({ email: cleanEmail, password });
       if (error) {
         setError(error.message);
       } else {

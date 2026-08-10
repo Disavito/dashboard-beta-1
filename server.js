@@ -15,12 +15,32 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = [
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+      'application/pdf',
+      'image/jpeg',
+      'image/png'
+    ];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Tipo de archivo no permitido. Solo se aceptan: .docx, .pdf, .jpg, .png'), false);
+    }
+  }
+});
 
 
 // Enable CORS, compression and JSON parsing
 app.use(compression());  // Gzip/deflate all responses (~65% size reduction)
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Setup Web Push
@@ -126,12 +146,12 @@ app.post('/api/send-push', async (req, res) => {
     res.status(200).json({ success: true, count: subs.length });
   } catch (error) {
     console.error('Error sending push:', error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
 // Endpoint specifically for Supabase Database Webhooks (Insert on approval_requests)
-app.post('/api/webhook/approval-request', async (req, res) => {
+app.post('/api/webhook/approval-request', requireWebhookSecret, async (req, res) => {
   if (!supabase) return res.status(500).json({ error: 'Supabase not configured' });
   
   try {
@@ -162,24 +182,29 @@ app.post('/api/webhook/approval-request', async (req, res) => {
       
       let sentCount = 0;
       
-      // Send to all admins
-      for (const admin of admins) {
-        const { data: subs } = await supabase.from('push_subscriptions').select('*').eq('user_id', admin.user_id);
-        if (subs) {
-          const promises = subs.map(async (sub) => {
-            try {
-              await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, pushPayload);
-              sentCount++;
-            } catch (e) {
-              const status = Number(e.statusCode);
-              if (status === 410 || status === 404 || status === 403) {
-                await supabase.from('push_subscriptions').delete().eq('id', sub.id);
-              } else {
-                console.error('Webhook push error:', e.message || e);
-              }
+      // Fetch all admin subscriptions in a single query (fix N+1)
+      const adminIds = admins.map(a => a.user_id);
+      const { data: allSubs } = await supabase.from('push_subscriptions').select('*').in('user_id', adminIds);
+      
+      if (allSubs && allSubs.length > 0) {
+        const invalidSubIds = [];
+        const promises = allSubs.map(async (sub) => {
+          try {
+            await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, pushPayload);
+            sentCount++;
+          } catch (e) {
+            const status = Number(e.statusCode);
+            if (status === 410 || status === 404 || status === 403) {
+              invalidSubIds.push(sub.id);
+            } else {
+              console.error('Webhook push error:', e.message || e);
             }
-          });
-          await Promise.all(promises);
+          }
+        });
+        await Promise.all(promises);
+        // Batch delete invalid subscriptions
+        if (invalidSubIds.length > 0) {
+          await supabase.from('push_subscriptions').delete().in('id', invalidSubIds);
         }
       }
       
@@ -195,13 +220,18 @@ app.post('/api/webhook/approval-request', async (req, res) => {
     res.status(200).json({ success: true, ignored: true });
   } catch (error) {
     console.error('Webhook error:', error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
 // Proxy route for Consultas Peru API
 app.post('/api/reniec', requireAuth, async (req, res) => {
   const { document_number, type_document } = req.body;
+
+  // Validar formato del documento (solo dígitos, 8-11 caracteres)
+  if (!document_number || !/^\d{8,11}$/.test(document_number)) {
+    return res.status(400).json({ success: false, message: 'Número de documento inválido. Debe contener entre 8 y 11 dígitos.' });
+  }
   
   const token1 = process.env.CONSULTAS_PERU_API_TOKEN || process.env.VITE_CONSULTAS_PERU_API_TOKEN;
   const token2 = process.env.MIAPI_CLOUD_API_TOKEN || process.env.VITE_MIAPI_CLOUD_API_TOKEN;
@@ -547,7 +577,7 @@ app.get('/api/admin/templates/download/:type', requireAuth, async (req, res) => 
     return res.send(buffer);
   } catch (error) {
     console.error('Error downloading template:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error descargando plantilla' });
   }
 });
 
@@ -589,8 +619,12 @@ app.post('/api/webhook/generate-ficha', requireWebhookSecret, async (req, res) =
       
       const templateId = configValor.ficha;
       const fileName = `ficha_${record.dni}.pdf`;
-      await renderAndUploadCarboneDocument(templateId, record, socioId, 'Ficha', 'ficha', fileName);
-      return res.status(200).json({ success: true, message: `Ficha ${payload.type.toLowerCase()}d successfully` });
+      
+      // Respond immediately to avoid webhook timeout, process in background
+      res.status(200).json({ success: true, message: `Ficha processing started` });
+      renderAndUploadCarboneDocument(templateId, record, socioId, 'Ficha', 'ficha', fileName)
+        .catch(err => console.error(`Error generating ficha for ${socioId}:`, err.message));
+      return;
     }
     
     if (payload.type === 'DELETE') {
@@ -639,7 +673,7 @@ app.post('/api/webhook/generate-ficha', requireWebhookSecret, async (req, res) =
     res.status(200).json({ success: true, ignored: true });
   } catch (error) {
     console.error('Error in generate-ficha webhook:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error interno procesando ficha' });
   }
 });
 
@@ -702,8 +736,12 @@ app.post('/api/webhook/generate-contrato', requireWebhookSecret, async (req, res
       };
       
       const fileName = `contrato_${record.receipt_number}.pdf`;
-      await renderAndUploadCarboneDocument(templateId, mergeData, socio.id, 'Contrato', 'contrato', fileName);
-      return res.status(200).json({ success: true, message: `Contrato ${payload.type.toLowerCase()}d successfully` });
+      
+      // Respond immediately to avoid webhook timeout, process in background
+      res.status(200).json({ success: true, message: 'Contrato processing started' });
+      renderAndUploadCarboneDocument(templateId, mergeData, socio.id, 'Contrato', 'contrato', fileName)
+        .catch(err => console.error(`Error generating contrato for ${record.receipt_number}:`, err.message));
+      return;
     }
     
     if (payload.type === 'DELETE') {
@@ -741,7 +779,7 @@ app.post('/api/webhook/generate-contrato', requireWebhookSecret, async (req, res
     res.status(200).json({ success: true, ignored: true });
   } catch (error) {
     console.error('Error generating/deleting Contrato in webhook:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error interno procesando contrato' });
   }
 });
 

@@ -31,11 +31,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
   const prevUserIdRef = useRef<string | null>(null);
 
+  const activeFetchIdRef = useRef<number>(0);
+
   // Usamos useCallback para memoizar esta función y evitar que se recree en cada render.
   const fetchUserAndRolesAndPermissions = useCallback(async () => {
+    const fetchId = ++activeFetchIdRef.current;
     setLoading(true);
     try {
       const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (fetchId !== activeFetchIdRef.current) return;
       setUser(authUser);
 
       if (authUser) {
@@ -44,6 +48,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           .from('user_roles')
           .select('roles(id, role_name)')
           .eq('user_id', authUser.id);
+
+        if (fetchId !== activeFetchIdRef.current) return;
 
         if (userRolesError) {
           console.error('UserContext: Error fetching user roles:', userRolesError);
@@ -57,15 +63,18 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const fetchedRoles = userRolesData
           .map(item => (item as SupabaseFetchedRolesData).roles?.role_name)
           .filter(Boolean) as string[] || [];
+        
+        if (fetchId !== activeFetchIdRef.current) return;
         setRoles(fetchedRoles);
 
         // 3. Obtener permisos personalizados (custom_permissions) desde colaboradores
-        // Lo hacemos antes de setear Permissions para inyectar rutas si es necesario
         const { data: colabData, error: colabError } = await supabase
           .from('colaboradores')
           .select('custom_permissions')
           .eq('user_id', authUser.id)
           .maybeSingle();
+
+        if (fetchId !== activeFetchIdRef.current) return;
 
         let customPerms = {};
         if (colabError) {
@@ -78,16 +87,16 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         // 2. Obtener los permisos de recursos basados en los roles del usuario
         if (fetchedRoles.length > 0) {
-          // Mapeo para obtener IDs de roles
           const roleIds = userRolesData
             .map(item => (item as SupabaseFetchedRolesData).roles?.id)
             .filter(Boolean) as number[];
 
-
           if (roleIds.length === 0) {
               console.warn('UserContext: No role IDs found for user, setting empty permissions.');
-              setPermissions(new Set());
-              setLoading(false);
+              if (fetchId === activeFetchIdRef.current) {
+                setPermissions(new Set());
+                setLoading(false);
+              }
               return;
           }
           
@@ -97,6 +106,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             .in('role_id', roleIds)
             .eq('can_access', true);
 
+          if (fetchId !== activeFetchIdRef.current) return;
+
           if (permissionsError) {
             console.error('UserContext: Error fetching permissions:', permissionsError);
             throw permissionsError;
@@ -104,12 +115,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
           const fetchedPermissions = new Set(permissionsData?.map(p => p.resource_path) || []);
           
-          // CRÍTICO: Asegurarse de que el dashboard principal siempre sea accesible si hay permisos
           if (fetchedPermissions.size > 0) {
             fetchedPermissions.add('/');
           }
 
-          // Añadir rutas basadas en custom_permissions
           if ((customPerms as Record<string, boolean>).can_invoice_only) {
             fetchedPermissions.add('/invoicing');
           }
@@ -124,7 +133,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             fetchedPermissions.add('/expenses');
             fetchedPermissions.add('/accounts');
           }
-          // Permisos granulares de tesorería (individuales)
           if ((customPerms as Record<string, boolean>).can_view_income) {
             fetchedPermissions.add('/income');
           }
@@ -135,24 +143,34 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             fetchedPermissions.add('/accounts');
           }
 
-          setPermissions(fetchedPermissions);
+          if (fetchId === activeFetchIdRef.current) {
+            setPermissions(fetchedPermissions);
+          }
 
         } else {
-          setPermissions(new Set());
+          if (fetchId === activeFetchIdRef.current) {
+            setPermissions(new Set());
+          }
         }
 
       } else {
-        setRoles(null);
-        setPermissions(null);
-        setCustomPermissions(null);
+        if (fetchId === activeFetchIdRef.current) {
+          setRoles(null);
+          setPermissions(null);
+          setCustomPermissions(null);
+        }
       }
     } catch (error) {
       console.error('UserContext: Global error fetching user, roles, or permissions:', error);
-      setRoles(null);
-      setPermissions(new Set()); // Aseguramos que sea un Set vacío en caso de error para evitar fallos
-      setCustomPermissions({});
+      if (fetchId === activeFetchIdRef.current) {
+        setRoles(null);
+        setPermissions(new Set());
+        setCustomPermissions({});
+      }
     } finally {
-      setLoading(false);
+      if (fetchId === activeFetchIdRef.current) {
+        setLoading(false);
+      }
     }
   }, []); 
 
@@ -161,7 +179,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
-        // Si es el mismo usuario, actualizar la sesión sin re-fetch completo para eventos no destructivos
         if (['SIGNED_IN', 'TOKEN_REFRESHED', 'USER_UPDATED'].includes(event) && prevUserIdRef.current === session.user.id) {
           setUser(session.user);
           setLoading(false); 
@@ -172,10 +189,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(session.user); 
         fetchUserAndRolesAndPermissions();
       } else {
+        activeFetchIdRef.current++; // Invalidate any ongoing fetch
         prevUserIdRef.current = null;
         setUser(null);
         setRoles(null);
-        setPermissions(new Set()); // Aseguramos Set vacío al cerrar sesión
+        setPermissions(new Set());
         setCustomPermissions(null);
         setLoading(false);
       }
@@ -184,7 +202,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return () => {
       authListener.subscription.unsubscribe();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchUserAndRolesAndPermissions]);
 
   return (
