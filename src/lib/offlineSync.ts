@@ -116,12 +116,12 @@ export const offlineSync = {
           if (error) throw error;
         } else if (job.type === 'update_lote_medido') {
           const { error } = await supabase.from('socio_titulares')
-            .update({ is_lote_medido: finalPayload.is_lote_medido, updated_at: nowIso })
+            .update({ is_lote_medido: finalPayload.is_lote_medido })
             .eq('id', finalPayload.id);
           if (error) throw error;
         } else if (job.type === 'bulk_update_lote_medido') {
           const { error } = await supabase.from('socio_titulares')
-            .update({ is_lote_medido: finalPayload.is_lote_medido, updated_at: nowIso })
+            .update({ is_lote_medido: finalPayload.is_lote_medido })
             .in('id', finalPayload.ids);
           if (error) throw error;
         } else if (job.type === 'jornada_clock_in') {
