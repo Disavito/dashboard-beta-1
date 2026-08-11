@@ -386,8 +386,17 @@ export const createIncomeFromBoleta = async (data: any) => {
 };
 
 export const fetchDailySummaries = async () => {
-  const { data } = await supabase.from('daily_summaries').select('*').order('fecha_resumen', { ascending: false }).limit(300);
-  return data || [];
+  try {
+    const { data, error } = await supabase.from('daily_summaries').select('*').order('fecha_resumen', { ascending: false }).limit(300);
+    if (error) {
+      console.warn('daily_summaries no está disponible:', error.message);
+      return [];
+    }
+    return data || [];
+  } catch (err) {
+    console.warn('Error capturado en fetchDailySummaries:', err);
+    return [];
+  }
 };
 
 export const downloadBoletaPdfToBrowser = async (id: number, numero: string, format: string) => {
