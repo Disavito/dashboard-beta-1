@@ -77,8 +77,8 @@ serve(async (req) => {
       try {
         await webpush.sendNotification(pushSubscription, notificationPayload);
       } catch (err: any) {
-        // If the subscription is expired or invalid (410, 404), delete it from DB
-        if (err.statusCode === 410 || err.statusCode === 404) {
+        // If the subscription is expired or invalid (410, 404, 403), delete it from DB
+        if (err.statusCode === 410 || err.statusCode === 404 || err.statusCode === 403) {
           await supabase.from("push_subscriptions").delete().eq("id", sub.id);
         } else {
           console.error("Error sending push to", sub.endpoint, err);
