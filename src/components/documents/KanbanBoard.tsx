@@ -32,7 +32,7 @@ export const openDocumentDirectly = async (socioId: string, tipoDocumento: strin
       .eq('socio_id', socioId)
       .ilike('tipo_documento', `%${typeKeyword}%`)
       .not('link_documento', 'is', null)
-      .order('created_at', { ascending: false })
+      .order('create_at', { ascending: false })
       .limit(1)
       .maybeSingle();
     

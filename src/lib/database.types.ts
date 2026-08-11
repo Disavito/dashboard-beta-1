@@ -176,6 +176,7 @@ export interface Database {
           tipo_documento: string
           link_documento: string
           deleted_at?: string | null
+          create_at?: string
           created_at?: string
         }
         Insert: Partial<Database['public']['Tables']['socio_documentos']['Row']>

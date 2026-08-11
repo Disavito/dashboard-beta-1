@@ -5,7 +5,8 @@ export interface SocioDocument {
   socio_id: string;
   tipo_documento: 'Planos de ubicación' | 'Memoria descriptiva' | 'Comprobante de pago' | 'Contrato' | 'Ficha';
   link_documento: string;
-  created_at: string;
+  create_at?: string;
+  created_at?: string;
 }
 
 /**
@@ -14,7 +15,7 @@ export interface SocioDocument {
 export const fetchSocioDocuments = async (socioId: string) => {
   const { data, error } = await supabase
     .from('socio_documentos')
-    .select('id, socio_id, tipo_documento, link_documento, created_at')
+    .select('id, socio_id, tipo_documento, link_documento, create_at')
     .eq('socio_id', socioId);
 
   if (error) throw error;
